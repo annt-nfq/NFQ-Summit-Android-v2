@@ -1,0 +1,67 @@
+name: Android CI
+
+on: workflow_dispatch
+# on:
+#   push:
+#     branches: [ "main" ]
+#   pull_request:
+#     branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'zulu'
+        cache: gradle
+    - name: Decode Release Keystore
+      id: decode_release_keystore
+      uses: timheuer/base64-to-file@v1
+      with:
+        fileName: 'release.jks'
+        encodedString: ${{ secrets.RELEASE_KEYSTORE }}
+    - name: Decode Debug Keystore
+      id: decode_debug_keystore
+      uses: timheuer/base64-to-file@v1
+      with:
+        fileName: 'debug.jks'
+        encodedString: ${{ secrets.DEBUG_KEYSTORE }}
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Update local.properties - Supabase URL
+      run: echo 'SUPABASE_URL=${{ secrets.SUPABASE_URL }}' > ./local.properties
+    - name: Update local.properties - Supabase KEY
+      run: echo 'SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}' > ./local.properties
+    - name: Update local.properties - RELEASE_STORE_FILE
+      run: echo 'RELEASE_STORE_FILE=${{ secrets.RELEASE_STORE_FILE }}' > ./local.properties
+    - name: Update local.properties - RELEASE_STORE_PASSWORD
+      run: echo 'RELEASE_STORE_PASSWORD=${{ secrets.RELEASE_STORE_PASSWORD }}' > ./local.properties
+    - name: Update local.properties - RELEASE_KEY_ALIAS
+      run: echo 'RELEASE_KEY_ALIAS=${{ secrets.RELEASE_KEY_ALIAS }}' > ./local.properties
+    - name: Update local.properties - RELEASE_KEY_PASSWORD
+      run: echo 'RELEASE_KEY_PASSWORD=${{ secrets.RELEASE_KEY_PASSWORD }}' > ./local.properties
+
+    - name: Update local.properties - DEBUG_STORE_FILE
+      run: echo 'DEBUG_STORE_FILE=${{ secrets.DEBUG_STORE_FILE }}' > ./local.properties
+    - name: Update local.properties - DEBUG_STORE_PASSWORD
+      run: echo 'DEBUG_STORE_PASSWORD=${{ secrets.DEBUG_STORE_PASSWORD }}' > ./local.properties
+    - name: Update local.properties - RELEASE_KEY_ALIAS
+      run: echo 'DEBUG_KEY_ALIAS=${{ secrets.DEBUG_KEY_ALIAS }}' > ./local.properties
+    - name: Update local.properties - DEBUG_KEY_PASSWORD
+      run: echo 'DEBUG_KEY_PASSWORD=${{ secrets.DEBUG_KEY_PASSWORD }}' > ./local.properties
+      
+    - name: Run tests
+      run: fastlane android test
+    - name: Fastlane build for Firebase Distribution
+      run: fastlane beta
+      env:
+        FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
