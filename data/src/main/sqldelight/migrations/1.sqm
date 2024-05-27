@@ -1,0 +1,3 @@
+CREATE TABLE FavoriteEvent(
+    id TEXT PRIMARY KEY
+);

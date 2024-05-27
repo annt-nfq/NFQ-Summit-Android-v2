@@ -1,0 +1,48 @@
+import kotlin.Boolean;
+
+CREATE TABLE Event (
+    id TEXT PRIMARY KEY,
+    created_at TEXT,
+    title TEXT,
+    description TEXT,
+    event_start_time TEXT,
+    event_end_time TEXT,
+    event_type TEXT,
+    cover_photo_url TEXT,
+    location_name TEXT,
+    is_conference INTEGER AS Boolean DEFAULT 0,
+    ordering INTEGER,
+    speaker_name TEXT,
+    speaker_position TEXT,
+    speaker_bio TEXT,
+    icon TEXT
+);
+
+CREATE TABLE FavoriteEvent(
+    id TEXT PRIMARY KEY
+);
+
+insertFavoriteEvent:
+INSERT INTO FavoriteEvent (id) VALUES (?);
+
+removeFavoriteEvent:
+DELETE FROM FavoriteEvent WHERE id = ?;
+
+getFavoriteEvent:
+SELECT FavoriteEvent.* FROM FavoriteEvent WHERE id = ?;
+
+insertEvent:
+INSERT INTO Event (id, created_at, title, description, event_start_time, event_end_time, event_type, cover_photo_url, location_name, is_conference, ordering, speaker_name, speaker_position, speaker_bio, icon)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+
+removeAllEvents:
+DELETE FROM Event;
+
+selectAllEvents:
+SELECT Event.* FROM Event;
+
+selectTechRocksEvents:
+SELECT Event.* FROM Event WHERE is_conference = 1;
+
+selectEvent:
+SELECT Event.* FROM Event WHERE id = ?;
