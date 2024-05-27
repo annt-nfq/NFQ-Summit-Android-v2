@@ -37,7 +37,7 @@ jobs:
       id: decode_google_services
       uses: timheuer/base64-to-file@v1
       with:
-        fileName: 'app/google-services.json'
+        fileName: 'google-services.json'
         encodedString: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
     - name: Grant execute permission for gradlew
