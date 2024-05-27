@@ -20,18 +20,12 @@ jobs:
         java-version: '17'
         distribution: 'zulu'
         cache: gradle
+
     - name: Decode Release Keystore
-      id: decode_release_keystore
-      uses: timheuer/base64-to-file@v1
-      with:
-        fileName: 'release.jks'
-        encodedString: ${{ secrets.RELEASE_KEYSTORE }}
+      run: echo ${{ secrets.RELEASE_KEYSTORE }} | base64 -d > release.jks
+
     - name: Decode Debug Keystore
-      id: decode_debug_keystore
-      uses: timheuer/base64-to-file@v1
-      with:
-        fileName: 'debug.jks'
-        encodedString: ${{ secrets.DEBUG_KEYSTORE }}
+      run: echo ${{ secrets.DEBUG_KEYSTORE }} | base64 -d > debug.jks
 
     - name: Decode google-services.json
       run: echo ${{ secrets.GOOGLE_SERVICES_JSON }} | base64 -d > app/google-services.json
@@ -61,11 +55,22 @@ jobs:
     - name: Update local.properties - DEBUG_KEY_PASSWORD
       run: echo 'DEBUG_KEY_PASSWORD=${{ vars.DEBUG_KEY_PASSWORD }}' >> ./local.properties
 
-    - name: Tree
-      run: tree
+
+    - name: Install Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.0.2
+        bundler-cache: true
+
+    - name: Install Fastlane
+      run: gem install fastlane
+
+    - name: Install Fastlane plugins
+      run: fastlane add_plugin firebase_app_distribution
       
     - name: Run tests
       run: fastlane android test
+
     - name: Fastlane build for Firebase Distribution
       run: fastlane android beta
       env:
