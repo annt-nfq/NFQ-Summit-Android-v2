@@ -59,9 +59,9 @@ jobs:
       run: echo 'DEBUG_KEY_PASSWORD=${{ vars.DEBUG_KEY_PASSWORD }}' >> ./local.properties
       
     - name: Run tests
-      run: fastlane android test
+      run: bundle exec fastlane android test
     - name: Fastlane build for Firebase Distribution
-      run: fastlane beta
+      run: bundle exec fastlane android beta
       env:
         FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
