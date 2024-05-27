@@ -39,24 +39,24 @@ jobs:
     - name: Update local.properties - Supabase URL
       run: echo 'SUPABASE_URL=${{ secrets.SUPABASE_URL }}' > ./local.properties
     - name: Update local.properties - Supabase KEY
-      run: echo 'SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}' > ./local.properties
+      run: echo 'SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}' >> ./local.properties
     - name: Update local.properties - RELEASE_STORE_FILE
-      run: echo 'RELEASE_STORE_FILE=${{ vars.RELEASE_STORE_FILE }}' > ./local.properties
+      run: echo 'RELEASE_STORE_FILE=${{ vars.RELEASE_STORE_FILE }}' >> ./local.properties
     - name: Update local.properties - RELEASE_STORE_PASSWORD
-      run: echo 'RELEASE_STORE_PASSWORD=${{ vars.RELEASE_STORE_PASSWORD }}' > ./local.properties
+      run: echo 'RELEASE_STORE_PASSWORD=${{ vars.RELEASE_STORE_PASSWORD }}' >> ./local.properties
     - name: Update local.properties - RELEASE_KEY_ALIAS
-      run: echo 'RELEASE_KEY_ALIAS=${{ vars.RELEASE_KEY_ALIAS }}' > ./local.properties
+      run: echo 'RELEASE_KEY_ALIAS=${{ vars.RELEASE_KEY_ALIAS }}' >> ./local.properties
     - name: Update local.properties - RELEASE_KEY_PASSWORD
-      run: echo 'RELEASE_KEY_PASSWORD=${{ vars.RELEASE_KEY_PASSWORD }}' > ./local.properties
+      run: echo 'RELEASE_KEY_PASSWORD=${{ vars.RELEASE_KEY_PASSWORD }}' >> ./local.properties
 
     - name: Update local.properties - DEBUG_STORE_FILE
-      run: echo 'DEBUG_STORE_FILE=${{ vars.DEBUG_STORE_FILE }}' > ./local.properties
+      run: echo 'DEBUG_STORE_FILE=${{ vars.DEBUG_STORE_FILE }}' >> ./local.properties
     - name: Update local.properties - DEBUG_STORE_PASSWORD
-      run: echo 'DEBUG_STORE_PASSWORD=${{ vars.DEBUG_STORE_PASSWORD }}' > ./local.properties
+      run: echo 'DEBUG_STORE_PASSWORD=${{ vars.DEBUG_STORE_PASSWORD }}' >> ./local.properties
     - name: Update local.properties - RELEASE_KEY_ALIAS
-      run: echo 'DEBUG_KEY_ALIAS=${{ vars.DEBUG_KEY_ALIAS }}' > ./local.properties
+      run: echo 'DEBUG_KEY_ALIAS=${{ vars.DEBUG_KEY_ALIAS }}' >> ./local.properties
     - name: Update local.properties - DEBUG_KEY_PASSWORD
-      run: echo 'DEBUG_KEY_PASSWORD=${{ vars.DEBUG_KEY_PASSWORD }}' > ./local.properties
+      run: echo 'DEBUG_KEY_PASSWORD=${{ vars.DEBUG_KEY_PASSWORD }}' >> ./local.properties
       
     - name: Run tests
       run: fastlane android test
