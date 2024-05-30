@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -67,7 +66,7 @@ jobs:
     - name: Install Fastlane plugins
       run: fastlane add_plugin firebase_app_distribution
       
-    - name: Run tests
+    - name: Run unit tests
       run: fastlane android test
 
     - name: Fastlane build for Firebase Distribution

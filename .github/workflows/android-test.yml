@@ -1,0 +1,100 @@
+name: Android CI Snapshot Test
+
+on:
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
+          bundler-cache: true
+
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: gradle
+
+      - name: Decode Release Keystore
+        run: echo ${{ secrets.RELEASE_KEYSTORE }} | base64 -d > release.jks
+
+      - name: Decode Debug Keystore
+        run: echo ${{ secrets.DEBUG_KEYSTORE }} | base64 -d > debug.jks
+
+      - name: Decode google-services.json
+        run: echo ${{ secrets.GOOGLE_SERVICES_JSON }} | base64 -d > app/google-services.json
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Update local.properties - Supabase URL
+        run: echo 'SUPABASE_URL=${{ secrets.SUPABASE_URL }}' > ./local.properties
+      - name: Update local.properties - Supabase KEY
+        run: echo 'SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}' >> ./local.properties
+      - name: Update local.properties - RELEASE_STORE_FILE
+        run: echo 'RELEASE_STORE_FILE=${{ vars.RELEASE_STORE_FILE }}' >> ./local.properties
+      - name: Update local.properties - RELEASE_STORE_PASSWORD
+        run: echo 'RELEASE_STORE_PASSWORD=${{ vars.RELEASE_STORE_PASSWORD }}' >> ./local.properties
+      - name: Update local.properties - RELEASE_KEY_ALIAS
+        run: echo 'RELEASE_KEY_ALIAS=${{ vars.RELEASE_KEY_ALIAS }}' >> ./local.properties
+      - name: Update local.properties - RELEASE_KEY_PASSWORD
+        run: echo 'RELEASE_KEY_PASSWORD=${{ vars.RELEASE_KEY_PASSWORD }}' >> ./local.properties
+
+      - name: Update local.properties - DEBUG_STORE_FILE
+        run: echo 'DEBUG_STORE_FILE=${{ vars.DEBUG_STORE_FILE }}' >> ./local.properties
+      - name: Update local.properties - DEBUG_STORE_PASSWORD
+        run: echo 'DEBUG_STORE_PASSWORD=${{ vars.DEBUG_STORE_PASSWORD }}' >> ./local.properties
+      - name: Update local.properties - RELEASE_KEY_ALIAS
+        run: echo 'DEBUG_KEY_ALIAS=${{ vars.DEBUG_KEY_ALIAS }}' >> ./local.properties
+      - name: Update local.properties - DEBUG_KEY_PASSWORD
+        run: echo 'DEBUG_KEY_PASSWORD=${{ vars.DEBUG_KEY_PASSWORD }}' >> ./local.properties
+
+      - name: Install Fastlane
+        run: gem install fastlane
+      - name: Install Fastlane plugins
+        run: fastlane add_plugin firebase_app_distribution
+      - name: Run unit tests
+        run: fastlane android test
+
+      - name: Run Snapshot Tests
+        id: snapshot-tests
+        run: ./gradlew app:verifyPaparazziDebug --continue
+      - name: Upload artifact 1
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshot-report1
+          path: /home/runner/work/nfq-summit-android/nfq-summit-android/**/build/reports/tests/testDebugUnitTest/
+      - name: Process failed screenshots
+        if: failure()
+        id: failed-screenshots
+        run: "./.github/workflows/process_failed_screenshot_tests.sh"
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+          GITHUB_REPOSITORY: ${{ secrets.REPO_PATH }}
+          PULL_REQUEST_BRANCH: ${{ github.head_ref }}
+      - name: Create an issue if screenshot tests failed
+        uses: octokit/request-action@v2.1.9
+        if: always() && steps.failed-screenshots.outputs.PULL_REQUEST_COMMENT
+        with:
+          route: POST /repos/:repo/issues/:issue_number/comments
+          repo: ${{ github.repository }}
+          issue_number: ${{ steps.failed-screenshots.outputs.PULL_REQUEST_NUMBER }}
+          body: ${{ steps.failed-screenshots.outputs.PULL_REQUEST_COMMENT }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+      - name: Upload artifact 2
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshot-report2
+          path: /home/runner/work/nfq-summit-android/nfq-summit-android/**/build/reports/tests/testDebugUnitTest/
