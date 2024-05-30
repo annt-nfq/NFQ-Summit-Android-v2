@@ -65,6 +65,9 @@ jobs:
       - name: Run unit tests
         run: fastlane android test
 
+      - name: Print dir
+        run: pwd
+
       - name: Run Snapshot Tests
         id: snapshot-tests
         run: ./gradlew app:verifyPaparazziDebug --continue
