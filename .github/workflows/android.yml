@@ -13,13 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Install ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 3.3
-        bundler-cache: true
-
     - name: set up JDK 17
       uses: actions/setup-java@v3
       with:
@@ -60,12 +53,6 @@ jobs:
       run: echo 'DEBUG_KEY_ALIAS=${{ vars.DEBUG_KEY_ALIAS }}' >> ./local.properties
     - name: Update local.properties - DEBUG_KEY_PASSWORD
       run: echo 'DEBUG_KEY_PASSWORD=${{ vars.DEBUG_KEY_PASSWORD }}' >> ./local.properties
-
-    - name: Tree
-      run: tree
-
-    - name: Install Fastlane
-      run: gem install fastlane
 
     - name: Install Fastlane plugins
       run: fastlane add_plugin firebase_app_distribution
