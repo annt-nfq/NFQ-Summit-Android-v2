@@ -52,8 +52,8 @@ jobs:
       - name: Update local.properties - DEBUG_KEY_PASSWORD
         run: echo 'DEBUG_KEY_PASSWORD=${{ vars.DEBUG_KEY_PASSWORD }}' >> ./local.properties
 
-      - name: Print dir
-        run: pwd
+      - name: Grant execute permission for shell script
+        run: chmod +x ./.github/workflows/process_failed_snapshot_tests.sh
 
       - name: Run Snapshot Tests
         id: snapshot-tests
@@ -63,9 +63,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: screenshot-report1
-          path: /home/runner/work/nfq-summit-android/nfq-summit-android/**/build/reports/tests/testDebugUnitTest/
-      - name: Grant execute permission for shell script
-        run: chmod +x ./.github/workflows/process_failed_snapshot_tests.sh
+          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/tests/testDebugUnitTest/
       - name: Process failed screenshots
         if: failure()
         id: failed-screenshots
@@ -89,4 +87,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: screenshot-report2
-          path: /home/runner/work/nfq-summit-android/nfq-summit-android/**/build/reports/tests/testDebugUnitTest/
+          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/tests/testDebugUnitTest/
