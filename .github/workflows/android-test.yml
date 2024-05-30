@@ -74,6 +74,8 @@ jobs:
         with:
           name: screenshot-report1
           path: /home/runner/work/nfq-summit-android/nfq-summit-android/**/build/reports/tests/testDebugUnitTest/
+      - name: Grant execute permission for shell script
+        run: chmod +x ./.github/workflows/process_failed_snapshot_tests.sh
       - name: Process failed screenshots
         if: failure()
         id: failed-screenshots
