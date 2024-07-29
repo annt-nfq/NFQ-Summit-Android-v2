@@ -56,4 +56,10 @@ class AttractionBlogsViewModel @Inject constructor(
             }
         }
     }
+
+    fun markBlogAsFavorite(favorite: Boolean, blog: Blog) {
+        viewModelScope.launch {
+            blogRepository.markBlogAsFavorite(blog, favorite)
+        }
+    }
 }

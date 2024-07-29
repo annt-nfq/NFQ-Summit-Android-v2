@@ -9,7 +9,8 @@ data class Blog(
     val iconUrl: String,
     val contentUrl: String,
     val attractionId: Int?,
-    val largeImageUrl: String? = null
+    val largeImageUrl: String? = null,
+    val isFavorite: Boolean
 )
 
 fun BlogRemoteModel.toBlog(): Blog =
@@ -20,5 +21,6 @@ fun BlogRemoteModel.toBlog(): Blog =
         iconUrl = iconUrl,
         contentUrl = contentUrl,
         attractionId = attractionId,
-        largeImageUrl = largeImageUrl
+        largeImageUrl = largeImageUrl,
+        isFavorite = isFavorite
     )

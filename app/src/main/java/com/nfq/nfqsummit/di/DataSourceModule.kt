@@ -1,5 +1,9 @@
 package com.nfq.nfqsummit.di
 
+import com.nfq.data.local.AttractionLocal
+import com.nfq.data.local.AttractionLocalImpl
+import com.nfq.data.local.BlogLocal
+import com.nfq.data.local.BlogLocalImpl
 import com.nfq.data.local.EventLocal
 import com.nfq.data.local.EventLocalImpl
 import com.nfq.data.remote.AttractionRemote
@@ -39,9 +43,21 @@ abstract class DataSourceModule {
 
     @Binds
     @Singleton
+    abstract fun bingBlogLocal(
+        blogLocalImpl: BlogLocalImpl
+    ): BlogLocal
+
+    @Binds
+    @Singleton
     abstract fun bingAttractionRemote(
         attractionRemoteImpl: AttractionRemoteImpl
     ): AttractionRemote
+
+    @Binds
+    @Singleton
+    abstract fun bindAttractionLocal(
+        attractionLocalImpl: AttractionLocalImpl
+    ): AttractionLocal
 
     @Binds
     @Singleton

@@ -62,6 +62,7 @@ fun TransportationScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransportationScreenUI(
     goBack: () -> Unit,
@@ -161,7 +162,8 @@ fun TransportationScreenUIPreview() {
                     contentUrl = "",
                     description = "",
                     iconUrl = "",
-                    attractionId = 2
+                    attractionId = 2,
+                    isFavorite = true
                 ),
                 Blog(
                     id = 2,
@@ -169,7 +171,8 @@ fun TransportationScreenUIPreview() {
                     contentUrl = "",
                     description = "",
                     iconUrl = "",
-                    attractionId = 2
+                    attractionId = 2,
+                    isFavorite = true
                 ),
                 Blog(
                     id = 3,
@@ -177,7 +180,8 @@ fun TransportationScreenUIPreview() {
                     contentUrl = "",
                     description = "",
                     iconUrl = "",
-                    attractionId = 2
+                    attractionId = 2,
+                    isFavorite = false
                 )
             )
         )

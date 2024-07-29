@@ -13,4 +13,6 @@ interface BlogRepository {
     suspend fun getTransportationBlogs(): Response<List<Blog>>
 
     suspend fun getBlogsByAttractionId(attractionId: Int): Response<List<Blog>>
+
+    suspend fun markBlogAsFavorite(blog: Blog, favorite: Boolean)
 }

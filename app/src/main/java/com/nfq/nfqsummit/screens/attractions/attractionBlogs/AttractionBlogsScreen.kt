@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.nfq.nfqsummit.screens.attractions.attractionBlogs
 
@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,7 +68,10 @@ fun AttractionBlogsScreen(
         attraction = viewModel.attraction,
         viewModel.blogs ?: emptyList(),
         goBack = goBack,
-        goToBlog = goToBlog
+        goToBlog = goToBlog,
+        markAsFavorite = { favorite, blog ->
+            viewModel.markBlogAsFavorite(favorite, blog)
+        }
     )
 }
 
@@ -76,7 +80,8 @@ fun AttractionBlogsUI(
     attraction: Attraction?,
     blogs: List<Blog>,
     goBack: () -> Unit,
-    goToBlog: (blogId: Int) -> Unit
+    goToBlog: (blogId: Int) -> Unit,
+    markAsFavorite: (favorite: Boolean, blog: Blog) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -106,7 +111,8 @@ fun AttractionBlogsUI(
             items(blogs) { blog ->
                 BlogListItem(
                     blog = blog,
-                    goToBlog = goToBlog
+                    goToBlog = goToBlog,
+                    markAsFavorite = markAsFavorite
                 )
             }
         }
@@ -116,11 +122,13 @@ fun AttractionBlogsUI(
 @Composable
 fun BlogListItem(
     blog: Blog,
-    goToBlog: (blogId: Int) -> Unit
+    goToBlog: (blogId: Int) -> Unit,
+    markAsFavorite: (favorite: Boolean, blog: Blog) -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
-            .clickable { 
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
                 goToBlog(blog.id)
             }
     ) {
@@ -144,6 +152,9 @@ fun BlogListItem(
             )
             Box(
                 modifier = Modifier
+                    .clickable {
+                        markAsFavorite(!blog.isFavorite, blog)
+                    }
                     .padding(8.dp)
                     .size(40.dp)
                     .background(
@@ -154,7 +165,7 @@ fun BlogListItem(
                     .padding(4.dp)
             ) {
                 Icon(
-                    Icons.Outlined.FavoriteBorder,
+                    if (blog.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                     contentDescription = null,
                     tint = NFQOrange,
                     modifier = Modifier.align(Alignment.Center)
@@ -197,6 +208,7 @@ fun AttractionBlogsUIPreview() {
                     iconUrl = "",
                     contentUrl = "",
                     attractionId = 2,
+                    isFavorite = true
                 ),
                 Blog(
                     id = 2,
@@ -204,11 +216,13 @@ fun AttractionBlogsUIPreview() {
                     description = "Blog description",
                     iconUrl = "",
                     contentUrl = "",
-                    attractionId = 2
+                    attractionId = 2,
+                    isFavorite = false
                 )
             ),
             goBack = {},
-            goToBlog = {}
+            goToBlog = {},
+            markAsFavorite = { _, _ -> }
         )
     }
 
@@ -225,9 +239,11 @@ fun BlogListItemPreview() {
                 description = "Blog description",
                 iconUrl = "",
                 contentUrl = "",
-                attractionId = 2
+                attractionId = 2,
+                isFavorite = false
             ),
-            goToBlog = {}
+            goToBlog = {},
+            markAsFavorite = { _, _ -> }
         )
     }
 }

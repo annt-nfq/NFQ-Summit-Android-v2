@@ -94,7 +94,8 @@ fun BlogUIPreview() {
                 contentUrl = "",
                 description = "",
                 iconUrl = "",
-                attractionId = 2
+                attractionId = 2,
+                isFavorite = true
             ),
             goBack = {}
         )

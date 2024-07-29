@@ -1,7 +1,9 @@
 package com.nfq.data.remote.model
 
+import com.nfq.data.cache.BlogLocalModel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class BlogRemoteModel(
@@ -20,5 +22,20 @@ data class BlogRemoteModel(
     @SerialName("category")
     val category: String,
     @SerialName("large_image_url")
-    val largeImageUrl: String?
+    val largeImageUrl: String?,
+    @Transient
+    val isFavorite: Boolean = false
 )
+
+fun BlogLocalModel.toRemoteModel(): BlogRemoteModel =
+    BlogRemoteModel(
+        id = id.toInt(),
+        title = title,
+        description = description,
+        iconUrl = icon_url,
+        contentUrl = content_url,
+        attractionId = attraction_id?.toInt(),
+        category = category,
+        largeImageUrl = large_image_url,
+        isFavorite = is_favorite
+    )
