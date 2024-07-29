@@ -44,6 +44,7 @@ dependencies {
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.functions)
+    implementation(libs.supabase.gotrue)
     implementation(libs.security.crypto)
     implementation(libs.sqldelight.android.driver)
     implementation(libs.dagger.hilt.android)

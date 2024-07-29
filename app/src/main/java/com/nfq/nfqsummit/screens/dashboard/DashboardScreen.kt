@@ -1,5 +1,6 @@
 package com.nfq.nfqsummit.screens.dashboard
 
+import android.app.Activity
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
@@ -13,10 +14,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -27,8 +32,13 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
 @Composable
 fun DashboardScreen(
-    goToEventDetails: (eventId: String) -> Unit
+    goToEventDetails: (eventId: String) -> Unit,
+    goToDestination: (destination: AppDestination) -> Unit
 ) {
+    val window = (LocalView.current.context as Activity).window
+    window.statusBarColor = Color.Transparent.toArgb()
+    WindowCompat.setDecorFitsSystemWindows(window, false)
+
     val bottomNavController = rememberNavController()
     val items = listOf(
         BottomNavItem.Home,
@@ -86,6 +96,7 @@ fun DashboardScreen(
         DashboardNavHost(
             navController = bottomNavController,
             goToEventDetails = goToEventDetails,
+            goToDestination = goToDestination,
             modifier = Modifier.padding(paddingValues)
         )
     }
@@ -108,6 +119,6 @@ sealed class BottomNavItem(
 @Composable
 fun DashboardScreenPreview() {
     NFQSnapshotTestThemeForPreview {
-        DashboardScreen(goToEventDetails = {})
+        DashboardScreen(goToEventDetails = {}, goToDestination = {})
     }
 }

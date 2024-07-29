@@ -131,6 +131,9 @@ dependencies {
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.functions)
+    implementation(libs.supabase.gotrue)
+
+    implementation(libs.compose.markdown)
 
     implementation(project(":data"))
 

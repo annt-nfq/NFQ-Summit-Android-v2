@@ -6,6 +6,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.nfq.nfqsummit.screens.attractions.AttractionsScreen
+import com.nfq.nfqsummit.screens.attractions.attractionBlogs.AttractionBlogsScreen
+import com.nfq.nfqsummit.screens.blog.BlogScreen
 import com.nfq.nfqsummit.screens.bookingNumber.BookingNumberScreen
 import com.nfq.nfqsummit.screens.dashboard.DashboardScreen
 import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
@@ -14,7 +17,10 @@ import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.techRocks.TechRocksTab
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsScreen
 import com.nfq.nfqsummit.screens.onboarding.OnboardingScreen
+import com.nfq.nfqsummit.screens.payment.PaymentScreen
 import com.nfq.nfqsummit.screens.splash.SplashScreen
+import com.nfq.nfqsummit.screens.survival.SurvivalScreen
+import com.nfq.nfqsummit.screens.transportation.TransportationScreen
 
 @SuppressLint("NewApi")
 @Composable
@@ -66,9 +72,70 @@ fun AppNavHost(
                     navController.navigate(
                         "${AppDestination.EventDetails.route}/$it"
                     )
+                },
+                goToDestination = {
+                    navController.navigate(it.route)
                 }
             )
         }
+
+        composable(AppDestination.Survival.route) {
+            SurvivalScreen(
+                goBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(AppDestination.Transportations.route) {
+            TransportationScreen(
+                goBack = { navController.popBackStack() },
+                goToBlog = {
+                    navController.navigate("${AppDestination.Blogs.route}/$it")
+                }
+            )
+        }
+
+        composable(AppDestination.Payment.route) {
+            PaymentScreen(
+                goBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(AppDestination.Attractions.route) {
+            AttractionsScreen(
+                goBack = { navController.popBackStack() },
+                goToAttraction = {
+                    navController.navigate("${AppDestination.Attractions.route}/${it}")
+                }
+            )
+        }
+
+        composable(
+            route = AppDestination.Attractions.routeWithArgs,
+            arguments = AppDestination.Attractions.arguments,
+            deepLinks = AppDestination.Attractions.deeplinks
+        ) {
+            val attractionId = it.arguments?.getInt(AppDestination.Attractions.attractionIdArg)
+            AttractionBlogsScreen(
+                attractionId = attractionId ?: 0,
+                goBack = { navController.popBackStack() },
+                goToBlog = {
+                    navController.navigate("${AppDestination.Blogs.route}/$it")
+                }
+            )
+        }
+
+        composable(
+            route = AppDestination.Blogs.routeWithArgs,
+            arguments = AppDestination.Blogs.arguments,
+            deepLinks = AppDestination.Blogs.deeplinks
+        ) {
+            val blogId = it.arguments?.getInt(AppDestination.Blogs.blogIdArg)
+            BlogScreen(
+                blogId = blogId ?: 0,
+                goBack = { navController.popBackStack() }
+            )
+        }
+
         composable(
             route = AppDestination.EventDetails.routeWithArgs,
             arguments = AppDestination.EventDetails.arguments,
@@ -84,6 +151,7 @@ fun AppNavHost(
 @Composable
 fun DashboardNavHost(
     goToEventDetails: (eventId: String) -> Unit,
+    goToDestination: (destination: AppDestination) -> Unit,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -104,7 +172,9 @@ fun DashboardNavHost(
             )
         }
         composable(AppDestination.Explore.route) {
-            ExploreTab()
+            ExploreTab(
+                goToDestination = goToDestination
+            )
         }
     }
 }

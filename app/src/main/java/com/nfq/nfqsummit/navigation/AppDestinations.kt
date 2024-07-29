@@ -22,6 +22,38 @@ sealed class AppDestination(var route: String) {
 
     data object Splash : AppDestination(route = "splash")
 
+    data object Payment : AppDestination(route = "payment")
+
+    data object Survival : AppDestination(route = "survival")
+
+    data object Blogs : AppDestination(route = "blogs") {
+        const val blogIdArg = "blogId"
+        val routeWithArgs = "$route/{$blogIdArg}"
+        val arguments = listOf(
+            navArgument(blogIdArg) { type = NavType.IntType }
+        )
+        val deeplinks = listOf(
+            navDeepLink {
+                uriPattern = "nfqsummit://$route/{$blogIdArg}"
+            }
+        )
+    }
+
+    data object Transportations : AppDestination(route = "transportations")
+
+    data object Attractions: AppDestination(route = "attractions") {
+        const val attractionIdArg = "attractionId"
+        val routeWithArgs = "$route/{$attractionIdArg}"
+        val arguments = listOf(
+            navArgument(attractionIdArg) { type = NavType.IntType }
+        )
+        val deeplinks = listOf(
+            navDeepLink {
+                uriPattern = "nfqsummit://$route/{$attractionIdArg}"
+            }
+        )
+    }
+
     data object EventDetails : AppDestination(route = "eventDetails") {
         const val eventIdArg = "eventId"
         val routeWithArgs = "$route/{$eventIdArg}"
@@ -30,7 +62,7 @@ sealed class AppDestination(var route: String) {
         )
         val deeplinks = listOf(
             navDeepLink {
-                uriPattern = "snapshottest://$route/{$eventIdArg}"
+                uriPattern = "nfqsummit://$route/{$eventIdArg}"
             }
         )
     }
