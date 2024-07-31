@@ -80,11 +80,12 @@ class BlogLocalImpl @Inject constructor(
         database.summitDatabaseQueries.markBlogAsFavorite(favorite, blogId.toLong())
     }
 
-    override suspend fun getFavoriteBlogs(): List<BlogRemoteModel> {
+    override suspend fun getFavoriteBlogs(): Flow<List<BlogRemoteModel>> {
         return database.summitDatabaseQueries.getFavoriteBlogs()
-            .executeAsList()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
             .map {
-                it.toRemoteModel()
+                it.map { it.toRemoteModel() }
             }
     }
 

@@ -15,5 +15,7 @@ interface BlogRepository {
 
     suspend fun getBlogsByAttractionId(attractionId: Int): Flow<Response<List<Blog>>>
 
+    fun getFavoriteBlogs(): Flow<Response<List<Blog>>>
+
     suspend fun markBlogAsFavorite(blog: Blog, favorite: Boolean)
 }

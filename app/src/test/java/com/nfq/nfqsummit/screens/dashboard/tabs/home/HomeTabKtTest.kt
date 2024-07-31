@@ -5,32 +5,42 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.Response
 import com.nfq.data.domain.model.SummitEvent
+import com.nfq.data.domain.repository.BlogRepository
 import com.nfq.data.domain.repository.EventRepository
 import com.nfq.nfqsummit.BaseComposeTest
 import io.mockk.coEvery
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDateTime
 
-class HomeTabKtTest: BaseComposeTest() {
+class HomeTabKtTest : BaseComposeTest() {
 
     private lateinit var viewModel: HomeViewModel
 
     @RelaxedMockK
-    private lateinit var repository: EventRepository
+    private lateinit var eventRepository: EventRepository
+
+    @RelaxedMockK
+    private lateinit var blogRepository: BlogRepository
 
 
     @Before
     @Throws(Exception::class)
     override fun setup() {
-        repository = mockk()
+        eventRepository = mockk()
+        blogRepository = mockk()
         coEvery {
-            repository.getAllEvents(any())
+            blogRepository.getFavoriteBlogs()
+        } returns MutableStateFlow<Response<List<Blog>>>(Response.Success(listOf()))
+        coEvery {
+            eventRepository.getAllEvents(any())
         } returns Response.Success(
             listOf(
                 SummitEvent(
@@ -53,11 +63,12 @@ class HomeTabKtTest: BaseComposeTest() {
                 )
             )
         )
-        viewModel = HomeViewModel(repository)
+        viewModel = HomeViewModel(eventRepository, blogRepository)
         composeTestRule.setContent {
             HomeTab(
                 viewModel = viewModel,
-                goToEventDetails = {}
+                goToEventDetails = {},
+                goToBlog = {}
             )
         }
     }
@@ -72,7 +83,8 @@ class HomeTabKtTest: BaseComposeTest() {
 
     @Test
     fun `shows three events when expanded`() = runTest {
-        composeTestRule.onNodeWithContentDescription("Expand/Collapse", ignoreCase = true).performClick()
+        composeTestRule.onNodeWithContentDescription("Expand/Collapse", ignoreCase = true)
+            .performClick()
         composeTestRule.onNodeWithText("Event 1").assertIsDisplayed()
         composeTestRule.onNodeWithText("Event 2").assertIsDisplayed()
         composeTestRule.onNodeWithText("Event 3").assertIsDisplayed()

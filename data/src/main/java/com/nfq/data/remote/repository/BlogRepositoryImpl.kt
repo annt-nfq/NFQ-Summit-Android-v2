@@ -82,6 +82,16 @@ class BlogRepositoryImpl @Inject constructor(
                 }
         }.flowOn(Dispatchers.IO)
 
+    override fun getFavoriteBlogs(): Flow<Response<List<Blog>>> =
+        flow {
+            emit(Response.Loading)
+            blogLocal.getFavoriteBlogs()
+                .catch { emit(Response.Failure(it)) }
+                .collect { localBlogs ->
+                    emit(Response.Success(localBlogs.map { it.toBlog() }))
+                }
+        }.flowOn(Dispatchers.IO)
+
     override suspend fun markBlogAsFavorite(blog: Blog, favorite: Boolean) {
         blogLocal.markBlogAsFavorite(blog.id, favorite)
     }

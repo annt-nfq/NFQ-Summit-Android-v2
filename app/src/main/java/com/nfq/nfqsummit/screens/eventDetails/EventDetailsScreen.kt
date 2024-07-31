@@ -666,6 +666,29 @@ fun EventDetailsUIPreview() {
         )
     }
 }
+@Preview
+@Composable
+fun EventDetailsUIDarkPreview() {
+    NFQSnapshotTestThemeForPreview(darkTheme = true) {
+        EventDetailsUI(
+            event = SummitEvent(
+                "1",
+                "Event Title",
+                LocalDateTime.of(2022, 1, 1, 1, 0),
+                LocalDateTime.of(2022, 1, 1, 2, 0),
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                0.0, 0.0,
+                "",
+                "Bangkok, Thailand",
+                iconUrl = "",
+                speakerName = "Speaker Name",
+                speakerPosition = "Speaker Position",
+            ),
+            goBack = { },
+            isBookmarked = true
+        )
+    }
+}
 
 @Composable
 fun ShimmeringEventDetails() {

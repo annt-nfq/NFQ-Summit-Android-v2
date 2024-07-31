@@ -2,12 +2,12 @@
 
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -32,8 +34,10 @@ import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -55,6 +59,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.nfq.data.domain.model.Blog
+import com.nfq.data.domain.model.Response
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.ui.theme.MainNeutral
 import com.nfq.nfqsummit.ui.theme.NFQOrange
@@ -72,54 +78,47 @@ import kotlin.math.sqrt
 @Composable
 fun HomeTab(
     viewModel: HomeViewModel = hiltViewModel(),
-    goToEventDetails: (String) -> Unit
+    goToEventDetails: (String) -> Unit,
+    goToBlog: (Int) -> Unit
 ) {
     val window = (LocalView.current.context as Activity).window
     window.statusBarColor = Color.Transparent.toArgb()
     WindowCompat.setDecorFitsSystemWindows(window, false)
 
+    val favoriteBlogsState by viewModel.favoriteBlogs.collectAsState()
+
     HomeTabUI(
         upcomingEvents = viewModel.upcomingEvents,
-        goToEventDetails = goToEventDetails
+        goToEventDetails = goToEventDetails,
+        favoriteBlogs = favoriteBlogsState,
+        goToBlog = goToBlog
     )
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeTabUI(
     upcomingEvents: List<SummitEvent>?,
-    goToEventDetails: (String) -> Unit = {}
+    goToEventDetails: (String) -> Unit = {},
+    favoriteBlogs: Response<List<Blog>>,
+    goToBlog: (Int) -> Unit
 ) {
-    Column {
-        HomeHeader(
-            upcomingEvents = upcomingEvents,
-            goToEventDetails = goToEventDetails
-        )
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-        ) {
-            HomeRecommendationsSection()
-            Spacer(modifier = Modifier.height(24.dp))
-            HomeFavoritesSection()
-            Spacer(modifier = Modifier.height(120.dp))
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeTabUIPreview() {
-    NFQSnapshotTestThemeForPreview {
-        HomeTabUI(
-            upcomingEvents = listOf(
-                SummitEvent(
-                    id = "1",
-                    name = "Event name",
-                    start = LocalDateTime.of(2024, 1, 6, 10, 0),
-                    end = LocalDateTime.of(2024, 1, 6, 11, 0)
-                )
+    Scaffold {
+        Column {
+            HomeHeader(
+                upcomingEvents = upcomingEvents,
+                goToEventDetails = goToEventDetails
             )
-        )
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+            ) {
+                HomeRecommendationsSection()
+                Spacer(modifier = Modifier.height(24.dp))
+                HomeFavoritesSection(favoriteBlogs = favoriteBlogs, goToBlog = goToBlog)
+                Spacer(modifier = Modifier.height(120.dp))
+            }
+        }
     }
 }
 
@@ -193,16 +192,11 @@ fun HomeRecommendation() {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun HomeRecommendationPreview() {
-    NFQSnapshotTestThemeForPreview {
-        HomeRecommendation()
-    }
-}
-
-@Composable
-fun HomeFavoritesSection() {
+fun HomeFavoritesSection(
+    favoriteBlogs: Response<List<Blog>>,
+    goToBlog: (Int) -> Unit
+) {
     Column {
         Text(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -212,26 +206,51 @@ fun HomeFavoritesSection() {
             )
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.horizontalScroll(rememberScrollState())
-        ) {
-            Spacer(modifier = Modifier.width(8.dp))
-            repeat(3) {
-                HomeFavorite()
+        when (favoriteBlogs) {
+            is Response.Success -> {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        Spacer(Modifier.width(0.dp))
+                    }
+                    items(favoriteBlogs.data!!) { blog ->
+                        HomeFavorite(blog, goToBlog)
+                    }
+                    item {
+                        Spacer(Modifier.width(0.dp))
+                    }
+                }
             }
-            Spacer(modifier = Modifier.width(8.dp))
+
+            is Response.Failure -> {
+                Text(
+                    text = "Failed to load favorites",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            is Response.Loading -> {
+                Text(
+                    text = "Loading favorites...",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
 
 @Composable
-fun HomeFavorite() {
-    OutlinedCard(
-        modifier = Modifier.padding(horizontal = 8.dp)
-    ) {
+fun HomeFavorite(
+    blog: Blog,
+    goToBlog: (Int) -> Unit
+) {
+    OutlinedCard(modifier = Modifier.clickable {
+        goToBlog(blog.id)
+    }) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Rod Fai Night Market",
+                text = blog.title,
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.SemiBold
                 )
@@ -263,8 +282,8 @@ fun HomeFavorite() {
                 modifier = Modifier
                     .size(220.dp)
                     .clip(RoundedCornerShape(10.dp)),
-                model = "https://d2d3n9ufwugv3m.cloudfront.net/w1200-h900-cfill/topics/gwp2i-%E0%B8%95%E0%B8%A5%E0%B8%B2%E0%B8%94%E0%B8%99%E0%B8%B1%E0%B8%94%E0%B8%A3%E0%B8%96%E0%B9%84%E0%B8%9F_%E0%B8%A1%E0%B8%B8%E0%B8%A1%E0%B8%AA%E0%B8%B9%E0%B8%87.jpg",
-                contentDescription = "Central World",
+                model = blog.iconUrl,
+                contentDescription = blog.title,
                 contentScale = ContentScale.Crop,
                 placeholder = BrushPainter(
                     Brush.linearGradient(
@@ -279,11 +298,42 @@ fun HomeFavorite() {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun HomeFavoritePreview() {
-    NFQSnapshotTestThemeForPreview {
-        HomeFavorite()
+fun UpcomingEvent(
+    modifier: Modifier = Modifier,
+    event: SummitEvent,
+    goToEventDetails: (String) -> Unit = {}
+) {
+    val dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    Row(modifier = modifier
+        .padding(8.dp)
+        .clickable {
+            goToEventDetails(event.id)
+        }) {
+        Box(
+            modifier = Modifier
+                .padding(4.dp)
+                .background(Color(0xFF3AB34A), shape = CircleShape)
+                .size(14.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Column {
+            Text(
+                text = event.name,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = MainNeutral,
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                "${event.start.format(dateTimeFormatter)} - ${event.end.format(dateTimeFormatter)}",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = MainNeutral,
+                    fontWeight = FontWeight.Normal
+                )
+            )
+        }
     }
 }
 
@@ -346,7 +396,7 @@ fun HomeHeader(
                     Column {
                         upcomingEvents.subList(1, upcomingEvents.size).forEach {
                             UpcomingEvent(
-                                it,
+                                event = it,
                                 goToEventDetails = goToEventDetails
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -357,42 +407,115 @@ fun HomeHeader(
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun UpcomingEvent(
-    event: SummitEvent,
-    goToEventDetails: (String) -> Unit = {},
-    modifier: Modifier = Modifier
-) {
-    val dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-    Row(modifier = modifier
-        .padding(8.dp)
-        .clickable {
-            goToEventDetails(event.id)
-        }) {
-        Box(
-            modifier = Modifier
-                .padding(4.dp)
-                .background(Color(0xFF3AB34A), shape = CircleShape)
-                .size(14.dp)
+fun HomeTabUIPreview() {
+    NFQSnapshotTestThemeForPreview {
+        HomeTabUI(
+            upcomingEvents = listOf(
+                SummitEvent(
+                    id = "1",
+                    name = "Event name",
+                    start = LocalDateTime.of(2024, 1, 6, 10, 0),
+                    end = LocalDateTime.of(2024, 1, 6, 11, 0)
+                )
+            ),
+            goToBlog = {},
+            favoriteBlogs = Response.Success(
+                listOf(
+                    Blog(
+                        id = 1,
+                        title = "Title 1",
+                        description = "Description 1",
+                        iconUrl = "",
+                        contentUrl = "contentUrl",
+                        attractionId = 1,
+                        largeImageUrl = "",
+                        isFavorite = true
+                    ),
+                    Blog(
+                        id = 2,
+                        title = "Title 2",
+                        description = "Description 2",
+                        iconUrl = "",
+                        contentUrl = "contentUrl",
+                        attractionId = 1,
+                        largeImageUrl = "",
+                        isFavorite = true
+                    ),
+                )
+            )
         )
-        Spacer(modifier = Modifier.width(4.dp))
-        Column {
-            Text(
-                text = event.name,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MainNeutral,
-                    fontWeight = FontWeight.SemiBold
+    }
+}
+
+@Preview
+@Composable
+fun HomeTabUIDarkPreview() {
+    NFQSnapshotTestThemeForPreview(darkTheme = true) {
+        HomeTabUI(
+            upcomingEvents = listOf(
+                SummitEvent(
+                    id = "1",
+                    name = "Event name",
+                    start = LocalDateTime.of(2024, 1, 6, 10, 0),
+                    end = LocalDateTime.of(2024, 1, 6, 11, 0)
+                )
+            ),
+            goToBlog = {},
+            favoriteBlogs = Response.Success(
+                listOf(
+                    Blog(
+                        id = 1,
+                        title = "Title 1",
+                        description = "Description 1",
+                        iconUrl = "",
+                        contentUrl = "contentUrl",
+                        attractionId = 1,
+                        largeImageUrl = "",
+                        isFavorite = true
+                    ),
+                    Blog(
+                        id = 2,
+                        title = "Title 2",
+                        description = "Description 2",
+                        iconUrl = "",
+                        contentUrl = "contentUrl",
+                        attractionId = 1,
+                        largeImageUrl = "",
+                        isFavorite = true
+                    ),
                 )
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                "${event.start.format(dateTimeFormatter)} - ${event.end.format(dateTimeFormatter)}",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MainNeutral,
-                    fontWeight = FontWeight.Normal
-                )
-            )
-        }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeRecommendationPreview() {
+    NFQSnapshotTestThemeForPreview {
+        HomeRecommendation()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeFavoritePreview() {
+    NFQSnapshotTestThemeForPreview {
+        HomeFavorite(
+            Blog(
+                id = 1,
+                title = "Title 1",
+                description = "Description 1",
+                iconUrl = "",
+                contentUrl = "contentUrl",
+                attractionId = 1,
+                largeImageUrl = "",
+                isFavorite = true
+            ),
+            goToBlog = {}
+        )
     }
 }
 
@@ -401,7 +524,7 @@ fun UpcomingEvent(
 fun UpcomingEventPreview() {
     NFQSnapshotTestThemeForPreview {
         UpcomingEvent(
-            SummitEvent(
+            event = SummitEvent(
                 id = "1",
                 name = "Event name",
                 start = LocalDateTime.of(2024, 1, 6, 10, 0),

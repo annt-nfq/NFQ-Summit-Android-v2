@@ -97,11 +97,7 @@ fun NFQSnapshotTestThemeForPreview(darkTheme: Boolean = false, content: @Composa
     MaterialTheme(
         colorScheme = if(darkTheme) DarkColorPalette else LightColorPalette,
         typography = Typography,
-        content = {
-            Surface {
-                content()
-            }
-        },
+        content = content
     )
 }
 

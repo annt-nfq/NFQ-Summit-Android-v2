@@ -1,6 +1,5 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.schedule
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -52,7 +50,6 @@ import java.time.LocalTime
 import java.time.format.TextStyle
 import java.util.Locale
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ScheduleTab(
     viewModel: ScheduleViewModel = hiltViewModel(),
@@ -61,19 +58,17 @@ fun ScheduleTab(
     val window = (LocalView.current.context as Activity).window
     window.statusBarColor = Color.Transparent.toArgb()
 
-    Scaffold {
-        ScheduleTabUI(
-            dayEventPair = viewModel.dayEventPair,
-            currentTime = viewModel.currentTime,
-            selectedDate = viewModel.selectedDate,
-            onDayClick = {
-                viewModel.selectedDate = it
-            },
-            onEventClick = {
-                goToEventDetails(it.id)
-            },
-        )
-    }
+    ScheduleTabUI(
+        dayEventPair = viewModel.dayEventPair,
+        currentTime = viewModel.currentTime,
+        selectedDate = viewModel.selectedDate,
+        onDayClick = {
+            viewModel.selectedDate = it
+        },
+        onEventClick = {
+            goToEventDetails(it.id)
+        },
+    )
 }
 
 @Composable
@@ -85,24 +80,28 @@ fun ScheduleTabUI(
     onEventClick: (SummitEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier
-        .statusBarsPadding()
-        .background(MaterialTheme.colorScheme.surface)) {
-        Text(
-            text = "My Bookings",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(16.dp)
-        )
-        SummitSchedule(
-            dayEventPair = dayEventPair,
-            currentTime = currentTime,
-            selectedDate = selectedDate,
-            onDayClick = {
-                onDayClick(it)
-            },
-            onEventClick = { onEventClick(it) },
-            modifier = modifier
-        )
+    Scaffold { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
+            Text(
+                text = "My Bookings",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(16.dp)
+            )
+            SummitSchedule(
+                dayEventPair = dayEventPair,
+                currentTime = currentTime,
+                selectedDate = selectedDate,
+                onDayClick = {
+                    onDayClick(it)
+                },
+                onEventClick = { onEventClick(it) },
+                modifier = modifier
+            )
+        }
     }
 }
 

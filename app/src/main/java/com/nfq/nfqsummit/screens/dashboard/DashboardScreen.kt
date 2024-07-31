@@ -33,7 +33,8 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 @Composable
 fun DashboardScreen(
     goToEventDetails: (eventId: String) -> Unit,
-    goToDestination: (destination: AppDestination) -> Unit
+    goToDestination: (destination: AppDestination) -> Unit,
+    goToBlog: (blogId: Int) -> Unit
 ) {
     val window = (LocalView.current.context as Activity).window
     window.statusBarColor = Color.Transparent.toArgb()
@@ -97,6 +98,7 @@ fun DashboardScreen(
             navController = bottomNavController,
             goToEventDetails = goToEventDetails,
             goToDestination = goToDestination,
+            goToBlog = goToBlog,
             modifier = Modifier.padding(paddingValues)
         )
     }
@@ -119,6 +121,6 @@ sealed class BottomNavItem(
 @Composable
 fun DashboardScreenPreview() {
     NFQSnapshotTestThemeForPreview {
-        DashboardScreen(goToEventDetails = {}, goToDestination = {})
+        DashboardScreen(goToEventDetails = {}, goToDestination = {}, goToBlog = {})
     }
 }

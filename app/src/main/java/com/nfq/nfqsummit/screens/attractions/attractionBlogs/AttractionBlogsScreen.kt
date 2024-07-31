@@ -36,7 +36,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
@@ -108,13 +110,15 @@ fun AttractionBlogsUI(
             )
         }
     ) { paddingValues ->
-        when(blogsState) {
+        when (blogsState) {
             is Response.Loading -> {
                 Text("Loading")
             }
+
             is Response.Failure -> {
                 Text(blogsState.e.message ?: "Error")
             }
+
             is Response.Success -> {
                 LazyColumn(
                     modifier = Modifier.padding(paddingValues),
@@ -163,7 +167,15 @@ fun BlogListItem(
                     .height(240.dp)
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                placeholder = BrushPainter(
+                    Brush.linearGradient(
+                        listOf(
+                            Color(color = 0xFFFFFFFF),
+                            Color(color = 0xFFDDDDDD),
+                        )
+                    )
+                ),
             )
             Box(
                 modifier = Modifier
@@ -205,43 +217,83 @@ fun BlogListItem(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun AttractionBlogsUIPreview() {
-//    NFQSnapshotTestThemeForPreview {
-//        AttractionBlogsUI(
-//            attraction = Attraction(
-//                id = 1,
-//                title = "Attraction Title",
-//                icon = ""
-//            ),
-//            blogsState = listOf(
-//                Blog(
-//                    id = 1,
-//                    title = "Blog Title",
-//                    description = "Blog description",
-//                    iconUrl = "",
-//                    contentUrl = "",
-//                    attractionId = 2,
-//                    isFavorite = true
-//                ),
-//                Blog(
-//                    id = 2,
-//                    title = "Blog Title",
-//                    description = "Blog description",
-//                    iconUrl = "",
-//                    contentUrl = "",
-//                    attractionId = 2,
-//                    isFavorite = false
-//                )
-//            ),
-//            goBack = {},
-//            goToBlog = {},
-//            markAsFavorite = { _, _ -> }
-//        )
-//    }
-//
-//}
+@Preview(showBackground = true)
+@Composable
+fun AttractionBlogsUIPreview() {
+    NFQSnapshotTestThemeForPreview {
+        AttractionBlogsUI(
+            attraction = Attraction(
+                id = 1,
+                title = "Attraction Title",
+                icon = ""
+            ),
+            blogsState = Response.Success(
+                listOf(
+                    Blog(
+                        id = 1,
+                        title = "Blog Title",
+                        description = "Blog description",
+                        iconUrl = "",
+                        contentUrl = "",
+                        attractionId = 2,
+                        isFavorite = true
+                    ),
+                    Blog(
+                        id = 2,
+                        title = "Blog Title",
+                        description = "Blog description",
+                        iconUrl = "",
+                        contentUrl = "",
+                        attractionId = 2,
+                        isFavorite = false
+                    )
+                )
+            ),
+            goBack = {},
+            goToBlog = {},
+            markAsFavorite = { _, _ -> }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AttractionBlogsUIDarkPreview() {
+    NFQSnapshotTestThemeForPreview(darkTheme = true) {
+        AttractionBlogsUI(
+            attraction = Attraction(
+                id = 1,
+                title = "Attraction Title",
+                icon = ""
+            ),
+            blogsState = Response.Success(
+                listOf(
+                    Blog(
+                        id = 1,
+                        title = "Blog Title",
+                        description = "Blog description",
+                        iconUrl = "",
+                        contentUrl = "",
+                        attractionId = 2,
+                        isFavorite = true
+                    ),
+                    Blog(
+                        id = 2,
+                        title = "Blog Title",
+                        description = "Blog description",
+                        iconUrl = "",
+                        contentUrl = "",
+                        attractionId = 2,
+                        isFavorite = false
+                    )
+                )
+            ),
+            goBack = {},
+            goToBlog = {},
+            markAsFavorite = { _, _ -> }
+        )
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

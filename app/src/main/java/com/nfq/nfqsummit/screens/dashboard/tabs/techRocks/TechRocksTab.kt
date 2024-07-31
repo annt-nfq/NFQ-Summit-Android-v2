@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,17 +61,13 @@ fun TechRocksTab(
     val window = (LocalView.current.context as Activity).window
     window.statusBarColor = Color.Transparent.toArgb()
 
-    Scaffold {
-        Column {
-            ConferenceSchedule(
-                events = viewModel.events,
-                currentTime = viewModel.currentTime,
-                onEventClick = {
-                    goToEventDetails(it.id)
-                }
-            )
+    ConferenceSchedule(
+        events = viewModel.events,
+        currentTime = viewModel.currentTime,
+        onEventClick = {
+            goToEventDetails(it.id)
         }
-    }
+    )
 }
 
 @Composable
@@ -151,45 +146,48 @@ fun ConferenceSchedule(
     onEventClick: (SummitEvent) -> Unit,
 ) {
     var selectedIndex by remember { mutableIntStateOf(0) }
-    Column(
-        modifier = Modifier.statusBarsPadding()
-    ) {
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Tech Rocks Asia",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-        SegmentedControl(
-            items = listOf("Business", "Product", "Tech"),
-            selectedIndex = selectedIndex,
-            onItemSelection = { selectedIndex = it },
+    Scaffold { paddingValues ->
+        Column(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-                .height(48.dp)
-        )
-        Column(Modifier.verticalScroll(rememberScrollState())) {
-            Surface(color = MaterialTheme.colorScheme.background) {
-                Schedule(
-                    hourSize = ScheduleSize.FixedSize(220.dp),
-                    events = events.filter { it.ordering == selectedIndex + 1 },
-                    currentTime = currentTime,
-                    minTime = LocalTime.of(10, 0, 0, 0),
-                    maxTime = LocalTime.of(18, 0, 0, 0),
-                    eventContent = {
-                        BasicEvent(
-                            positionedEvent = it,
-                            titleMaxLines = 2,
-                            compact = true,
-                            roundedAvatar = true,
-                            modifier = Modifier
-                                .clickable {
-                                    onEventClick(it.event)
-                                }
-                        )
-                    }
-                )
+                .padding(paddingValues)
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Tech Rocks Asia",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+            SegmentedControl(
+                items = listOf("Business", "Product", "Tech"),
+                selectedIndex = selectedIndex,
+                onItemSelection = { selectedIndex = it },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .height(48.dp)
+            )
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    Schedule(
+                        hourSize = ScheduleSize.FixedSize(220.dp),
+                        events = events.filter { it.ordering == selectedIndex + 1 },
+                        currentTime = currentTime,
+                        minTime = LocalTime.of(10, 0, 0, 0),
+                        maxTime = LocalTime.of(18, 0, 0, 0),
+                        eventContent = {
+                            BasicEvent(
+                                positionedEvent = it,
+                                titleMaxLines = 2,
+                                compact = true,
+                                roundedAvatar = true,
+                                modifier = Modifier
+                                    .clickable {
+                                        onEventClick(it.event)
+                                    }
+                            )
+                        }
+                    )
+                }
             }
         }
     }
@@ -199,6 +197,52 @@ fun ConferenceSchedule(
 @Composable
 fun ConferenceSchedulePreview() {
     NFQSnapshotTestThemeForPreview {
+        ConferenceSchedule(
+            events = listOf(
+                SummitEvent(
+                    "1",
+                    "Event 1",
+                    LocalDate.now().atTime(9, 0),
+                    LocalDate.now().atTime(10, 0),
+                ),
+                SummitEvent(
+                    "2",
+                    "Event 2",
+                    LocalDate.now().atTime(10, 0),
+                    LocalDate.now().atTime(11, 0),
+                    iconUrl = "",
+                    ordering = 1,
+                    speakerName = "Speaker One"
+                ),
+                SummitEvent(
+                    "3",
+                    "Event 3",
+                    LocalDate.now().atTime(10, 0),
+                    LocalDate.now().atTime(11, 0),
+                    iconUrl = "",
+                    ordering = 2,
+                    speakerName = "Speaker Two"
+                ),
+                SummitEvent(
+                    "4",
+                    "Event 4",
+                    LocalDate.now().atTime(10, 0),
+                    LocalDate.now().atTime(11, 0),
+                    iconUrl = "",
+                    ordering = 3,
+                    speakerName = "Speaker Three"
+                ),
+            ),
+            currentTime = LocalTime.now(),
+        ) {
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ConferenceScheduleDarkPreview() {
+    NFQSnapshotTestThemeForPreview(darkTheme = true) {
         ConferenceSchedule(
             events = listOf(
                 SummitEvent(

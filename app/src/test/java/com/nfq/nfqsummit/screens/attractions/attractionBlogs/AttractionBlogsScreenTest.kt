@@ -1,29 +1,27 @@
-package com.nfq.nfqsummit.screens.dashboard.tabs.home
+package com.nfq.nfqsummit.screens.attractions.attractionBlogs
 
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import org.junit.Rule
 import org.junit.Test
 
-
-class HomeTabSnapshotTest {
-
+class AttractionBlogsScreenTest {
     @get:Rule
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_5,
     )
 
     @Test
-    fun testHomeTabUI() {
+    fun testBookingNumberScreenUI() {
         paparazzi.snapshot {
-            HomeTabUIPreview()
+            AttractionBlogsUIPreview()
         }
     }
 
     @Test
-    fun testHomeTabUIDark() {
+    fun testBookingNumberScreenUIDark() {
         paparazzi.snapshot {
-            HomeTabUIDarkPreview()
+            AttractionBlogsUIDarkPreview()
         }
     }
 }

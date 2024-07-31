@@ -18,7 +18,7 @@ interface BlogLocal {
 
     suspend fun markBlogAsFavorite(blogId: Int, favorite: Boolean)
 
-    suspend fun getFavoriteBlogs(): List<BlogRemoteModel>
+    suspend fun getFavoriteBlogs(): Flow<List<BlogRemoteModel>>
 
     suspend fun clearAllBlogs()
 }
