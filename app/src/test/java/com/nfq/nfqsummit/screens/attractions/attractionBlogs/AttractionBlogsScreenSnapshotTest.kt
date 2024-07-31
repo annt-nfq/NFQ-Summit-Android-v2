@@ -5,7 +5,7 @@ import app.cash.paparazzi.Paparazzi
 import org.junit.Rule
 import org.junit.Test
 
-class AttractionBlogsScreenTest {
+class AttractionBlogsScreenSnapshotTest {
     @get:Rule
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_5,
