@@ -6,6 +6,11 @@ import com.nfq.data.domain.model.toBlog
 import com.nfq.data.domain.repository.BlogRepository
 import com.nfq.data.local.BlogLocal
 import com.nfq.data.remote.BlogRemote
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class BlogRepositoryImpl @Inject constructor(
@@ -57,18 +62,25 @@ class BlogRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBlogsByAttractionId(attractionId: Int): Response<List<Blog>> {
-        val cachedBlogs = blogLocal.getBlogsByAttraction(attractionId)
-        return if (cachedBlogs.isNotEmpty())
-            Response.Success(cachedBlogs.map { it.toBlog() })
-        else {
-            Response.Success(blogRemote.getBlogsByAttractionId(attractionId)
-                .also {
-                    blogLocal.insertBlogs(it)
+    override suspend fun getBlogsByAttractionId(attractionId: Int): Flow<Response<List<Blog>>> =
+        flow {
+            emit(Response.Loading)
+            blogLocal.getBlogsByAttraction(attractionId)
+                .catch { emit(Response.Failure(it)) }
+                .collect { localBlogs ->
+                    if (localBlogs.isNotEmpty()) {
+                        emit(Response.Success(localBlogs.map { it.toBlog() }))
+                    } else {
+                        try {
+                            val remoteBlogs = blogRemote.getBlogsByAttractionId(attractionId)
+                            blogLocal.insertBlogs(remoteBlogs)
+                            emit(Response.Success(remoteBlogs.map { it.toBlog() }))
+                        } catch (e: Exception) {
+                            emit(Response.Failure(e))
+                        }
+                    }
                 }
-                .map { it.toBlog() })
-        }
-    }
+        }.flowOn(Dispatchers.IO)
 
     override suspend fun markBlogAsFavorite(blog: Blog, favorite: Boolean) {
         blogLocal.markBlogAsFavorite(blog.id, favorite)

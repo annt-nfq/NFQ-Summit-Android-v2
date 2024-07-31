@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.nfq.nfqsummit.screens.attractions.attractionBlogs
 
 import androidx.compose.runtime.getValue
@@ -11,6 +13,12 @@ import com.nfq.data.domain.model.Response
 import com.nfq.data.domain.repository.AttractionRepository
 import com.nfq.data.domain.repository.BlogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,17 +28,13 @@ class AttractionBlogsViewModel @Inject constructor(
     private val blogRepository: BlogRepository
 ) : ViewModel() {
 
-    var blogs by mutableStateOf<List<Blog>?>(emptyList())
-
-    var attraction by mutableStateOf<Attraction?>(null)
-        private set
+    var attraction = MutableStateFlow<Attraction?>(null)
 
     fun getAttraction(attractionId: Int) {
         viewModelScope.launch {
             when (val response = attractRepository.getAttractionById(attractionId)) {
                 is Response.Success -> {
-                    attraction = response.data
-                    getBlogs(attractionId)
+                    attraction.value = response.data
                 }
                 is Response.Loading -> {
                 }
@@ -40,22 +44,16 @@ class AttractionBlogsViewModel @Inject constructor(
         }
     }
 
-    fun getBlogs(attractionId: Int) {
-        viewModelScope.launch {
-            val response = blogRepository.getBlogsByAttractionId(attractionId)
-            when (response) {
-                is Response.Success<List<Blog>> -> {
-                    blogs = response.data
-                }
-
-                is Response.Loading -> {
-                }
-
-                is Response.Failure -> {
-                }
-            }
+    val blogs = attraction
+        .filterNotNull()
+        .flatMapLatest { attraction ->
+            blogRepository.getBlogsByAttractionId(attraction.id)
         }
-    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = Response.Loading
+        )
 
     fun markBlogAsFavorite(favorite: Boolean, blog: Blog) {
         viewModelScope.launch {

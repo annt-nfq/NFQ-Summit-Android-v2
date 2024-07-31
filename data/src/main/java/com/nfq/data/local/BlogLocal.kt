@@ -1,6 +1,7 @@
 package com.nfq.data.local
 
 import com.nfq.data.remote.model.BlogRemoteModel
+import kotlinx.coroutines.flow.Flow
 
 interface BlogLocal {
     suspend fun getAllBlogs(): List<BlogRemoteModel>
@@ -13,7 +14,7 @@ interface BlogLocal {
 
     suspend fun getBlogsByCategory(category: String): List<BlogRemoteModel>
 
-    suspend fun getBlogsByAttraction(attractionId: Int): List<BlogRemoteModel>
+    suspend fun getBlogsByAttraction(attractionId: Int): Flow<List<BlogRemoteModel>>
 
     suspend fun markBlogAsFavorite(blogId: Int, favorite: Boolean)
 

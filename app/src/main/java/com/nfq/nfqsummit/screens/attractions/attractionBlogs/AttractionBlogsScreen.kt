@@ -31,6 +31,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.nfq.data.domain.model.Attraction
 import com.nfq.data.domain.model.Blog
+import com.nfq.data.domain.model.Response
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
@@ -59,14 +62,16 @@ fun AttractionBlogsScreen(
     val window = (LocalView.current.context as Activity).window
     window.statusBarColor = Color.Transparent.toArgb()
 
+    val blogsState by viewModel.blogs.collectAsState()
+    val attractionState by viewModel.attraction.collectAsState()
+
     LaunchedEffect(viewModel) {
         viewModel.getAttraction(attractionId)
-        viewModel.getBlogs(attractionId)
     }
 
     AttractionBlogsUI(
-        attraction = viewModel.attraction,
-        viewModel.blogs ?: emptyList(),
+        attraction = attractionState,
+        blogsState = blogsState,
         goBack = goBack,
         goToBlog = goToBlog,
         markAsFavorite = { favorite, blog ->
@@ -78,7 +83,7 @@ fun AttractionBlogsScreen(
 @Composable
 fun AttractionBlogsUI(
     attraction: Attraction?,
-    blogs: List<Blog>,
+    blogsState: Response<List<Blog>>,
     goBack: () -> Unit,
     goToBlog: (blogId: Int) -> Unit,
     markAsFavorite: (favorite: Boolean, blog: Blog) -> Unit
@@ -103,17 +108,27 @@ fun AttractionBlogsUI(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(blogs) { blog ->
-                BlogListItem(
-                    blog = blog,
-                    goToBlog = goToBlog,
-                    markAsFavorite = markAsFavorite
-                )
+        when(blogsState) {
+            is Response.Loading -> {
+                Text("Loading")
+            }
+            is Response.Failure -> {
+                Text(blogsState.e.message ?: "Error")
+            }
+            is Response.Success -> {
+                LazyColumn(
+                    modifier = Modifier.padding(paddingValues),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(blogsState.data!!) { blog ->
+                        BlogListItem(
+                            blog = blog,
+                            goToBlog = goToBlog,
+                            markAsFavorite = markAsFavorite
+                        )
+                    }
+                }
             }
         }
     }
@@ -190,43 +205,43 @@ fun BlogListItem(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun AttractionBlogsUIPreview() {
-    NFQSnapshotTestThemeForPreview {
-        AttractionBlogsUI(
-            attraction = Attraction(
-                id = 1,
-                title = "Attraction Title",
-                icon = ""
-            ),
-            blogs = listOf(
-                Blog(
-                    id = 1,
-                    title = "Blog Title",
-                    description = "Blog description",
-                    iconUrl = "",
-                    contentUrl = "",
-                    attractionId = 2,
-                    isFavorite = true
-                ),
-                Blog(
-                    id = 2,
-                    title = "Blog Title",
-                    description = "Blog description",
-                    iconUrl = "",
-                    contentUrl = "",
-                    attractionId = 2,
-                    isFavorite = false
-                )
-            ),
-            goBack = {},
-            goToBlog = {},
-            markAsFavorite = { _, _ -> }
-        )
-    }
-
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun AttractionBlogsUIPreview() {
+//    NFQSnapshotTestThemeForPreview {
+//        AttractionBlogsUI(
+//            attraction = Attraction(
+//                id = 1,
+//                title = "Attraction Title",
+//                icon = ""
+//            ),
+//            blogsState = listOf(
+//                Blog(
+//                    id = 1,
+//                    title = "Blog Title",
+//                    description = "Blog description",
+//                    iconUrl = "",
+//                    contentUrl = "",
+//                    attractionId = 2,
+//                    isFavorite = true
+//                ),
+//                Blog(
+//                    id = 2,
+//                    title = "Blog Title",
+//                    description = "Blog description",
+//                    iconUrl = "",
+//                    contentUrl = "",
+//                    attractionId = 2,
+//                    isFavorite = false
+//                )
+//            ),
+//            goBack = {},
+//            goToBlog = {},
+//            markAsFavorite = { _, _ -> }
+//        )
+//    }
+//
+//}
 
 @Preview(showBackground = true)
 @Composable

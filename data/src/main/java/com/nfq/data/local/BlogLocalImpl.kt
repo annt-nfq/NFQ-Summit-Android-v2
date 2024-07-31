@@ -1,8 +1,13 @@
 package com.nfq.data.local
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import com.nfq.data.cache.SummitDatabase
 import com.nfq.data.remote.model.BlogRemoteModel
 import com.nfq.data.remote.model.toRemoteModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class BlogLocalImpl @Inject constructor(
@@ -62,11 +67,12 @@ class BlogLocalImpl @Inject constructor(
             }
     }
 
-    override suspend fun getBlogsByAttraction(attractionId: Int): List<BlogRemoteModel> {
+    override suspend fun getBlogsByAttraction(attractionId: Int): Flow<List<BlogRemoteModel>> {
         return database.summitDatabaseQueries.selectBlogsByAttraction(attractionId.toLong())
-            .executeAsList()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
             .map {
-                it.toRemoteModel()
+                it.map { it.toRemoteModel() }
             }
     }
 

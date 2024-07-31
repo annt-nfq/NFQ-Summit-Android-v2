@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.supabase.gotrue)
     implementation(libs.security.crypto)
     implementation(libs.sqldelight.android.driver)
+    implementation(libs.sqldelight.coroutines)
     implementation(libs.dagger.hilt.android)
     ksp(libs.dagger.compiler)
     ksp(libs.dagger.hilt.compiler)
