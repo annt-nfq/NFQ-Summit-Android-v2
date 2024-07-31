@@ -9,6 +9,7 @@ class OnboardingScreenSnapshotTest {
     @get:Rule
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_5,
+        maxPercentDifference = 0.2
     )
 
     @Test

@@ -202,14 +202,14 @@ fun ConferenceSchedulePreview() {
                 SummitEvent(
                     "1",
                     "Event 1",
-                    LocalDate.now().atTime(9, 0),
-                    LocalDate.now().atTime(10, 0),
+                    LocalDate.of(2024,1,1).atTime(9, 0),
+                    LocalDate.of(2024,1,1).atTime(10, 0),
                 ),
                 SummitEvent(
                     "2",
                     "Event 2",
-                    LocalDate.now().atTime(10, 0),
-                    LocalDate.now().atTime(11, 0),
+                    LocalDate.of(2024,1,1).atTime(10, 0),
+                    LocalDate.of(2024,1,1).atTime(11, 0),
                     iconUrl = "",
                     ordering = 1,
                     speakerName = "Speaker One"
@@ -217,8 +217,8 @@ fun ConferenceSchedulePreview() {
                 SummitEvent(
                     "3",
                     "Event 3",
-                    LocalDate.now().atTime(10, 0),
-                    LocalDate.now().atTime(11, 0),
+                    LocalDate.of(2024,1,1).atTime(10, 0),
+                    LocalDate.of(2024,1,1).atTime(11, 0),
                     iconUrl = "",
                     ordering = 2,
                     speakerName = "Speaker Two"
@@ -226,14 +226,14 @@ fun ConferenceSchedulePreview() {
                 SummitEvent(
                     "4",
                     "Event 4",
-                    LocalDate.now().atTime(10, 0),
-                    LocalDate.now().atTime(11, 0),
+                    LocalDate.of(2024,1,1).atTime(10, 0),
+                    LocalDate.of(2024,1,1).atTime(11, 0),
                     iconUrl = "",
                     ordering = 3,
                     speakerName = "Speaker Three"
                 ),
             ),
-            currentTime = LocalTime.now(),
+            currentTime = LocalTime.of(11,15),
         ) {
         }
     }
@@ -248,14 +248,14 @@ fun ConferenceScheduleDarkPreview() {
                 SummitEvent(
                     "1",
                     "Event 1",
-                    LocalDate.now().atTime(9, 0),
-                    LocalDate.now().atTime(10, 0),
+                    LocalDate.of(2024,1,1).atTime(9, 0),
+                    LocalDate.of(2024,1,1).atTime(10, 0),
                 ),
                 SummitEvent(
                     "2",
                     "Event 2",
-                    LocalDate.now().atTime(10, 0),
-                    LocalDate.now().atTime(11, 0),
+                    LocalDate.of(2024,1,1).atTime(10, 0),
+                    LocalDate.of(2024,1,1).atTime(11, 0),
                     iconUrl = "",
                     ordering = 1,
                     speakerName = "Speaker One"
@@ -263,8 +263,8 @@ fun ConferenceScheduleDarkPreview() {
                 SummitEvent(
                     "3",
                     "Event 3",
-                    LocalDate.now().atTime(10, 0),
-                    LocalDate.now().atTime(11, 0),
+                    LocalDate.of(2024,1,1).atTime(10, 0),
+                    LocalDate.of(2024,1,1).atTime(11, 0),
                     iconUrl = "",
                     ordering = 2,
                     speakerName = "Speaker Two"
@@ -272,14 +272,14 @@ fun ConferenceScheduleDarkPreview() {
                 SummitEvent(
                     "4",
                     "Event 4",
-                    LocalDate.now().atTime(10, 0),
-                    LocalDate.now().atTime(11, 0),
+                    LocalDate.of(2024,1,1).atTime(10, 0),
+                    LocalDate.of(2024,1,1).atTime(11, 0),
                     iconUrl = "",
                     ordering = 3,
                     speakerName = "Speaker Three"
                 ),
             ),
-            currentTime = LocalTime.now(),
+            currentTime = LocalTime.of(11,15),
         ) {
         }
     }
