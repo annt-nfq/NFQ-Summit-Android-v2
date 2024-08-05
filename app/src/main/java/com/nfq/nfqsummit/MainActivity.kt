@@ -2,7 +2,6 @@ package com.nfq.nfqsummit
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +35,7 @@ class MainActivity : ComponentActivity() {
                     AppNavHost(navController = navController)
                 }
             }
-            checkNotificationExtras()
+//            checkNotificationExtras()
         }
     }
 
@@ -53,7 +52,6 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val eventId = intent.getStringExtra("eventId")
-        Log.e("On New Intent" , eventId ?: "No event id")
         eventId?.let {
             navigateToEventDetails(it)
         }

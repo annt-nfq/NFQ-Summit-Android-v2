@@ -3,9 +3,11 @@ package com.nfq.nfqsummit.di
 import com.nfq.data.domain.model.Response
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.domain.repository.EventRepository
+import com.nfq.nfqsummit.mocks.mockEventDay1
 import java.time.LocalDateTime
+import javax.inject.Inject
 
-class FakeEventRepository: EventRepository {
+class FakeEventRepository @Inject constructor(): EventRepository {
     override suspend fun getAllEvents(forceReload: Boolean): Response<List<SummitEvent>> {
         return Response.Success(
             listOf(
@@ -32,22 +34,18 @@ class FakeEventRepository: EventRepository {
     }
 
     override suspend fun getTechRocksEvents(forceReload: Boolean): Response<List<SummitEvent>> {
-        TODO("Not yet implemented")
+        return Response.Success(listOf())
     }
 
     override suspend fun getEventById(eventId: String): Response<SummitEvent> {
-        TODO("Not yet implemented")
+        return Response.Success(mockEventDay1)
     }
 
     override suspend fun saveFavoriteEvent(eventId: String) {
-        TODO("Not yet implemented")
     }
 
-    override suspend fun isEventFavorite(eventId: String): Boolean {
-        TODO("Not yet implemented")
-    }
+    override suspend fun isEventFavorite(eventId: String): Boolean = true
 
     override suspend fun removeFavoriteEvent(eventId: String) {
-        TODO("Not yet implemented")
     }
 }

@@ -37,6 +37,9 @@ class HomeTabKtTest : BaseComposeTest() {
         eventRepository = mockk()
         blogRepository = mockk()
         coEvery {
+            blogRepository.getRecommendedBlogs()
+        } returns MutableStateFlow(Response.Success(listOf()))
+        coEvery {
             blogRepository.getFavoriteBlogs()
         } returns MutableStateFlow<Response<List<Blog>>>(Response.Success(listOf()))
         coEvery {
@@ -68,7 +71,8 @@ class HomeTabKtTest : BaseComposeTest() {
             HomeTab(
                 viewModel = viewModel,
                 goToEventDetails = {},
-                goToBlog = {}
+                goToBlog = {},
+                goToAttractions = {}
             )
         }
     }

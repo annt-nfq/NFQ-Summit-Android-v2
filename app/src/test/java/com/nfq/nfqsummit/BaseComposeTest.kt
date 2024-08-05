@@ -11,7 +11,7 @@ import org.robolectric.shadows.ShadowLog
 
 @RunWith(RobolectricTestRunner::class)
 @Config(
-    application = NFQSnapshotTestApp::class,
+    application = NFQTestApp::class,
     sdk = [34],
     instrumentedPackages = [
         "androidx.loader.content"

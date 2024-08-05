@@ -5,7 +5,7 @@ import com.google.firebase.FirebaseApp
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class NFQSnapshotTestApp: Application() {
+class NFQSummitApp : Application() {
     override fun onCreate() {
         super.onCreate()
         FirebaseApp.initializeApp(this)
