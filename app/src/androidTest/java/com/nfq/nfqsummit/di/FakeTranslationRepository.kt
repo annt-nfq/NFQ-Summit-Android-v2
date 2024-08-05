@@ -7,6 +7,6 @@ import javax.inject.Inject
 
 class FakeTranslationRepository @Inject constructor(): TranslationRepository {
     override suspend fun getAllTranslations(forceReload: Boolean): Response<List<Translation>> {
-        TODO("Not yet implemented")
+        return Response.Success(listOf())
     }
 }

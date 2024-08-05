@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +55,7 @@ import coil.compose.AsyncImage
 import com.nfq.data.domain.model.Attraction
 import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.Response
+import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.mocks.mockAttraction
 import com.nfq.nfqsummit.mocks.mockBlog
 import com.nfq.nfqsummit.mocks.mockFavoriteAndRecommendedBlog
@@ -197,15 +199,7 @@ fun BlogListItem(
                     .height(240.dp)
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop,
-                placeholder = BrushPainter(
-                    Brush.linearGradient(
-                        listOf(
-                            Color(color = 0xFFFFFFFF),
-                            Color(color = 0xFFDDDDDD),
-                        )
-                    )
-                ),
+                contentScale = ContentScale.Crop
             )
             Box(
                 modifier = Modifier
