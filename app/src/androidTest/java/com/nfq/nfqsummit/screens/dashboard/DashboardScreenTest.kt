@@ -55,7 +55,6 @@ class DashboardScreenTest {
         Thread.sleep(1500)
         composeTestRule.onNodeWithText("Muay Thai").assertIsDisplayed()
         val route = navController.currentBackStackEntry?.destination?.route
-        println(route)
         Assert.assertEquals(route, "eventDetails/{eventId}")
     }
 }

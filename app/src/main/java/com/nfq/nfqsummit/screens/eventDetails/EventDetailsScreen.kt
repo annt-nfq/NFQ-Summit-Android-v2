@@ -84,6 +84,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.components.shimmerBrush
+import com.nfq.nfqsummit.mocks.mockEventDay1
 import com.nfq.nfqsummit.notification.AlarmReceiver
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -648,19 +649,7 @@ fun EventDetailsUI(
 fun EventDetailsUIPreview() {
     NFQSnapshotTestThemeForPreview {
         EventDetailsUI(
-            event = SummitEvent(
-                "1",
-                "Event Title",
-                LocalDateTime.of(2022, 1, 1, 1, 0),
-                LocalDateTime.of(2022, 1, 1, 2, 0),
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                0.0, 0.0,
-                "",
-                "Bangkok, Thailand",
-                iconUrl = "",
-                speakerName = "Speaker Name",
-                speakerPosition = "Speaker Position",
-            ),
+            event = mockEventDay1,
             goBack = { },
             isBookmarked = true
         )
@@ -671,19 +660,7 @@ fun EventDetailsUIPreview() {
 fun EventDetailsUIDarkPreview() {
     NFQSnapshotTestThemeForPreview(darkTheme = true) {
         EventDetailsUI(
-            event = SummitEvent(
-                "1",
-                "Event Title",
-                LocalDateTime.of(2022, 1, 1, 1, 0),
-                LocalDateTime.of(2022, 1, 1, 2, 0),
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                0.0, 0.0,
-                "",
-                "Bangkok, Thailand",
-                iconUrl = "",
-                speakerName = "Speaker Name",
-                speakerPosition = "Speaker Position",
-            ),
+            event = mockEventDay1,
             goBack = { },
             isBookmarked = true
         )

@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.paparazzi)
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.firebase.crashlytics)
     jacoco
 }
 
@@ -21,8 +22,8 @@ android {
         applicationId = "com.nfq.nfqsummit"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 101000
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "com.nfq.nfqsummit.HiltTestRunner"
         vectorDrawables {
@@ -53,7 +54,7 @@ android {
         val supabaseKey: String = p.getProperty("SUPABASE_KEY")
         release {
             isDebuggable = false
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -112,11 +113,16 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.splash)
     implementation(libs.navigation)
     implementation(libs.coil)
     implementation(libs.kotlinx.serialization)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.coroutines.android)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
 
     implementation(libs.google.code.scanner)
     implementation(libs.security.crypto)

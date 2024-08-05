@@ -78,6 +78,9 @@ fun AppNavHost(
                 },
                 goToBlog = {
                     navController.navigate("${AppDestination.Blogs.route}/$it")
+                },
+                goToAttractions = {
+                    navController.navigate(AppDestination.Attractions.route)
                 }
             )
         }
@@ -156,6 +159,7 @@ fun DashboardNavHost(
     goToEventDetails: (eventId: String) -> Unit,
     goToDestination: (destination: AppDestination) -> Unit,
     goToBlog: (blogId: Int) -> Unit,
+    goToAttractions: () -> Unit,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -163,7 +167,8 @@ fun DashboardNavHost(
         composable(AppDestination.Home.route) {
             HomeTab(
                 goToEventDetails = goToEventDetails,
-                goToBlog = goToBlog
+                goToBlog = goToBlog,
+                goToAttractions = goToAttractions
             )
         }
         composable(AppDestination.Schedule.route) {

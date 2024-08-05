@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.nfq.data.domain.model.Blog
+import com.nfq.nfqsummit.mocks.mockBlog
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
@@ -91,9 +92,10 @@ fun TransportationScreenUI(
             )
         }
     ) { paddingValues ->
-        LazyVerticalGrid (
+        LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .padding(paddingValues)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(32.dp),
             horizontalArrangement = Arrangement.spacedBy(32.dp)
@@ -148,7 +150,7 @@ fun BlogGridItem(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun TransportationScreenUIPreview() {
     NFQSnapshotTestThemeForPreview {
@@ -156,33 +158,25 @@ fun TransportationScreenUIPreview() {
             goBack = {},
             goToBlog = {},
             blogs = listOf(
-                Blog(
-                    id = 1,
-                    title = "Blog title",
-                    contentUrl = "",
-                    description = "",
-                    iconUrl = "",
-                    attractionId = 2,
-                    isFavorite = true
-                ),
-                Blog(
-                    id = 2,
-                    title = "Blog title",
-                    contentUrl = "",
-                    description = "",
-                    iconUrl = "",
-                    attractionId = 2,
-                    isFavorite = true
-                ),
-                Blog(
-                    id = 3,
-                    title = "Blog title",
-                    contentUrl = "",
-                    description = "",
-                    iconUrl = "",
-                    attractionId = 2,
-                    isFavorite = false
-                )
+                mockBlog,
+                mockBlog,
+                mockBlog
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+fun TransportationScreenUIDarkPreview() {
+    NFQSnapshotTestThemeForPreview(darkTheme = true) {
+        TransportationScreenUI(
+            goBack = {},
+            goToBlog = {},
+            blogs = listOf(
+                mockBlog,
+                mockBlog,
+                mockBlog
             )
         )
     }

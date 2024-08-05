@@ -23,9 +23,7 @@ class AttractionsViewModel @Inject constructor(
 
     fun getAttractions() {
         viewModelScope.launch {
-            val response = attractionRepository.getAllAttractions(forceReload = false)
-            Log.e("AttractionsViewModel", "getAttractions: $response")
-            when(response) {
+            when(val response = attractionRepository.getAllAttractions(forceReload = false)) {
                 is Response.Success -> {
                     attractions = response.data
                 }

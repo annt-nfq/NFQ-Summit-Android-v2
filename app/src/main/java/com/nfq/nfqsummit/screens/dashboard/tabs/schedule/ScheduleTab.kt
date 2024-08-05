@@ -41,11 +41,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.components.BasicEvent
 import com.nfq.nfqsummit.components.Schedule
+import com.nfq.nfqsummit.mocks.mockEventDay1
+import com.nfq.nfqsummit.mocks.mockEventDay2H1
+import com.nfq.nfqsummit.mocks.mockEventDay2H2
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.TextStyle
 import java.util.Locale
@@ -294,26 +296,11 @@ fun ScheduleTabUIPreview() {
         ScheduleTabUI(
             dayEventPair = listOf(
                 LocalDate.of(2024, 1, 1) to listOf(
-                    SummitEvent(
-                        id = "1",
-                        name = "Event 1",
-                        start = LocalDateTime.of(2024, 1, 1, 9, 0),
-                        end = LocalDateTime.of(2024, 1, 1, 10, 0)
-                    ),
+                    mockEventDay1
                 ),
                 LocalDate.of(2024, 1, 2) to listOf(
-                    SummitEvent(
-                        id = "2",
-                        name = "Event 2",
-                        start = LocalDateTime.of(2024, 1, 2, 9, 0),
-                        end = LocalDateTime.of(2024, 1, 2, 10, 0)
-                    ),
-                    SummitEvent(
-                        id = "3",
-                        name = "Event 3",
-                        start = LocalDateTime.of(2024, 1, 2, 11, 0),
-                        end = LocalDateTime.of(2024, 1, 2, 12, 0)
-                    ),
+                    mockEventDay2H1,
+                    mockEventDay2H2,
                 )
             ),
             currentTime = LocalTime.of(11, 0),
@@ -331,26 +318,11 @@ fun ScheduleTabUIDarkPreview() {
         ScheduleTabUI(
             dayEventPair = listOf(
                 LocalDate.of(2024, 1, 1) to listOf(
-                    SummitEvent(
-                        id = "1",
-                        name = "Event 1",
-                        start = LocalDateTime.of(2024, 1, 1, 9, 0),
-                        end = LocalDateTime.of(2024, 1, 1, 10, 0)
-                    ),
+                    mockEventDay1
                 ),
                 LocalDate.of(2024, 1, 2) to listOf(
-                    SummitEvent(
-                        id = "2",
-                        name = "Event 2",
-                        start = LocalDateTime.of(2024, 1, 2, 9, 0),
-                        end = LocalDateTime.of(2024, 1, 2, 10, 0)
-                    ),
-                    SummitEvent(
-                        id = "3",
-                        name = "Event 3",
-                        start = LocalDateTime.of(2024, 1, 2, 11, 0),
-                        end = LocalDateTime.of(2024, 1, 2, 12, 0)
-                    ),
+                    mockEventDay2H1,
+                    mockEventDay2H2,
                 )
             ),
             currentTime = LocalTime.of(10, 30),

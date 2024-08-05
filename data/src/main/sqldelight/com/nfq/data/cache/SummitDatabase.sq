@@ -37,6 +37,7 @@ CREATE TABLE BlogLocalModel (
     category TEXT NOT NULL,
     large_image_url TEXT,
     is_favorite INTEGER AS Boolean NOT NULL DEFAULT 0,
+    is_recommended INTEGER AS Boolean NOT NULL DEFAULT 0,
     attraction_id INTEGER,
     FOREIGN KEY (attraction_id) REFERENCES AttractionLocalModel(id)
 );
@@ -80,8 +81,8 @@ clearAttractions:
 DELETE FROM AttractionLocalModel;
 
 insertBlog:
-INSERT OR REPLACE INTO BlogLocalModel (id, title, description, icon_url, content_url, category, large_image_url, is_favorite, attraction_id)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO BlogLocalModel (id, title, description, icon_url, content_url, category, large_image_url, is_favorite, attraction_id, is_recommended)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 selectAllBlogs:
 SELECT BlogLocalModel.* FROM BlogLocalModel;
@@ -103,3 +104,6 @@ UPDATE BlogLocalModel SET is_favorite = ? WHERE id = ?;
 
 getFavoriteBlogs:
 SELECT BlogLocalModel.* FROM BlogLocalModel WHERE is_favorite = 1;
+
+getRecommendedBlogs:
+SELECT BlogLocalModel.* FROM BlogLocalModel WHERE is_recommended = 1;

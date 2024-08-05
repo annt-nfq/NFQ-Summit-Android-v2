@@ -17,5 +17,7 @@ interface BlogRepository {
 
     fun getFavoriteBlogs(): Flow<Response<List<Blog>>>
 
+    fun getRecommendedBlogs(): Flow<Response<List<Blog>>>
+
     suspend fun markBlogAsFavorite(blog: Blog, favorite: Boolean)
 }

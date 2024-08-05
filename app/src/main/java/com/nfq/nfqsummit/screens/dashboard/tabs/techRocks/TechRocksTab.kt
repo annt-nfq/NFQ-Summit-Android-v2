@@ -47,9 +47,10 @@ import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.components.BasicEvent
 import com.nfq.nfqsummit.components.Schedule
 import com.nfq.nfqsummit.components.ScheduleSize
+import com.nfq.nfqsummit.mocks.mockSpeakerEvent
+import com.nfq.nfqsummit.mocks.mockSpeakerEvent2
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
-import java.time.LocalDate
 import java.time.LocalTime
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -199,41 +200,10 @@ fun ConferenceSchedulePreview() {
     NFQSnapshotTestThemeForPreview {
         ConferenceSchedule(
             events = listOf(
-                SummitEvent(
-                    "1",
-                    "Event 1",
-                    LocalDate.of(2024,1,1).atTime(9, 0),
-                    LocalDate.of(2024,1,1).atTime(10, 0),
-                ),
-                SummitEvent(
-                    "2",
-                    "Event 2",
-                    LocalDate.of(2024,1,1).atTime(10, 0),
-                    LocalDate.of(2024,1,1).atTime(11, 0),
-                    iconUrl = "",
-                    ordering = 1,
-                    speakerName = "Speaker One"
-                ),
-                SummitEvent(
-                    "3",
-                    "Event 3",
-                    LocalDate.of(2024,1,1).atTime(10, 0),
-                    LocalDate.of(2024,1,1).atTime(11, 0),
-                    iconUrl = "",
-                    ordering = 2,
-                    speakerName = "Speaker Two"
-                ),
-                SummitEvent(
-                    "4",
-                    "Event 4",
-                    LocalDate.of(2024,1,1).atTime(10, 0),
-                    LocalDate.of(2024,1,1).atTime(11, 0),
-                    iconUrl = "",
-                    ordering = 3,
-                    speakerName = "Speaker Three"
-                ),
+                mockSpeakerEvent,
+                mockSpeakerEvent2
             ),
-            currentTime = LocalTime.of(11,15),
+            currentTime = LocalTime.of(11, 15),
         ) {
         }
     }
@@ -245,41 +215,10 @@ fun ConferenceScheduleDarkPreview() {
     NFQSnapshotTestThemeForPreview(darkTheme = true) {
         ConferenceSchedule(
             events = listOf(
-                SummitEvent(
-                    "1",
-                    "Event 1",
-                    LocalDate.of(2024,1,1).atTime(9, 0),
-                    LocalDate.of(2024,1,1).atTime(10, 0),
-                ),
-                SummitEvent(
-                    "2",
-                    "Event 2",
-                    LocalDate.of(2024,1,1).atTime(10, 0),
-                    LocalDate.of(2024,1,1).atTime(11, 0),
-                    iconUrl = "",
-                    ordering = 1,
-                    speakerName = "Speaker One"
-                ),
-                SummitEvent(
-                    "3",
-                    "Event 3",
-                    LocalDate.of(2024,1,1).atTime(10, 0),
-                    LocalDate.of(2024,1,1).atTime(11, 0),
-                    iconUrl = "",
-                    ordering = 2,
-                    speakerName = "Speaker Two"
-                ),
-                SummitEvent(
-                    "4",
-                    "Event 4",
-                    LocalDate.of(2024,1,1).atTime(10, 0),
-                    LocalDate.of(2024,1,1).atTime(11, 0),
-                    iconUrl = "",
-                    ordering = 3,
-                    speakerName = "Speaker Three"
-                ),
+                mockSpeakerEvent,
+                mockSpeakerEvent2
             ),
-            currentTime = LocalTime.of(11,15),
+            currentTime = LocalTime.of(11, 15),
         ) {
         }
     }

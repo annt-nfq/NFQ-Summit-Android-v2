@@ -1,10 +1,12 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.Response
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.domain.repository.BlogRepository
@@ -35,9 +37,15 @@ class HomeViewModel @Inject constructor(
             is Response.Loading -> listOf()
             else -> listOf()
         }
-
         upcomingEvents = events.sortedBy { it.start }.take(3)
     }
+
+    val recommendedBlogs = blogRepository.getRecommendedBlogs()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = Response.Loading
+        )
 
     val favoriteBlogs = blogRepository.getFavoriteBlogs()
         .stateIn(
@@ -45,4 +53,10 @@ class HomeViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(),
             initialValue = Response.Loading
         )
+
+    fun markAsFavorite(favorite: Boolean, blog: Blog) {
+        viewModelScope.launch {
+            blogRepository.markBlogAsFavorite(blog, favorite)
+        }
+    }
 }

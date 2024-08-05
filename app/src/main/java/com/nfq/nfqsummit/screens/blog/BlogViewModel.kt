@@ -23,9 +23,7 @@ class BlogViewModel @Inject constructor(
 
     fun getBlogById(blogId: Int) {
         viewModelScope.launch {
-            val response = blogRepository.getBlogById(blogId)
-            Log.e("BlogViewModel", "getBlogById: $response")
-            when(response) {
+            when(val response = blogRepository.getBlogById(blogId)) {
                 is Response.Success -> {
                     blog = response.data
                 }

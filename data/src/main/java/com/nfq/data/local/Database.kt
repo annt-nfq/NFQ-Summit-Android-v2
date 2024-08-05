@@ -14,12 +14,7 @@ fun createDatabase(databaseDriver: SqlDriver) =
 fun createDriver(
     context: Context
 ): SqlDriver = AndroidSqliteDriver(
-    schema = SummitDatabase.Schema,
-    context = context,
-    name = "SummitDatabase",
-    callback = object: AndroidSqliteDriver.Callback(SummitDatabase.Schema) {
-        override fun onOpen(db: SupportSQLiteDatabase) {
-            db.setForeignKeyConstraintsEnabled(true)
-        }
-    }
+    SummitDatabase.Schema,
+    context,
+    "SummitDatabase"
 )

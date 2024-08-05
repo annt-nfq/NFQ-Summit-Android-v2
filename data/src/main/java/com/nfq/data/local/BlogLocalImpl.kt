@@ -31,15 +31,16 @@ class BlogLocalImpl @Inject constructor(
         database.summitDatabaseQueries.transaction {
             blogs.forEach {
                 database.summitDatabaseQueries.insertBlog(
-                    it.id.toLong(),
-                    it.title,
-                    it.description,
-                    it.iconUrl,
-                    it.contentUrl,
-                    it.category,
-                    it.largeImageUrl,
-                    false,
-                    it.attractionId?.toLong()
+                    id = it.id.toLong(),
+                    title = it.title,
+                    description = it.description,
+                    icon_url = it.iconUrl,
+                    content_url = it.contentUrl,
+                    category = it.category,
+                    large_image_url = it.largeImageUrl,
+                    is_favorite = false,
+                    attraction_id = it.attractionId?.toLong(),
+                    is_recommended = it.isRecommended
                 )
             }
         }
@@ -47,15 +48,16 @@ class BlogLocalImpl @Inject constructor(
 
     override suspend fun insertBlog(blog: BlogRemoteModel) {
         database.summitDatabaseQueries.insertBlog(
-            blog.id.toLong(),
-            blog.title,
-            blog.description,
-            blog.iconUrl,
-            blog.contentUrl,
-            blog.category,
-            blog.largeImageUrl,
-            false,
-            blog.attractionId?.toLong()
+            id = blog.id.toLong(),
+            title = blog.title,
+            description = blog.description,
+            icon_url = blog.iconUrl,
+            content_url = blog.contentUrl,
+            category = blog.category,
+            large_image_url = blog.largeImageUrl,
+            is_favorite = false,
+            attraction_id = blog.attractionId?.toLong(),
+            is_recommended = blog.isRecommended
         )
     }
 
@@ -82,6 +84,15 @@ class BlogLocalImpl @Inject constructor(
 
     override suspend fun getFavoriteBlogs(): Flow<List<BlogRemoteModel>> {
         return database.summitDatabaseQueries.getFavoriteBlogs()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map {
+                it.map { it.toRemoteModel() }
+            }
+    }
+
+    override suspend fun getRecommendedBlogs(): Flow<List<BlogRemoteModel>> {
+        return database.summitDatabaseQueries.getRecommendedBlogs()
             .asFlow()
             .mapToList(Dispatchers.IO)
             .map {

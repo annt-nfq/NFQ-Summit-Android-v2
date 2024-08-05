@@ -72,9 +72,12 @@ class BlogRepositoryImpl @Inject constructor(
                         emit(Response.Success(localBlogs.map { it.toBlog() }))
                     } else {
                         try {
-                            val remoteBlogs = blogRemote.getBlogsByAttractionId(attractionId)
+                            val remoteBlogs = blogRemote.getAllBlogs()
                             blogLocal.insertBlogs(remoteBlogs)
-                            emit(Response.Success(remoteBlogs.map { it.toBlog() }))
+                            emit(Response.Success(remoteBlogs
+                                .filter { it.attractionId == attractionId }
+                                .map { it.toBlog() })
+                            )
                         } catch (e: Exception) {
                             emit(Response.Failure(e))
                         }
@@ -91,6 +94,28 @@ class BlogRepositoryImpl @Inject constructor(
                     emit(Response.Success(localBlogs.map { it.toBlog() }))
                 }
         }.flowOn(Dispatchers.IO)
+
+    override fun getRecommendedBlogs(): Flow<Response<List<Blog>>> {
+        return flow {
+            emit(Response.Loading)
+            blogLocal.getRecommendedBlogs()
+                .catch { emit(Response.Failure(it)) }
+                .collect { localBlogs ->
+                    if (localBlogs.isNotEmpty()) {
+                        emit(Response.Success(localBlogs.map { it.toBlog() }))
+                    } else {
+                        try {
+                            val remoteBlogs = blogRemote.getAllBlogs()
+                            blogLocal.insertBlogs(remoteBlogs)
+                            emit(Response.Success(remoteBlogs.filter { it.isRecommended }
+                                .map { it.toBlog() }))
+                        } catch (e: Exception) {
+                            emit(Response.Failure(e))
+                        }
+                    }
+                }
+        }.flowOn(Dispatchers.IO)
+    }
 
     override suspend fun markBlogAsFavorite(blog: Blog, favorite: Boolean) {
         blogLocal.markBlogAsFavorite(blog.id, favorite)

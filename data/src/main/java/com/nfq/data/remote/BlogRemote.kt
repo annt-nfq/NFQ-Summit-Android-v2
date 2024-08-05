@@ -12,4 +12,6 @@ interface BlogRemote {
     suspend fun getBlogsByAttractionId(attractionId: Int): List<BlogRemoteModel>
 
     suspend fun getTransportationBlogs(): List<BlogRemoteModel>
+
+    suspend fun getRecommendedBlogs(): List<BlogRemoteModel>
 }

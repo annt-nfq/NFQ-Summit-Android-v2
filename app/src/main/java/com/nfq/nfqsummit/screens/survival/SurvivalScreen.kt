@@ -44,6 +44,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.Translation
 import com.nfq.data.domain.model.TranslationAudio
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.mocks.mockTranslation
+import com.nfq.nfqsummit.mocks.mockTranslationAudio
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
@@ -179,8 +181,7 @@ fun AudioListItem(
         )
         IconButton(
             modifier = Modifier
-                .background(color = NFQOrange, shape = CircleShape)
-            ,
+                .background(color = NFQOrange, shape = CircleShape),
             onClick = {
                 playAudio(audio.audioUrl)
             }
@@ -195,6 +196,36 @@ fun AudioListItem(
     }   // Audio item
 }
 
+@Preview
+@Composable
+fun SurvivalScreenUIPreview() {
+    NFQSnapshotTestThemeForPreview {
+        SurvivalScreenUI(
+            goBack = {},
+            translations = listOf(
+                mockTranslation,
+                mockTranslation
+            )
+        )
+    }
+
+}
+
+@Preview
+@Composable
+fun SurvivalScreenUIDarkPreview() {
+    NFQSnapshotTestThemeForPreview(darkTheme = true) {
+        SurvivalScreenUI(
+            goBack = {},
+            translations = listOf(
+                mockTranslation,
+                mockTranslation
+            )
+        )
+    }
+
+}
+
 @Preview(showBackground = true)
 @Composable
 fun TranslationListItemPreview() {
@@ -204,16 +235,8 @@ fun TranslationListItemPreview() {
                 id = 1,
                 title = "Title",
                 audios = listOf(
-                    TranslationAudio(
-                        id = 1,
-                        title = "Audio 1",
-                        audioUrl = "https://example.com/audio1.mp3"
-                    ),
-                    TranslationAudio(
-                        id = 2,
-                        title = "Audio 2",
-                        audioUrl = "https://example.com/audio2.mp3"
-                    )
+                    mockTranslationAudio,
+                    mockTranslationAudio
                 )
             ),
             playAudio = {}

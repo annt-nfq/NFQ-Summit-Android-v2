@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.Blog
 import com.nfq.nfqsummit.components.MarkdownDisplay
+import com.nfq.nfqsummit.mocks.mockBlog
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import java.net.URL
 
@@ -72,9 +73,11 @@ fun BlogUI(
             )
         }
     ) { paddingValues ->
-        Column(modifier = Modifier
-            .padding(paddingValues)
-            .verticalScroll(rememberScrollState())) {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+        ) {
             if (blog != null)
                 MarkdownDisplay(
                     URL(blog.contentUrl)
@@ -88,15 +91,7 @@ fun BlogUI(
 fun BlogUIPreview() {
     NFQSnapshotTestThemeForPreview {
         BlogUI(
-            blog = Blog(
-                id = 1,
-                title = "Blog title",
-                contentUrl = "",
-                description = "",
-                iconUrl = "",
-                attractionId = 2,
-                isFavorite = true
-            ),
+            blog = mockBlog,
             goBack = {}
         )
     }

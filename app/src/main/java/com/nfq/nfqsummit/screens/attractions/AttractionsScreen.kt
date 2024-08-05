@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.nfq.data.domain.model.Attraction
+import com.nfq.nfqsummit.mocks.mockAttraction
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
@@ -144,16 +145,8 @@ fun AttractionsUIPreview() {
     NFQSnapshotTestThemeForPreview {
         AttractionsUI(
             attractions = listOf(
-                Attraction(
-                    id = 1,
-                    title = "Attraction 1",
-                    icon = ""
-                ),
-                Attraction(
-                    id = 2,
-                    title = "Attraction 2",
-                    icon = ""
-                )
+                mockAttraction,
+                mockAttraction
             ),
             goBack = {}
         )
@@ -165,11 +158,7 @@ fun AttractionsUIPreview() {
 fun AttractionListItemPreview() {
     NFQSnapshotTestThemeForPreview {
         AttractionListItem(
-            Attraction(
-                id = 1,
-                title = "Attraction Title",
-                icon = ""
-            )
+            mockAttraction
         )
     }
 }

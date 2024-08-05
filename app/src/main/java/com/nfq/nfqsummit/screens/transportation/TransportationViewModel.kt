@@ -23,10 +23,7 @@ class TransportationViewModel @Inject constructor(
 
     fun getTransportationBlogs() {
         viewModelScope.launch {
-            val response = blogRepository.getTransportationBlogs()
-            Log.e("TransportationViewModel", response.toString())
-
-            when(response) {
+            when(val response = blogRepository.getTransportationBlogs()) {
                 is Response.Success<List<Blog>> -> {
                     blogs = response.data
                 }

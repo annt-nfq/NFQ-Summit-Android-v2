@@ -20,5 +20,7 @@ interface BlogLocal {
 
     suspend fun getFavoriteBlogs(): Flow<List<BlogRemoteModel>>
 
+    suspend fun getRecommendedBlogs(): Flow<List<BlogRemoteModel>>
+
     suspend fun clearAllBlogs()
 }

@@ -40,6 +40,14 @@ class BlogRemoteImpl @Inject constructor(
         }.decodeSingle()
     }
 
+    override suspend fun getRecommendedBlogs(): List<BlogRemoteModel> {
+        return supabaseClient.from("blogs").select {
+            filter {
+                filter(column = "is_recommended", operator = FilterOperator.EQ, value = true)
+            }
+        }.decodeList()
+    }
+
     override suspend fun getBlogById(blogId: Int): BlogRemoteModel {
         return supabaseClient.from("blogs").select {
             filter {

@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -22,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -51,6 +54,9 @@ import coil.compose.AsyncImage
 import com.nfq.data.domain.model.Attraction
 import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.Response
+import com.nfq.nfqsummit.mocks.mockAttraction
+import com.nfq.nfqsummit.mocks.mockBlog
+import com.nfq.nfqsummit.mocks.mockFavoriteAndRecommendedBlog
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
@@ -155,6 +161,30 @@ fun BlogListItem(
             text = blog.title,
             style = MaterialTheme.typography.titleLarge
         )
+        if (blog.isRecommended) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colorScheme.secondaryContainer,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(4.dp)
+            ) {
+                Icon(
+                    Icons.Outlined.ThumbUp,
+                    contentDescription = "Thumbs up",
+                    modifier = Modifier.size(12.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    "Recommended", style = MaterialTheme.typography.labelSmall.copy(
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(8.dp))
         Box(
             modifier = Modifier
@@ -222,31 +252,11 @@ fun BlogListItem(
 fun AttractionBlogsUIPreview() {
     NFQSnapshotTestThemeForPreview {
         AttractionBlogsUI(
-            attraction = Attraction(
-                id = 1,
-                title = "Attraction Title",
-                icon = ""
-            ),
+            attraction = mockAttraction,
             blogsState = Response.Success(
                 listOf(
-                    Blog(
-                        id = 1,
-                        title = "Blog Title",
-                        description = "Blog description",
-                        iconUrl = "",
-                        contentUrl = "",
-                        attractionId = 2,
-                        isFavorite = true
-                    ),
-                    Blog(
-                        id = 2,
-                        title = "Blog Title",
-                        description = "Blog description",
-                        iconUrl = "",
-                        contentUrl = "",
-                        attractionId = 2,
-                        isFavorite = false
-                    )
+                    mockBlog,
+                    mockFavoriteAndRecommendedBlog
                 )
             ),
             goBack = {},
@@ -261,31 +271,11 @@ fun AttractionBlogsUIPreview() {
 fun AttractionBlogsUIDarkPreview() {
     NFQSnapshotTestThemeForPreview(darkTheme = true) {
         AttractionBlogsUI(
-            attraction = Attraction(
-                id = 1,
-                title = "Attraction Title",
-                icon = ""
-            ),
+            attraction = mockAttraction,
             blogsState = Response.Success(
                 listOf(
-                    Blog(
-                        id = 1,
-                        title = "Blog Title",
-                        description = "Blog description",
-                        iconUrl = "",
-                        contentUrl = "",
-                        attractionId = 2,
-                        isFavorite = true
-                    ),
-                    Blog(
-                        id = 2,
-                        title = "Blog Title",
-                        description = "Blog description",
-                        iconUrl = "",
-                        contentUrl = "",
-                        attractionId = 2,
-                        isFavorite = false
-                    )
+                    mockBlog,
+                    mockFavoriteAndRecommendedBlog
                 )
             ),
             goBack = {},
@@ -300,15 +290,7 @@ fun AttractionBlogsUIDarkPreview() {
 fun BlogListItemPreview() {
     NFQSnapshotTestThemeForPreview {
         BlogListItem(
-            blog = Blog(
-                id = 1,
-                title = "Blog Title",
-                description = "Blog description",
-                iconUrl = "",
-                contentUrl = "",
-                attractionId = 2,
-                isFavorite = false
-            ),
+            blog = mockFavoriteAndRecommendedBlog,
             goToBlog = {},
             markAsFavorite = { _, _ -> }
         )

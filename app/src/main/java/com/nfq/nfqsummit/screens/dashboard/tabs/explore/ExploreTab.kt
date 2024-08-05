@@ -40,8 +40,8 @@ fun ExploreTab(
 
     val exploreItems = listOf(
         ExploreItem(R.drawable.explore_attractions, AppDestination.Attractions),
-        ExploreItem(R.drawable.explore_activities, AppDestination.Attractions),
-        ExploreItem(R.drawable.explore_gifts, AppDestination.Attractions),
+//        ExploreItem(R.drawable.explore_activities, AppDestination.Attractions),
+//        ExploreItem(R.drawable.explore_gifts, AppDestination.Attractions),
         ExploreItem(R.drawable.explore_payment, AppDestination.Payment),
         ExploreItem(R.drawable.explore_survival, AppDestination.Survival),
         ExploreItem(R.drawable.explore_transport, AppDestination.Transportations)

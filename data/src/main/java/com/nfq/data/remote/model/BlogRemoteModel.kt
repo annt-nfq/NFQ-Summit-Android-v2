@@ -23,6 +23,8 @@ data class BlogRemoteModel(
     val category: String,
     @SerialName("large_image_url")
     val largeImageUrl: String?,
+    @SerialName("is_recommended")
+    val isRecommended: Boolean,
     @Transient
     val isFavorite: Boolean = false
 )
@@ -37,5 +39,6 @@ fun BlogLocalModel.toRemoteModel(): BlogRemoteModel =
         attractionId = attraction_id?.toInt(),
         category = category,
         largeImageUrl = large_image_url,
+        isRecommended = is_recommended,
         isFavorite = is_favorite
     )

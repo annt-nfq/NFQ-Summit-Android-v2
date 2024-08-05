@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.paparazzi) apply false
     alias(libs.plugins.androidLibrary) apply false
     alias(libs.plugins.sonarqube) apply false
+    alias(libs.plugins.firebase.crashlytics) apply false
     jacoco
 }
 
