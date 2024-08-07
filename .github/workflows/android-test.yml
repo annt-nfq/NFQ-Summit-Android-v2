@@ -63,7 +63,7 @@ jobs:
         uses: madrapps/jacoco-report@v1.6.1
         with:
           paths: |
-            /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+            /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
           token: ${{ secrets.REPO_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
@@ -76,7 +76,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: screenshot-report1
-          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/tests/testDebugUnitTest/
+          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/
       - name: Process failed screenshots
         if: failure()
         id: failed-screenshots
@@ -100,4 +100,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: screenshot-report2
-          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/tests/testDebugUnitTest/
+          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/
