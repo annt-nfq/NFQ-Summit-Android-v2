@@ -30,19 +30,34 @@ platform :android do
       UI.important("Snapshot tests failed. Running error handling script...")
 
       # Ensure the script is executable
-      sh("chmod +x ./process_failed_snapshot_tests.sh")
+      sh("chmod +x #{Dir.pwd}/process_failed_snapshot_tests.sh")
 
-      # Run the script with necessary environment variables
-      result = sh("GITHUB_TOKEN='#{ENV['GITHUB_TOKEN']}' " \
-      "GITHUB_REPOSITORY='#{ENV['GITHUB_REPOSITORY']}' " \
-      "PULL_REQUEST_BRANCH='#{ENV['PULL_REQUEST_BRANCH']}' " \
-      "GITHUB_REF='#{ENV['GITHUB_REF']}' " \
-      "./process_failed_snapshot_tests.sh")
+      # Run the script with necessary environment variables and capture output
+      result = `GITHUB_TOKEN='#{ENV['GITHUB_TOKEN']}' \
+         GITHUB_REPOSITORY='#{ENV['GITHUB_REPOSITORY']}' \
+         PULL_REQUEST_BRANCH='#{ENV['PULL_REQUEST_BRANCH']}' \
+         GITHUB_REF='#{ENV['GITHUB_REF']}' \
+         #{Dir.pwd}/process_failed_snapshot_tests.sh`
 
-      pr_number = result.match(/PULL_REQUEST_NUMBER=(\d+)/)[1]
-      pr_comment = result.match(/PULL_REQUEST_COMMENT=(.+)/m)[1]
+      # Check if the script executed successfully
+      unless $?.success?
+        UI.error("Failed to process screenshots: #{result}")
+        raise "Screenshot processing failed"
+      end
 
-      create_pr_comment(pr_number, pr_comment)
+      # Parse the output to get PR number and comment
+      pr_number_match = result.match(/PULL_REQUEST_NUMBER=(\d+)/)
+      pr_comment_match = result.match(/PULL_REQUEST_COMMENT=(.+)/m)
+
+      if pr_number_match && pr_comment_match
+        pr_number = pr_number_match[1]
+        pr_comment = pr_comment_match[1]
+
+        # Create a comment on the PR using Octokit
+        create_pr_comment(pr_number, pr_comment)
+      else
+        UI.error("Failed to parse script output: #{result}")
+      end
 
       # Re-raise the exception to ensure the lane is marked as failed
       raise exception

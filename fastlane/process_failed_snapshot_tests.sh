@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [[ -z ${GITHUB_TOKEN} ]]; then
   echo "Missing GITHUB_TOKEN variable"
   exit 1
@@ -15,8 +17,14 @@ if [[ -z ${PULL_REQUEST_BRANCH} ]]; then
   exit 1
 fi
 
-echo $GITHUB_REPOSITORY
-echo $PULL_REQUEST_BRANCH
+# Change to the root directory of your project
+cd "$(dirname "$0")/.."
+
+# Check if gradlew exists
+if [ ! -f "./gradlew" ]; then
+  echo "gradlew file not found in $(pwd)"
+  exit 1
+fi
 
 ./gradlew recordPaparazziDebug
 
@@ -42,12 +50,14 @@ fi
 
 printf -v PULL_REQUEST_COMMENT "Screenshot tests failed.<br><br>[See differences](https://github.com/%s/compare/%s...%s)<br><br>Merge the branch if it's an intentional change." "$GITHUB_REPOSITORY" "$PULL_REQUEST_BRANCH" "$NEW_BRANCH_NAME"
 
-EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-{
-  echo "PULL_REQUEST_NUMBER<<$EOF"
-  echo "$PULL_REQUEST_NUMBER"
-  echo "$EOF"
-  echo "PULL_REQUEST_COMMENT<<$EOF"
-  echo "$PULL_REQUEST_COMMENT"
-  echo "$EOF"
-} >>"$GITHUB_OUTPUT"
+echo "PULL_REQUEST_NUMBER=$PULL_REQUEST_NUMBER"
+echo "PULL_REQUEST_COMMENT=$PULL_REQUEST_COMMENT"
+#EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+#{
+#  echo "PULL_REQUEST_NUMBER<<$EOF"
+#  echo "$PULL_REQUEST_NUMBER"
+#  echo "$EOF"
+#  echo "PULL_REQUEST_COMMENT<<$EOF"
+#  echo "$PULL_REQUEST_COMMENT"
+#  echo "$EOF"
+#} >>"$GITHUB_OUTPUT"
