@@ -5,12 +5,12 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000381">
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000374">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: test" time="50.377038">
+      <testcase classname="fastlane.lanes" name="1: app:verifyPaparazziDebug" time="26.731792">
         
       </testcase>
     

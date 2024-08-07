@@ -21,6 +21,11 @@ platform :android do
     gradle(task: "test")
   end
 
+  desc "Run snapshot tests"
+  lane :snapshotTest do
+    gradle(task: "app:verifyPaparazziDebug")
+  end
+
   desc "Submit a new Beta Build to Crashlytics Beta"
   lane :beta do
     gradle(task: "clean assembleRelease")

@@ -66,7 +66,7 @@ android {
         debug {
             isDebuggable = true
             isMinifyEnabled = false
-            isTestCoverageEnabled = true
+            enableUnitTestCoverage = true
             buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
             buildConfigField("String", "SUPABASE_KEY", "\"$supabaseKey\"")
             signingConfig = signingConfigs.getByName("debug")
@@ -109,6 +109,7 @@ val jacocoTestReport = tasks.register<JacocoReport>("jacocoTestReport") {
     reports {
         xml.required.set(true)
         html.required.set(true)
+        csv.required.set(true)
     }
 
     val kotlinTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
