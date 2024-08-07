@@ -64,7 +64,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -209,15 +208,7 @@ fun Header(
             modifier = Modifier.fillMaxSize(),
             model = imageUrl,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
-            placeholder = BrushPainter(
-                Brush.linearGradient(
-                    listOf(
-                        Color(color = 0xFFFFFFFF),
-                        Color(color = 0xFF949494),
-                    )
-                )
-            ),
+            contentScale = ContentScale.Crop
         )
 
         Box(
@@ -325,7 +316,7 @@ fun Body(
         Spacer(modifier = Modifier.height(8.dp))
         if (!event.speakerName.isNullOrEmpty() && !event.speakerPosition.isNullOrEmpty())
             Text(
-                modifier = androidx.compose.ui.Modifier
+                modifier = Modifier
                     .background(NFQOrange, shape = RoundedCornerShape(8.dp))
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 text = if (event.ordering == 1) "Business" else if (event.ordering == 2) "Product Development" else "Tech",
@@ -348,15 +339,7 @@ fun Body(
                         .clip(CircleShape),
                     model = event.iconUrl,
                     contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    placeholder = BrushPainter(
-                        Brush.linearGradient(
-                            listOf(
-                                Color(color = 0xFFFFFFFF),
-                                Color(color = 0xFFDDDDDD),
-                            )
-                        )
-                    ),
+                    contentScale = ContentScale.Crop
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
@@ -655,6 +638,7 @@ fun EventDetailsUIPreview() {
         )
     }
 }
+
 @Preview
 @Composable
 fun EventDetailsUIDarkPreview() {

@@ -23,7 +23,7 @@ platform :android do
 
   desc "Run snapshot tests"
   lane :snapshotTest do
-    gradle(task: "app:verifyPaparazziDebug")
+    gradle(task: "app:verifyPaparazziDebug --continue")
   end
 
   desc "Submit a new Beta Build to Crashlytics Beta"

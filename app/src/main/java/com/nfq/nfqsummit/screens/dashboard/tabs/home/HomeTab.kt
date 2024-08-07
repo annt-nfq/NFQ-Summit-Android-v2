@@ -50,7 +50,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
@@ -238,15 +237,7 @@ fun HomeRecommendation(
                         .clip(RoundedCornerShape(10.dp)),
                     model = blog.iconUrl,
                     contentDescription = blog.title,
-                    contentScale = ContentScale.Crop,
-                    placeholder = BrushPainter(
-                        Brush.linearGradient(
-                            listOf(
-                                Color(color = 0xFFFFFFFF),
-                                Color(color = 0xFFDDDDDD),
-                            )
-                        )
-                    ),
+                    contentScale = ContentScale.Crop
                 )
                 Box(
                     modifier = Modifier
@@ -390,15 +381,7 @@ fun HomeFavorite(
                         .clip(RoundedCornerShape(12.dp)),
                     model = blog.iconUrl,
                     contentDescription = blog.title,
-                    contentScale = ContentScale.Crop,
-                    placeholder = BrushPainter(
-                        Brush.linearGradient(
-                            listOf(
-                                Color(color = 0xFFFFFFFF),
-                                Color(color = 0xFFDDDDDD),
-                            )
-                        )
-                    ),
+                    contentScale = ContentScale.Crop
                 )
                 Box(
                     modifier = Modifier

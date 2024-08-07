@@ -22,10 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -149,15 +147,7 @@ fun BasicEvent(
                             .clip(if (roundedAvatar) CircleShape else RectangleShape),
                         model = event.iconUrl,
                         contentDescription = null,
-                        contentScale = if (roundedAvatar) ContentScale.Crop else ContentScale.Fit,
-                        placeholder = BrushPainter(
-                            Brush.linearGradient(
-                                listOf(
-                                    Color(color = 0xFFFFFFFF),
-                                    Color(color = 0xFFDDDDDD),
-                                )
-                            )
-                        ),
+                        contentScale = if (roundedAvatar) ContentScale.Crop else ContentScale.Fit
                     )
                     if (event.speakerName != null)
                         Text(
