@@ -29,15 +29,25 @@ platform :android do
     rescue => exception
       UI.important("Snapshot tests failed. Running error handling script...")
 
+      script_path = "#{Dir.pwd}/process_failed_snapshot_tests.sh"
+      UI.message("Script path: #{script_path}")
+
+      unless File.exist?(script_path)
+        UI.error("Script file not found at #{script_path}")
+        raise "Screenshot processing script not found"
+      end
+
       # Ensure the script is executable
-      sh("chmod +x #{Dir.pwd}/process_failed_snapshot_tests.sh")
+      sh("chmod +x #{script_path}")
 
       # Run the script with necessary environment variables and capture output
+      UI.message("Executing script...")
       result = `GITHUB_TOKEN='#{ENV['GITHUB_TOKEN']}' \
          GITHUB_REPOSITORY='#{ENV['GITHUB_REPOSITORY']}' \
          PULL_REQUEST_BRANCH='#{ENV['PULL_REQUEST_BRANCH']}' \
          GITHUB_REF='#{ENV['GITHUB_REF']}' \
          #{Dir.pwd}/process_failed_snapshot_tests.sh`
+      UI.message("Script output:\n#{result}")
 
       # Check if the script executed successfully
       unless $?.success?
@@ -53,6 +63,7 @@ platform :android do
         pr_number = pr_number_match[1]
         pr_comment = pr_comment_match[1]
 
+        UI.message("Creating PR comment. PR number: #{pr_number}")
         # Create a comment on the PR using Octokit
         create_pr_comment(pr_number, pr_comment)
       else
