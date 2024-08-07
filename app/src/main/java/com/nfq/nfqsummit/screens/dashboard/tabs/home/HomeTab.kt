@@ -558,7 +558,7 @@ fun HomeTabUIDarkPreview() {
             goToAttractions = {},
             markAsFavorite = { _, _ -> },
             favoriteBlogs = Response.Success(
-                listOf(mockFavoriteAndRecommendedBlog, mockBlog)
+                listOf()
             ),
             recommendedBlogs = Response.Success(
                 listOf(

@@ -12,6 +12,7 @@
 
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
+require 'octokit'
 
 default_platform(:android)
 
@@ -23,7 +24,29 @@ platform :android do
 
   desc "Run snapshot tests"
   lane :snapshotTest do
-    gradle(task: "app:verifyPaparazziDebug --continue")
+    begin
+      gradle(task: "app:verifyPaparazziDebug")
+    rescue => exception
+      UI.important("Snapshot tests failed. Running error handling script...")
+
+      # Ensure the script is executable
+      sh("chmod +x ./process_failed_snapshot_tests.sh")
+
+      # Run the script with necessary environment variables
+      result = sh("GITHUB_TOKEN='#{ENV['GITHUB_TOKEN']}' " \
+      "GITHUB_REPOSITORY='#{ENV['GITHUB_REPOSITORY']}' " \
+      "PULL_REQUEST_BRANCH='#{ENV['PULL_REQUEST_BRANCH']}' " \
+      "GITHUB_REF='#{ENV['GITHUB_REF']}' " \
+      "./process_failed_snapshot_tests.sh")
+
+      pr_number = result.match(/PULL_REQUEST_NUMBER=(\d+)/)[1]
+      pr_comment = result.match(/PULL_REQUEST_COMMENT=(.+)/m)[1]
+
+      create_pr_comment(pr_number, pr_comment)
+
+      # Re-raise the exception to ensure the lane is marked as failed
+      raise exception
+    end
   end
 
   desc "Submit a new Beta Build to Crashlytics Beta"
@@ -36,14 +59,19 @@ platform :android do
         android_artifact_type: "APK",
         debug: "true"
     )
-  
-    # sh "your_script.sh"
-    # You can also use other beta testing services here
   end
 
   desc "Deploy a new version to the Google Play"
   lane :deploy do
     gradle(task: "clean assembleRelease")
     upload_to_play_store
+  end
+
+  def create_pr_comment(pr_number, comment)
+    client = Octokit::Client.new(access_token: ENV['GITHUB_TOKEN'])
+    repo = ENV['GITHUB_REPOSITORY']
+    client.add_comment(repo, pr_number, comment)
+  rescue => e
+    UI.error("Failed to create PR comment: #{e.message}")
   end
 end

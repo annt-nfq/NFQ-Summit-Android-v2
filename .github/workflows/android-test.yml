@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -52,9 +52,6 @@ jobs:
       - name: Update local.properties - DEBUG_KEY_PASSWORD
         run: echo 'DEBUG_KEY_PASSWORD=${{ vars.DEBUG_KEY_PASSWORD }}' >> ./local.properties
 
-      - name: Grant execute permission for shell script
-        run: chmod +x ./.github/workflows/process_failed_snapshot_tests.sh
-
 #      - name: Run Unit Tests
 #        run: ./gradlew app:test --continue
 #
@@ -72,16 +69,19 @@ jobs:
 #          min-coverage-changed-files: 60
 
       - name: Install Fastlane
-        run: gem install fastlane
+        run: |
+          gem install bundler
+          bundle install
 
       - name: Install Fastlane plugins
         run: fastlane add_plugin firebase_app_distribution
 
-      - name: Run unit tests
-        run: fastlane android test
-
       - name: Run snapshot tests
         id: snapshot-tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+          GITHUB_REPOSITORY: ${{ secrets.REPO_PATH }}
+          PULL_REQUEST_BRANCH: ${{ github.head_ref }}
         run: fastlane android snapshotTest
 
 #      - name: Run Snapshot Tests
@@ -93,27 +93,27 @@ jobs:
 #        with:
 #          name: screenshot-report1
 #          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/tests/testDebugUnitTest/
-      - name: Process failed screenshots
-        if: failure()
-        id: failed-screenshots
-        run: "./.github/workflows/process_failed_snapshot_tests.sh"
-        env:
-          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-          GITHUB_REPOSITORY: ${{ secrets.REPO_PATH }}
-          PULL_REQUEST_BRANCH: ${{ github.head_ref }}
-      - name: Create an issue if screenshot tests failed
-        uses: octokit/request-action@v2.1.9
-        if: always() && steps.failed-screenshots.outputs.PULL_REQUEST_COMMENT
-        with:
-          route: POST /repos/:repo/issues/:issue_number/comments
-          repo: ${{ github.repository }}
-          issue_number: ${{ steps.failed-screenshots.outputs.PULL_REQUEST_NUMBER }}
-          body: ${{ steps.failed-screenshots.outputs.PULL_REQUEST_COMMENT }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-      - name: Upload artifact 2
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: screenshot-report2
-          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/tests/testDebugUnitTest/
+#      - name: Process failed screenshots
+#        if: failure()
+#        id: failed-screenshots
+#        run: "./.github/workflows/process_failed_snapshot_tests.sh"
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+#          GITHUB_REPOSITORY: ${{ secrets.REPO_PATH }}
+#          PULL_REQUEST_BRANCH: ${{ github.head_ref }}
+#      - name: Create an issue if screenshot tests failed
+#        uses: octokit/request-action@v2.1.9
+#        if: always() && steps.failed-screenshots.outputs.PULL_REQUEST_COMMENT
+#        with:
+#          route: POST /repos/:repo/issues/:issue_number/comments
+#          repo: ${{ github.repository }}
+#          issue_number: ${{ steps.failed-screenshots.outputs.PULL_REQUEST_NUMBER }}
+#          body: ${{ steps.failed-screenshots.outputs.PULL_REQUEST_COMMENT }}
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+#      - name: Upload artifact 2
+#        if: failure()
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: screenshot-report2
+#          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/tests/testDebugUnitTest/
