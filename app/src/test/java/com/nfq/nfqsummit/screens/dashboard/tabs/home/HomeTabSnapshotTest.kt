@@ -19,4 +19,11 @@ class HomeTabSnapshotTest {
             HomeTabUIPreview()
         }
     }
+
+    @Test
+    fun testHomeTabUIDark() {
+        paparazzi.snapshot {
+            HomeTabUIDarkPreview()
+        }
+    }
 }

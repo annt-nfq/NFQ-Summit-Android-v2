@@ -1,9 +1,19 @@
 package com.nfq.nfqsummit.di
 
+import com.nfq.data.local.AttractionLocal
+import com.nfq.data.local.AttractionLocalImpl
+import com.nfq.data.local.BlogLocal
+import com.nfq.data.local.BlogLocalImpl
 import com.nfq.data.local.EventLocal
 import com.nfq.data.local.EventLocalImpl
+import com.nfq.data.remote.AttractionRemote
+import com.nfq.data.remote.AttractionRemoteImpl
+import com.nfq.data.remote.BlogRemote
+import com.nfq.data.remote.BlogRemoteImpl
 import com.nfq.data.remote.EventRemote
 import com.nfq.data.remote.EventRemoteImpl
+import com.nfq.data.remote.TranslationRemote
+import com.nfq.data.remote.TranslationRemoteImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -24,4 +34,34 @@ abstract class DataSourceModule {
     abstract fun bindEventLocal(
         eventLocalImpl: EventLocalImpl
     ): EventLocal
+
+    @Binds
+    @Singleton
+    abstract fun bindBlogRemote(
+        blogRemoteImpl: BlogRemoteImpl
+    ): BlogRemote
+
+    @Binds
+    @Singleton
+    abstract fun bingBlogLocal(
+        blogLocalImpl: BlogLocalImpl
+    ): BlogLocal
+
+    @Binds
+    @Singleton
+    abstract fun bingAttractionRemote(
+        attractionRemoteImpl: AttractionRemoteImpl
+    ): AttractionRemote
+
+    @Binds
+    @Singleton
+    abstract fun bindAttractionLocal(
+        attractionLocalImpl: AttractionLocalImpl
+    ): AttractionLocal
+
+    @Binds
+    @Singleton
+    abstract fun bindTranslationRemote(
+        translationRemoteImpl: TranslationRemoteImpl
+    ): TranslationRemote
 }

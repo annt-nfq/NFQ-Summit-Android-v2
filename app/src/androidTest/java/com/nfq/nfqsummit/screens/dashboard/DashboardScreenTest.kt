@@ -46,16 +46,12 @@ class DashboardScreenTest {
 
         composeTestRule.onNodeWithText("Schedule").performClick()
         composeTestRule.onNodeWithText("My Bookings").assertIsDisplayed()
-
-        composeTestRule.onNodeWithText("Wed").performClick()
+        composeTestRule.onNodeWithText("Sat").performClick()
         Thread.sleep(1500)
-        composeTestRule.onNodeWithText("Muay Thai").performScrollTo()
+        composeTestRule.onNodeWithText("Event 1").performClick()
         Thread.sleep(1500)
-        composeTestRule.onNodeWithText("Muay Thai").performClick()
-        Thread.sleep(1500)
-        composeTestRule.onNodeWithText("Muay Thai").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Event 1").assertIsDisplayed()
         val route = navController.currentBackStackEntry?.destination?.route
-        println(route)
         Assert.assertEquals(route, "eventDetails/{eventId}")
     }
 }

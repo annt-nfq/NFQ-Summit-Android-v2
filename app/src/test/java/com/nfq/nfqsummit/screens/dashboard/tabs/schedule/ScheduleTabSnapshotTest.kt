@@ -18,4 +18,11 @@ class ScheduleTabSnapshotTest {
             ScheduleTabUIPreview()
         }
     }
+
+    @Test
+    fun testScheduleTabUIDark() {
+        paparazzi.snapshot {
+            ScheduleTabUIDarkPreview()
+        }
+    }
 }

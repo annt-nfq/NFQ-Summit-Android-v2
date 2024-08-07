@@ -19,4 +19,11 @@ class EventDetailsScreenSnapshotTest {
             EventDetailsUIPreview()
         }
     }
+
+    @Test
+    fun testEventDetailsScreenDark() {
+        paparazzi.snapshot {
+            EventDetailsUIDarkPreview()
+        }
+    }
 }

@@ -22,6 +22,26 @@ CREATE TABLE FavoriteEvent(
     id TEXT PRIMARY KEY
 );
 
+CREATE TABLE AttractionLocalModel (
+    id INTEGER NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    icon TEXT NOT NULL
+);
+
+CREATE TABLE BlogLocalModel (
+    id INTEGER NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    icon_url TEXT NOT NULL,
+    content_url TEXT NOT NULL,
+    category TEXT NOT NULL,
+    large_image_url TEXT,
+    is_favorite INTEGER AS Boolean NOT NULL DEFAULT 0,
+    is_recommended INTEGER AS Boolean NOT NULL DEFAULT 0,
+    attraction_id INTEGER,
+    FOREIGN KEY (attraction_id) REFERENCES AttractionLocalModel(id)
+);
+
 insertFavoriteEvent:
 INSERT INTO FavoriteEvent (id) VALUES (?);
 
@@ -46,3 +66,44 @@ SELECT Event.* FROM Event WHERE is_conference = 1;
 
 selectEvent:
 SELECT Event.* FROM Event WHERE id = ?;
+
+insertAttraction:
+INSERT OR REPLACE INTO AttractionLocalModel (id, title, icon)
+VALUES (?, ?, ?);
+
+selectAllAttractions:
+SELECT AttractionLocalModel.* FROM AttractionLocalModel;
+
+selectAttraction:
+SELECT AttractionLocalModel.* FROM  AttractionLocalModel WHERE id = ?;
+
+clearAttractions:
+DELETE FROM AttractionLocalModel;
+
+insertBlog:
+INSERT OR REPLACE INTO BlogLocalModel (id, title, description, icon_url, content_url, category, large_image_url, is_favorite, attraction_id, is_recommended)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+selectAllBlogs:
+SELECT BlogLocalModel.* FROM BlogLocalModel;
+
+selectBlog:
+SELECT BlogLocalModel.* FROM BlogLocalModel WHERE id = ?;
+
+selectBlogsByCategory:
+SELECT BlogLocalModel.* FROM BlogLocalModel WHERE category = ?;
+
+selectBlogsByAttraction:
+SELECT BlogLocalModel.* FROM BlogLocalModel WHERE attraction_id = ?;
+
+clearBlogs:
+DELETE FROM BlogLocalModel;
+
+markBlogAsFavorite:
+UPDATE BlogLocalModel SET is_favorite = ? WHERE id = ?;
+
+getFavoriteBlogs:
+SELECT BlogLocalModel.* FROM BlogLocalModel WHERE is_favorite = 1;
+
+getRecommendedBlogs:
+SELECT BlogLocalModel.* FROM BlogLocalModel WHERE is_recommended = 1;

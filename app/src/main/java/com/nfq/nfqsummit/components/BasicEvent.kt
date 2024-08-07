@@ -22,10 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,7 +34,6 @@ import coil.compose.AsyncImage
 import com.nfq.nfqsummit.model.PositionedEvent
 import com.nfq.nfqsummit.model.SplitType
 import com.nfq.nfqsummit.ui.theme.NFQOrange
-import com.nfq.nfqsummit.ui.theme.OnSecondaryContainerLight
 import com.nfq.nfqsummit.ui.theme.coloredShadow
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -69,12 +66,7 @@ fun BasicEvent(
                 offsetY = 8.dp,
             )
             .background(
-                color = when (event.ordering) {
-                    1 -> Color(0xFFFFCDD2)
-                    2 -> Color(0xFFC8E6C9)
-                    3 -> Color(0xFFB2EBF2)
-                    else -> Color(0xFFFBE9E7)
-                },
+                color = MaterialTheme.colorScheme.secondaryContainer,
                 shape = RoundedCornerShape(
                     topStart = topRadius,
                     topEnd = topRadius,
@@ -140,7 +132,7 @@ fun BasicEvent(
                         fontWeight = FontWeight.Bold,
                         maxLines = titleMaxLines,
                         overflow = TextOverflow.Ellipsis,
-                        color = OnSecondaryContainerLight
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
             }
@@ -155,15 +147,7 @@ fun BasicEvent(
                             .clip(if (roundedAvatar) CircleShape else RectangleShape),
                         model = event.iconUrl,
                         contentDescription = null,
-                        contentScale = if (roundedAvatar) ContentScale.Crop else ContentScale.Fit,
-                        placeholder = BrushPainter(
-                            Brush.linearGradient(
-                                listOf(
-                                    Color(color = 0xFFFFFFFF),
-                                    Color(color = 0xFFDDDDDD),
-                                )
-                            )
-                        ),
+                        contentScale = if (roundedAvatar) ContentScale.Crop else ContentScale.Fit
                     )
                     if (event.speakerName != null)
                         Text(
@@ -175,7 +159,7 @@ fun BasicEvent(
                             textAlign = TextAlign.Start,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            color = OnSecondaryContainerLight
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                 }
         }

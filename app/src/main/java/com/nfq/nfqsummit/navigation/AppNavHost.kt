@@ -6,6 +6,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.nfq.nfqsummit.screens.attractions.AttractionsScreen
+import com.nfq.nfqsummit.screens.attractions.attractionBlogs.AttractionBlogsScreen
+import com.nfq.nfqsummit.screens.blog.BlogScreen
 import com.nfq.nfqsummit.screens.bookingNumber.BookingNumberScreen
 import com.nfq.nfqsummit.screens.dashboard.DashboardScreen
 import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
@@ -14,7 +17,10 @@ import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.techRocks.TechRocksTab
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsScreen
 import com.nfq.nfqsummit.screens.onboarding.OnboardingScreen
+import com.nfq.nfqsummit.screens.payment.PaymentScreen
 import com.nfq.nfqsummit.screens.splash.SplashScreen
+import com.nfq.nfqsummit.screens.survival.SurvivalScreen
+import com.nfq.nfqsummit.screens.transportation.TransportationScreen
 
 @SuppressLint("NewApi")
 @Composable
@@ -66,9 +72,76 @@ fun AppNavHost(
                     navController.navigate(
                         "${AppDestination.EventDetails.route}/$it"
                     )
+                },
+                goToDestination = {
+                    navController.navigate(it.route)
+                },
+                goToBlog = {
+                    navController.navigate("${AppDestination.Blogs.route}/$it")
+                },
+                goToAttractions = {
+                    navController.navigate(AppDestination.Attractions.route)
                 }
             )
         }
+
+        composable(AppDestination.Survival.route) {
+            SurvivalScreen(
+                goBack = { navController.navigateUp() }
+            )
+        }
+
+        composable(AppDestination.Transportations.route) {
+            TransportationScreen(
+                goBack = { navController.navigateUp() },
+                goToBlog = {
+                    navController.navigate("${AppDestination.Blogs.route}/$it")
+                }
+            )
+        }
+
+        composable(AppDestination.Payment.route) {
+            PaymentScreen(
+                goBack = { navController.navigateUp() }
+            )
+        }
+
+        composable(AppDestination.Attractions.route) {
+            AttractionsScreen(
+                goBack = { navController.navigateUp() },
+                goToAttraction = {
+                    navController.navigate("${AppDestination.Attractions.route}/${it}")
+                }
+            )
+        }
+
+        composable(
+            route = AppDestination.Attractions.routeWithArgs,
+            arguments = AppDestination.Attractions.arguments,
+            deepLinks = AppDestination.Attractions.deeplinks
+        ) {
+            val attractionId = it.arguments?.getInt(AppDestination.Attractions.attractionIdArg)
+            AttractionBlogsScreen(
+                attractionId = attractionId ?: 0,
+                goBack = { navController.navigateUp() },
+                goToBlog = {
+                    navController.navigate("${AppDestination.Blogs.route}/$it")
+                }
+            )
+        }
+
+        composable(
+            route = AppDestination.Blogs.routeWithArgs,
+            arguments = AppDestination.Blogs.arguments,
+            deepLinks = AppDestination.Blogs.deeplinks
+        ) {
+            val blogId = it.arguments?.getInt(AppDestination.Blogs.blogIdArg)
+            BlogScreen(
+                blogId = blogId ?: 0,
+                goBack = { navController.navigateUp() }
+            )
+        }
+
         composable(
             route = AppDestination.EventDetails.routeWithArgs,
             arguments = AppDestination.EventDetails.arguments,
@@ -76,7 +149,7 @@ fun AppNavHost(
         ) {
             val eventId =
                 it.arguments?.getString(AppDestination.EventDetails.eventIdArg)
-            EventDetailsScreen(eventId = eventId, goBack = { navController.popBackStack() })
+            EventDetailsScreen(eventId = eventId, goBack = { navController.navigateUp() })
         }
     }
 }
@@ -84,13 +157,18 @@ fun AppNavHost(
 @Composable
 fun DashboardNavHost(
     goToEventDetails: (eventId: String) -> Unit,
+    goToDestination: (destination: AppDestination) -> Unit,
+    goToBlog: (blogId: Int) -> Unit,
+    goToAttractions: () -> Unit,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     NavHost(navController = navController, startDestination = AppDestination.Home.route) {
         composable(AppDestination.Home.route) {
             HomeTab(
-                goToEventDetails = goToEventDetails
+                goToEventDetails = goToEventDetails,
+                goToBlog = goToBlog,
+                goToAttractions = goToAttractions
             )
         }
         composable(AppDestination.Schedule.route) {
@@ -104,7 +182,9 @@ fun DashboardNavHost(
             )
         }
         composable(AppDestination.Explore.route) {
-            ExploreTab()
+            ExploreTab(
+                goToDestination = goToDestination
+            )
         }
     }
 }

@@ -64,7 +64,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.BrushPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -84,6 +83,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.components.shimmerBrush
+import com.nfq.nfqsummit.mocks.mockEventDay1
 import com.nfq.nfqsummit.notification.AlarmReceiver
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -208,15 +208,7 @@ fun Header(
             modifier = Modifier.fillMaxSize(),
             model = imageUrl,
             contentDescription = null,
-            contentScale = ContentScale.Crop,
-            placeholder = BrushPainter(
-                Brush.linearGradient(
-                    listOf(
-                        Color(color = 0xFFFFFFFF),
-                        Color(color = 0xFF949494),
-                    )
-                )
-            ),
+            contentScale = ContentScale.Crop
         )
 
         Box(
@@ -324,7 +316,7 @@ fun Body(
         Spacer(modifier = Modifier.height(8.dp))
         if (!event.speakerName.isNullOrEmpty() && !event.speakerPosition.isNullOrEmpty())
             Text(
-                modifier = androidx.compose.ui.Modifier
+                modifier = Modifier
                     .background(NFQOrange, shape = RoundedCornerShape(8.dp))
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 text = if (event.ordering == 1) "Business" else if (event.ordering == 2) "Product Development" else "Tech",
@@ -347,15 +339,7 @@ fun Body(
                         .clip(CircleShape),
                     model = event.iconUrl,
                     contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    placeholder = BrushPainter(
-                        Brush.linearGradient(
-                            listOf(
-                                Color(color = 0xFFFFFFFF),
-                                Color(color = 0xFFDDDDDD),
-                            )
-                        )
-                    ),
+                    contentScale = ContentScale.Crop
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
@@ -648,19 +632,19 @@ fun EventDetailsUI(
 fun EventDetailsUIPreview() {
     NFQSnapshotTestThemeForPreview {
         EventDetailsUI(
-            event = SummitEvent(
-                "1",
-                "Event Title",
-                LocalDateTime.of(2022, 1, 1, 1, 0),
-                LocalDateTime.of(2022, 1, 1, 2, 0),
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                0.0, 0.0,
-                "",
-                "Bangkok, Thailand",
-                iconUrl = "",
-                speakerName = "Speaker Name",
-                speakerPosition = "Speaker Position",
-            ),
+            event = mockEventDay1,
+            goBack = { },
+            isBookmarked = true
+        )
+    }
+}
+
+@Preview
+@Composable
+fun EventDetailsUIDarkPreview() {
+    NFQSnapshotTestThemeForPreview(darkTheme = true) {
+        EventDetailsUI(
+            event = mockEventDay1,
             goBack = { },
             isBookmarked = true
         )

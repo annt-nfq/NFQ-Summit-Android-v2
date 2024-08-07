@@ -1,0 +1,3 @@
+import kotlin.Boolean;
+
+ALTER TABLE BlogLocalModel ADD COLUMN is_recommended INTEGER AS Boolean NOT NULL DEFAULT 0;

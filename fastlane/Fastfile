@@ -12,6 +12,7 @@
 
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
+require 'octokit'
 
 default_platform(:android)
 
@@ -19,6 +20,59 @@ platform :android do
   desc "Runs all the tests"
   lane :test do
     gradle(task: "test")
+  end
+
+  desc "Run snapshot tests"
+  lane :snapshotTest do
+    begin
+      gradle(task: "app:verifyPaparazziDebug")
+    rescue => exception
+      UI.important("Snapshot tests failed. Running error handling script...")
+
+      script_path = "#{Dir.pwd}/process_failed_snapshot_tests.sh"
+      UI.message("Script path: #{script_path}")
+
+      unless File.exist?(script_path)
+        UI.error("Script file not found at #{script_path}")
+        raise "Screenshot processing script not found"
+      end
+
+      # Ensure the script is executable
+      sh("chmod +x #{script_path}")
+
+      # Run the script with necessary environment variables and capture output
+      UI.message("Executing script...")
+      result = `GITHUB_TOKEN='#{ENV['GITHUB_TOKEN']}' \
+         GITHUB_REPOSITORY='#{ENV['GITHUB_REPOSITORY']}' \
+         PULL_REQUEST_BRANCH='#{ENV['PULL_REQUEST_BRANCH']}' \
+         GITHUB_REF='#{ENV['GITHUB_REF']}' \
+         #{Dir.pwd}/process_failed_snapshot_tests.sh`
+      UI.message("Script output:\n#{result}")
+
+      # Check if the script executed successfully
+      unless $?.success?
+        UI.error("Failed to process screenshots: #{result}")
+        raise "Screenshot processing failed"
+      end
+
+      # Parse the output to get PR number and comment
+      pr_number_match = result.match(/PULL_REQUEST_NUMBER=(\d+)/)
+      pr_comment_match = result.match(/PULL_REQUEST_COMMENT=(.+)/m)
+
+      if pr_number_match && pr_comment_match
+        pr_number = pr_number_match[1]
+        pr_comment = pr_comment_match[1]
+
+        UI.message("Creating PR comment. PR number: #{pr_number}")
+        # Create a comment on the PR using Octokit
+        create_pr_comment(pr_number, pr_comment)
+      else
+        UI.error("Failed to parse script output: #{result}")
+      end
+
+      # Re-raise the exception to ensure the lane is marked as failed
+      raise exception
+    end
   end
 
   desc "Submit a new Beta Build to Crashlytics Beta"
@@ -31,14 +85,19 @@ platform :android do
         android_artifact_type: "APK",
         debug: "true"
     )
-  
-    # sh "your_script.sh"
-    # You can also use other beta testing services here
   end
 
   desc "Deploy a new version to the Google Play"
   lane :deploy do
     gradle(task: "clean assembleRelease")
     upload_to_play_store
+  end
+
+  def create_pr_comment(pr_number, comment)
+    client = Octokit::Client.new(access_token: ENV['GITHUB_TOKEN'])
+    repo = ENV['GITHUB_REPOSITORY']
+    client.add_comment(repo, pr_number, comment)
+  rescue => e
+    UI.error("Failed to create PR comment: #{e.message}")
   end
 end
