@@ -1,0 +1,16 @@
+current directory: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/vendor/bundle/ruby/3.3.0/gems/json-2.7.2/ext/json
+/opt/hostedtoolcache/Ruby/3.3.4/x64/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/vendor/bundle/ruby/3.3.0/gems/json-2.7.2/ext/json
+make DESTDIR\= sitearchdir\=./.gem.20240807-1797-z5byun sitelibdir\=./.gem.20240807-1797-z5byun clean
+
+current directory: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/vendor/bundle/ruby/3.3.0/gems/json-2.7.2/ext/json
+make DESTDIR\= sitearchdir\=./.gem.20240807-1797-z5byun sitelibdir\=./.gem.20240807-1797-z5byun
+make: Nothing to be done for 'all'.
+
+current directory: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/vendor/bundle/ruby/3.3.0/gems/json-2.7.2/ext/json
+make DESTDIR\= sitearchdir\=./.gem.20240807-1797-z5byun sitelibdir\=./.gem.20240807-1797-z5byun install
+
+current directory: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/vendor/bundle/ruby/3.3.0/gems/json-2.7.2/ext/json
+make DESTDIR\= sitearchdir\=./.gem.20240807-1797-z5byun sitelibdir\=./.gem.20240807-1797-z5byun clean
