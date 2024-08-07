@@ -71,15 +71,28 @@ jobs:
 #          min-coverage-overall: 40
 #          min-coverage-changed-files: 60
 
-      - name: Run Snapshot Tests
+      - name: Install Fastlane
+        run: gem install fastlane
+
+      - name: Install Fastlane plugins
+        run: fastlane add_plugin firebase_app_distribution
+
+      - name: Run unit tests
+        run: fastlane android test
+
+      - name: Run snapshot tests
         id: snapshot-tests
-        run: ./gradlew app:verifyPaparazziDebug --continue
-      - name: Upload artifact 1
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: screenshot-report1
-          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/
+        run: fastlane android snapshotTest
+
+#      - name: Run Snapshot Tests
+#        id: snapshot-tests
+#        run: ./gradlew app:verifyPaparazziDebug --continue
+#      - name: Upload artifact 1
+#        if: failure()
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: screenshot-report1
+#          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/tests/testDebugUnitTest/
       - name: Process failed screenshots
         if: failure()
         id: failed-screenshots
@@ -103,4 +116,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: screenshot-report2
-          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/
+          path: /home/runner/work/NFQ-Summit-Android-v2/NFQ-Summit-Android-v2/**/build/reports/tests/testDebugUnitTest/
