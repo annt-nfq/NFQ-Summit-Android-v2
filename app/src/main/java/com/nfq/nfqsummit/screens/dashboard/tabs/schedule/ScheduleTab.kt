@@ -1,6 +1,5 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.schedule
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -43,16 +41,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.components.BasicEvent
 import com.nfq.nfqsummit.components.Schedule
+import com.nfq.nfqsummit.mocks.mockEventDay1
+import com.nfq.nfqsummit.mocks.mockEventDay2H1
+import com.nfq.nfqsummit.mocks.mockEventDay2H2
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.TextStyle
 import java.util.Locale
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ScheduleTab(
     viewModel: ScheduleViewModel = hiltViewModel(),
@@ -61,19 +60,17 @@ fun ScheduleTab(
     val window = (LocalView.current.context as Activity).window
     window.statusBarColor = Color.Transparent.toArgb()
 
-    Scaffold {
-        ScheduleTabUI(
-            dayEventPair = viewModel.dayEventPair,
-            currentTime = viewModel.currentTime,
-            selectedDate = viewModel.selectedDate,
-            onDayClick = {
-                viewModel.selectedDate = it
-            },
-            onEventClick = {
-                goToEventDetails(it.id)
-            },
-        )
-    }
+    ScheduleTabUI(
+        dayEventPair = viewModel.dayEventPair,
+        currentTime = viewModel.currentTime,
+        selectedDate = viewModel.selectedDate,
+        onDayClick = {
+            viewModel.selectedDate = it
+        },
+        onEventClick = {
+            goToEventDetails(it.id)
+        },
+    )
 }
 
 @Composable
@@ -85,24 +82,28 @@ fun ScheduleTabUI(
     onEventClick: (SummitEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier
-        .statusBarsPadding()
-        .background(MaterialTheme.colorScheme.surface)) {
-        Text(
-            text = "My Bookings",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(16.dp)
-        )
-        SummitSchedule(
-            dayEventPair = dayEventPair,
-            currentTime = currentTime,
-            selectedDate = selectedDate,
-            onDayClick = {
-                onDayClick(it)
-            },
-            onEventClick = { onEventClick(it) },
-            modifier = modifier
-        )
+    Scaffold { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
+            Text(
+                text = "My Bookings",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(16.dp)
+            )
+            SummitSchedule(
+                dayEventPair = dayEventPair,
+                currentTime = currentTime,
+                selectedDate = selectedDate,
+                onDayClick = {
+                    onDayClick(it)
+                },
+                onEventClick = { onEventClick(it) },
+                modifier = modifier
+            )
+        }
     }
 }
 
@@ -295,26 +296,11 @@ fun ScheduleTabUIPreview() {
         ScheduleTabUI(
             dayEventPair = listOf(
                 LocalDate.of(2024, 1, 1) to listOf(
-                    SummitEvent(
-                        id = "1",
-                        name = "Event 1",
-                        start = LocalDateTime.of(2024, 1, 1, 9, 0),
-                        end = LocalDateTime.of(2024, 1, 1, 10, 0)
-                    ),
+                    mockEventDay1
                 ),
                 LocalDate.of(2024, 1, 2) to listOf(
-                    SummitEvent(
-                        id = "2",
-                        name = "Event 2",
-                        start = LocalDateTime.of(2024, 1, 2, 9, 0),
-                        end = LocalDateTime.of(2024, 1, 2, 10, 0)
-                    ),
-                    SummitEvent(
-                        id = "3",
-                        name = "Event 3",
-                        start = LocalDateTime.of(2024, 1, 2, 11, 0),
-                        end = LocalDateTime.of(2024, 1, 2, 12, 0)
-                    ),
+                    mockEventDay2H1,
+                    mockEventDay2H2,
                 )
             ),
             currentTime = LocalTime.of(11, 0),
@@ -332,26 +318,11 @@ fun ScheduleTabUIDarkPreview() {
         ScheduleTabUI(
             dayEventPair = listOf(
                 LocalDate.of(2024, 1, 1) to listOf(
-                    SummitEvent(
-                        id = "1",
-                        name = "Event 1",
-                        start = LocalDateTime.of(2024, 1, 1, 9, 0),
-                        end = LocalDateTime.of(2024, 1, 1, 10, 0)
-                    ),
+                    mockEventDay1
                 ),
                 LocalDate.of(2024, 1, 2) to listOf(
-                    SummitEvent(
-                        id = "2",
-                        name = "Event 2",
-                        start = LocalDateTime.of(2024, 1, 2, 9, 0),
-                        end = LocalDateTime.of(2024, 1, 2, 10, 0)
-                    ),
-                    SummitEvent(
-                        id = "3",
-                        name = "Event 3",
-                        start = LocalDateTime.of(2024, 1, 2, 11, 0),
-                        end = LocalDateTime.of(2024, 1, 2, 12, 0)
-                    ),
+                    mockEventDay2H1,
+                    mockEventDay2H2,
                 )
             ),
             currentTime = LocalTime.of(10, 30),

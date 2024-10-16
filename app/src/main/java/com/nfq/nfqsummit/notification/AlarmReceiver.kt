@@ -12,7 +12,6 @@ import com.nfq.nfqsummit.R
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        Log.e("AlarmReceiver", "Received notification")
         showNotification(
             context,
             intent.getStringExtra("title") ?: "",
@@ -37,7 +36,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .setContentIntent(notifyPendingIntent)
             .setContentTitle(title)
             .setContentText(body)
-            .setSmallIcon(R.drawable.ic_tech_rocks)
+            .setSmallIcon(R.drawable.ic_stat_nfq)
 
         manager.notify(System.currentTimeMillis().toInt(), builder.build())
     }

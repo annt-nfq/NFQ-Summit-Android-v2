@@ -17,4 +17,11 @@ class TechRocksTabSnapshotTest {
             ConferenceSchedulePreview()
         }
     }
+
+    @Test
+    fun testTechRocksTabUIDark() {
+        paparazzi.snapshot {
+            ConferenceScheduleDarkPreview()
+        }
+    }
 }

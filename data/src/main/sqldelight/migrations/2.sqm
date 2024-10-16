@@ -1,0 +1,20 @@
+import kotlin.Boolean;
+
+CREATE TABLE AttractionLocalModel (
+    id INTEGER NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    icon TEXT NOT NULL
+);
+
+CREATE TABLE BlogLocalModel (
+    id INTEGER NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    icon_url TEXT NOT NULL,
+    content_url TEXT NOT NULL,
+    category TEXT NOT NULL,
+    large_image_url TEXT,
+    is_favorite INTEGER AS Boolean NOT NULL DEFAULT 0,
+    attraction_id INTEGER,
+    FOREIGN KEY (attraction_id) REFERENCES AttractionLocalModel(id)
+);

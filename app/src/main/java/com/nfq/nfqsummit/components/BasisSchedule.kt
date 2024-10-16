@@ -75,7 +75,6 @@ private fun splitEvents(events: List<SummitEvent>): List<PositionedEvent> {
 }
 
 private fun PositionedEvent.overlapsWith(other: PositionedEvent): Boolean {
-    Log.e("OVERLAPS", "${this.date} - ${this.event.name} vs. ${other.date} - ${other.event.name}")
     return date == other.date &&
             start < other.end &&
             end > other.start &&
