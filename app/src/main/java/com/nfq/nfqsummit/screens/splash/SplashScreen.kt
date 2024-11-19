@@ -30,7 +30,7 @@ fun SplashScreen(
     WindowCompat.setDecorFitsSystemWindows(window, false)
     LaunchedEffect(Unit) {
         delay(1000)
-        navigateToOnboarding()
+        navigateToHome()
     }
     Box(
         modifier = Modifier

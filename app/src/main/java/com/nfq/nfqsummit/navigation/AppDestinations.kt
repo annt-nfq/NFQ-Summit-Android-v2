@@ -26,6 +26,8 @@ sealed class AppDestination(var route: String) {
 
     data object Survival : AppDestination(route = "survival")
 
+    data object SignIn : AppDestination(route = "signIn")
+
     data object Blogs : AppDestination(route = "blogs") {
         const val blogIdArg = "blogId"
         val routeWithArgs = "$route/{$blogIdArg}"

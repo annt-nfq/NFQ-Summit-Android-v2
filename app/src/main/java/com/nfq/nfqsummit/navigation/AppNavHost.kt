@@ -18,6 +18,7 @@ import com.nfq.nfqsummit.screens.dashboard.tabs.techRocks.TechRocksTab
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsScreen
 import com.nfq.nfqsummit.screens.onboarding.OnboardingScreen
 import com.nfq.nfqsummit.screens.payment.PaymentScreen
+import com.nfq.nfqsummit.screens.signIn.SignInScreen
 import com.nfq.nfqsummit.screens.splash.SplashScreen
 import com.nfq.nfqsummit.screens.survival.SurvivalScreen
 import com.nfq.nfqsummit.screens.transportation.TransportationScreen
@@ -28,11 +29,11 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    NavHost(navController = navController, startDestination = AppDestination.Dashboard.route) {
+    NavHost(navController = navController, startDestination = AppDestination.Splash.route) {
         composable(AppDestination.Splash.route) {
             SplashScreen(
                 navigateToHome = {
-                    navController.navigate(AppDestination.Dashboard.route) {
+                    navController.navigate(AppDestination.SignIn.route) {
                         popUpTo(AppDestination.Splash.route) { inclusive = true }
                     }
                 },
@@ -53,6 +54,20 @@ fun AppNavHost(
                 navigateToBooking = {
                     navController.navigate(AppDestination.BookingNumber.route) {
                         popUpTo(AppDestination.Onboarding.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable(AppDestination.SignIn.route) {
+            SignInScreen(
+                continueAsGuest = {
+                    navController.navigate(AppDestination.Dashboard.route) {
+                        popUpTo(AppDestination.SignIn.route) { inclusive = true }
+                    }
+                },
+                onSignInSuccess = {
+                    navController.navigate(AppDestination.Dashboard.route) {
+                        popUpTo(AppDestination.SignIn.route) { inclusive = true }
                     }
                 }
             )
