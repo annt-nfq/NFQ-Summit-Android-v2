@@ -1,6 +1,7 @@
 package com.nfq.nfqsummit.ui.theme
 
 import android.app.Activity
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 
 private val DarkColorPalette = darkColorScheme(
@@ -112,3 +114,7 @@ fun Surface(
         content()
     }
 }
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light theme")
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark theme")
+annotation class ThemePreviews
