@@ -6,11 +6,7 @@ import com.nfq.data.domain.model.toSummitEvent
 import com.nfq.data.domain.repository.EventRepository
 import com.nfq.data.local.EventLocal
 import com.nfq.data.remote.EventRemote
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -18,15 +14,25 @@ class EventRepositoryImpl @Inject constructor(
     private val eventRemote: EventRemote,
     private val eventLocal: EventLocal
 ) : EventRepository {
-    override suspend fun getAllEvents(forceReload: Boolean): Response<List<SummitEvent>> {
-        val cachedEvents = eventLocal.getAllEvents()
-        return if (cachedEvents.isNotEmpty() && !forceReload)
-            Response.Success(cachedEvents.map { it.toSummitEvent() })
-        else {
-            Response.Success(eventRemote.getAllEvents().also {
-                eventLocal.clearAllEvents()
-                eventLocal.insertEvents(it)
-            }.map { it.toSummitEvent() })
+    override val events: Flow<List<SummitEvent>>
+        get() = eventLocal
+            .events
+            .map { it.map { event -> event.toSummitEvent() } }
+
+    override val savedEvents: Flow<List<SummitEvent>>
+        get() = eventLocal
+            .savedEvents
+            .map { it.map { event -> event.toSummitEvent() } }
+
+    override suspend fun fetchAllEvents(forceReload: Boolean): Response<List<SummitEvent>> {
+        return try {
+            val cachedEvents = eventLocal.getAllEvents()
+            val remoteEvents = eventRemote.getAllEvents()
+            val allEvents = (cachedEvents + remoteEvents).distinctBy { it.id }
+            eventLocal.insertEvents(allEvents)
+            Response.Success(allEvents.map { it.toSummitEvent() })
+        } catch (e: Exception) {
+            return Response.Failure(e)
         }
     }
 
@@ -57,13 +63,7 @@ class EventRepositoryImpl @Inject constructor(
         eventLocal.removeFavoriteEvent(eventId)
     }
 
-    override fun getSavedEvents():Flow<Response<List<SummitEvent>>> {
-        return flow {
-            emit(Response.Loading)
-            eventLocal
-                .getSavedEvents()
-                .catch { emit(Response.Failure(it)) }
-                .map { it.map { event -> event.toSummitEvent() } }
-        }.flowOn(Dispatchers.IO)
+    override suspend fun markEventAsFavorite(isFavorite: Boolean, eventId: String) {
+        eventLocal.markEventAsFavorite(isFavorite, eventId)
     }
 }

@@ -43,7 +43,7 @@ class HomeTabKtTest : BaseComposeTest() {
             blogRepository.getFavoriteBlogs()
         } returns MutableStateFlow<Response<List<Blog>>>(Response.Success(listOf()))
         coEvery {
-            eventRepository.getAllEvents(any())
+            eventRepository.fetchAllEvents(any())
         } returns Response.Success(
             listOf(
                 SummitEvent(
@@ -71,7 +71,7 @@ class HomeTabKtTest : BaseComposeTest() {
             HomeTab(
                 viewModel = viewModel,
                 goToEventDetails = {},
-                goToBlog = {},
+                goToDetails = {},
                 goToAttractions = {}
             )
         }

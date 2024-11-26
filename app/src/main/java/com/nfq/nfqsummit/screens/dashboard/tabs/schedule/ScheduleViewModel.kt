@@ -32,7 +32,7 @@ class ScheduleViewModel @Inject constructor(
     }
 
     private fun getEvents() = viewModelScope.launch {
-        val response = eventRepository.getAllEvents()
+        val response = eventRepository.fetchAllEvents()
         events = when (response) {
             is Response.Success -> response.data?.sortedBy { it.start }
                 ?: listOf()

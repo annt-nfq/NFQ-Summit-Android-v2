@@ -33,7 +33,9 @@ data class SummitEventRemoteModel(
     @SerialName("speaker_name")
     var speakerName: String? = null,
     @SerialName("speaker_position")
-    var speakerPosition: String? = null
+    var speakerPosition: String? = null,
+    @SerialName("is_favorite")
+    var isFavorite: Boolean? = null
 )
 
 fun Event.toSummitEventRemoteModel() : SummitEventRemoteModel =
@@ -52,4 +54,5 @@ fun Event.toSummitEventRemoteModel() : SummitEventRemoteModel =
         speakerName = speaker_name,
         speakerPosition = speaker_position,
         iconUrl = icon,
+        isFavorite = is_favorite
     )

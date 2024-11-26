@@ -7,13 +7,26 @@ import com.nfq.data.remote.model.SummitEventRemoteModel
 import com.nfq.data.remote.model.toSummitEventRemoteModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class EventLocalImpl @Inject constructor(
     private val database: SummitDatabase
 ) : EventLocal {
+    override val events: Flow<List<SummitEventRemoteModel>>
+        get() = database.summitDatabaseQueries
+            .selectAllEvents()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { it.map { event -> event.toSummitEventRemoteModel() } }
+
+    override val savedEvents: Flow<List<SummitEventRemoteModel>>
+        get() = database.summitDatabaseQueries
+            .getSavedEvents()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { it.map { event -> event.toSummitEventRemoteModel() } }
+
     override suspend fun clearAllEvents() {
         database.summitDatabaseQueries.removeAllEvents()
     }
@@ -73,11 +86,7 @@ class EventLocalImpl @Inject constructor(
         database.summitDatabaseQueries.removeFavoriteEvent(eventId)
     }
 
-    override fun getSavedEvents(): Flow<List<SummitEventRemoteModel>> {
-        return database.summitDatabaseQueries
-            .getFavoriteEvents()
-            .asFlow()
-            .mapToList(Dispatchers.IO)
-            .map { it.map { event -> event.toSummitEventRemoteModel() } }
+    override suspend fun markEventAsFavorite(isFavorite: Boolean, eventId: String) {
+        database.summitDatabaseQueries.markEventAsFavorite(isFavorite, eventId)
     }
 }

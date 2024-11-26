@@ -5,6 +5,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface EventLocal {
 
+    val events: Flow<List<SummitEventRemoteModel>>
+
+    val savedEvents: Flow<List<SummitEventRemoteModel>>
+
     suspend fun clearAllEvents()
 
     suspend fun getAllEvents(): List<SummitEventRemoteModel>
@@ -21,5 +25,5 @@ interface EventLocal {
 
     suspend fun removeFavoriteEvent(eventId: String)
 
-    fun getSavedEvents(): Flow<List<SummitEventRemoteModel>>
+    suspend fun markEventAsFavorite(isFavorite: Boolean, eventId: String)
 }

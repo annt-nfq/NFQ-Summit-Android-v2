@@ -52,7 +52,7 @@ class HomeTabKtTest {
                     viewModel = viewModel,
                     goToEventDetails = {},
                     goToAttractions = {},
-                    goToBlog = {}
+                    goToDetails = {}
                 )
             }
         }

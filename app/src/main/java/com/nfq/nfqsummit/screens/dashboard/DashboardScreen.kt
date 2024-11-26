@@ -63,7 +63,7 @@ import kotlinx.coroutines.launch
 fun DashboardScreen(
     goToEventDetails: (eventId: String) -> Unit,
     goToDestination: (destination: AppDestination) -> Unit,
-    goToBlog: (blogId: Int) -> Unit,
+    goToDetails: (eventId: Int) -> Unit,
     goToAttractions: () -> Unit
 ) {
     val window = (LocalView.current.context as Activity).window
@@ -132,7 +132,6 @@ fun DashboardScreen(
                 composable(AppDestination.Home.route) {
                     HomeTab(
                         goToEventDetails = goToEventDetails,
-                        goToBlog = goToBlog,
                         goToAttractions = goToAttractions
                     )
                 }
@@ -341,7 +340,7 @@ fun DashboardScreenPreview() {
         DashboardScreen(
             goToEventDetails = {},
             goToDestination = {},
-            goToBlog = {},
+            goToDetails = {},
             goToAttractions = {})
     }
 }
