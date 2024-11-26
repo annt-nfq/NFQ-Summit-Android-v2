@@ -1,8 +1,14 @@
 package com.nfq.data.local
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import com.nfq.data.cache.SummitDatabase
 import com.nfq.data.remote.model.SummitEventRemoteModel
 import com.nfq.data.remote.model.toSummitEventRemoteModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class EventLocalImpl @Inject constructor(
@@ -65,5 +71,13 @@ class EventLocalImpl @Inject constructor(
 
     override suspend fun removeFavoriteEvent(eventId: String) {
         database.summitDatabaseQueries.removeFavoriteEvent(eventId)
+    }
+
+    override fun getSavedEvents(): Flow<List<SummitEventRemoteModel>> {
+        return database.summitDatabaseQueries
+            .getFavoriteEvents()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { it.map { event -> event.toSummitEventRemoteModel() } }
     }
 }

@@ -1,6 +1,7 @@
 package com.nfq.data.local
 
 import com.nfq.data.remote.model.SummitEventRemoteModel
+import kotlinx.coroutines.flow.Flow
 
 interface EventLocal {
 
@@ -19,4 +20,6 @@ interface EventLocal {
     suspend fun getFavoriteEvent(eventId: String): String?
 
     suspend fun removeFavoriteEvent(eventId: String)
+
+    fun getSavedEvents(): Flow<List<SummitEventRemoteModel>>
 }

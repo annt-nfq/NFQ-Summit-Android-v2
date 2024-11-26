@@ -6,6 +6,12 @@ import com.nfq.data.domain.model.toSummitEvent
 import com.nfq.data.domain.repository.EventRepository
 import com.nfq.data.local.EventLocal
 import com.nfq.data.remote.EventRemote
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class EventRepositoryImpl @Inject constructor(
@@ -49,5 +55,15 @@ class EventRepositoryImpl @Inject constructor(
 
     override suspend fun removeFavoriteEvent(eventId: String) {
         eventLocal.removeFavoriteEvent(eventId)
+    }
+
+    override fun getSavedEvents():Flow<Response<List<SummitEvent>>> {
+        return flow {
+            emit(Response.Loading)
+            eventLocal
+                .getSavedEvents()
+                .catch { emit(Response.Failure(it)) }
+                .map { it.map { event -> event.toSummitEvent() } }
+        }.flowOn(Dispatchers.IO)
     }
 }
