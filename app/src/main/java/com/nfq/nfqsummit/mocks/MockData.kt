@@ -5,6 +5,7 @@ import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.domain.model.Translation
 import com.nfq.data.domain.model.TranslationAudio
+import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -143,6 +144,30 @@ val mockUpcomingEvents = listOf(
         imageUrl = "",
         isFavorite = false,
         startAndEndTime = "12:00 - 13:00",
+        tag = "\uD83D\uDCBC Summit"
+    )
+)
+
+val mockSavedEvents = listOf(
+    SavedEventUIModel(
+        id = "1",
+        imageUrl = "",
+        name = "E-Commerce Conference - Thai Market",
+        date = "Wed, Jun 28 •17:00",
+        tag = "\uD83D\uDCBC Summit"
+    ),
+    SavedEventUIModel(
+        id = "2",
+        imageUrl = "",
+        name = "E-Commerce Conference ",
+        date = "Wed, Jun 28 •17:00",
+        tag = "\uD83D\uDCBC Summit"
+    ),
+    SavedEventUIModel(
+        id = "3",
+        imageUrl = "",
+        name = " Thai Market",
+        date = "Wed, Jun 28 •17:00",
         tag = "\uD83D\uDCBC Summit"
     )
 )

@@ -84,8 +84,11 @@ import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.mocks.mockBlog
 import com.nfq.nfqsummit.mocks.mockEventDay1
 import com.nfq.nfqsummit.mocks.mockFavoriteAndRecommendedBlog
+import com.nfq.nfqsummit.mocks.mockSavedEvents
 import com.nfq.nfqsummit.mocks.mockUpcomingEvents
+import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
+import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.SavedEventCard
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.UpcomingEventCard
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.MainNeutral
@@ -115,7 +118,7 @@ fun HomeTab(
     window.statusBarColor = Color.Transparent.toArgb()
     WindowCompat.setDecorFitsSystemWindows(window, false)
 
-    val favoriteBlogsState by viewModel.favoriteBlogs.collectAsState()
+    val savedEvents by viewModel.savedEvents.collectAsState()
     val recommendedBlogsState by viewModel.recommendedBlogs.collectAsState()
     val upcomingEventsState by viewModel.upcomingEvents.collectAsState()
 
@@ -125,11 +128,10 @@ fun HomeTab(
 
     Scaffold { _ ->
         HomeTabUI(
-
             goToEventDetails = goToEventDetails,
-            favoriteBlogs = favoriteBlogsState,
+            savedEvents = savedEvents,
             upcomingEvents = upcomingEventsState,
-            goToBlog = goToBlog,
+            goToDetails = goToBlog,
             goToAttractions = goToAttractions,
             onShowQRCode = {
                 scope.launch {
@@ -233,8 +235,8 @@ fun QRCodeContent() {
 fun HomeTabUI(
     goToEventDetails: (String) -> Unit = {},
     upcomingEvents: Response<List<UpcomingEventUIModel>>,
-    favoriteBlogs: Response<List<Blog>>,
-    goToBlog: (Int) -> Unit,
+    savedEvents: Response<List<SavedEventUIModel>>,
+    goToDetails: (Int) -> Unit,
     goToAttractions: () -> Unit,
     onShowQRCode: () -> Unit,
     markAsFavorite: (favorite: Boolean, blog: Blog) -> Unit
@@ -249,12 +251,12 @@ fun HomeTabUI(
             HomeRecommendationsSection(
                 upcomingEvents = upcomingEvents,
                 markAsFavorite = markAsFavorite,
-                goToBlog = goToBlog
+                goToBlog = goToDetails
             )
             Spacer(modifier = Modifier.height(24.dp))
-            HomeFavoritesSection(
-                favoriteBlogs = favoriteBlogs,
-                goToBlog = goToBlog,
+            SavedEventSection(
+                savedEvents = savedEvents,
+                goToEventDetails = goToEventDetails,
                 markAsFavorite = markAsFavorite,
                 goToAttractions = goToAttractions
             )
@@ -372,31 +374,29 @@ fun HomeRecommendationsSection(
 @Composable
 fun SectionHeader(title: String, onSeeAll: () -> Unit) {
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(horizontal = 24.dp)
     ) {
-        Spacer(modifier = Modifier.width(24.dp))
         Text(
-            text = title, style = MaterialTheme.typography.headlineSmall.copy(
-                color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.W400
-            )
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.weight(1f))
-        Box(modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .clickable {
-                onSeeAll()
-            }
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
-            .padding(horizontal = 12.dp, vertical = 8.dp)) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { onSeeAll() }
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_arrow_right),
                 contentDescription = null,
                 modifier = Modifier.size(16.dp)
             )
         }
-        Spacer(modifier = Modifier.width(24.dp))
     }
-
 }
 
 @Composable
@@ -538,29 +538,30 @@ fun HomeRecommendation(
 }
 
 @Composable
-fun HomeFavoritesSection(
-    favoriteBlogs: Response<List<Blog>>,
-    goToBlog: (Int) -> Unit,
+private fun SavedEventSection(
+    savedEvents: Response<List<SavedEventUIModel>>,
+    goToEventDetails: (String) -> Unit,
     goToAttractions: () -> Unit,
     markAsFavorite: (favorite: Boolean, blog: Blog) -> Unit
 ) {
     Column {
-        SectionHeader("Your Saved Favorites") {
+        SectionHeader("Saved Event") {
 
         }
         Spacer(modifier = Modifier.height(16.dp))
-        when (favoriteBlogs) {
+        when (savedEvents) {
             is Response.Success -> {
-                if (favoriteBlogs.data?.isNotEmpty() == true) {
+                if (savedEvents.data?.isNotEmpty() == true) {
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         item {
                             Spacer(Modifier.width(0.dp))
                         }
-                        items(favoriteBlogs.data!!) { blog ->
-                            HomeFavorite(
-                                blog = blog, goToBlog = goToBlog, markAsFavorite = markAsFavorite
+                        items(savedEvents.data!!) { uiModel ->
+                            SavedEventCard(
+                                uiModel = uiModel,
+                                goToEventDetails = goToEventDetails,
                             )
                         }
                         item {
@@ -805,12 +806,10 @@ fun HomeHeader(
 fun HomeTabUIPreview() {
     NFQSnapshotTestThemeForPreview {
         HomeTabUI(
-            goToBlog = {},
+            goToDetails = {},
             goToAttractions = {},
             markAsFavorite = { _, _ -> },
-            favoriteBlogs = Response.Success(
-                listOf(mockFavoriteAndRecommendedBlog, mockBlog)
-            ),
+            savedEvents = Response.Success(mockSavedEvents),
             onShowQRCode = {},
             upcomingEvents = Response.Success(mockUpcomingEvents)
         )
@@ -822,12 +821,10 @@ fun HomeTabUIPreview() {
 fun HomeTabUIDarkPreview() {
     NFQSnapshotTestThemeForPreview(darkTheme = true) {
         HomeTabUI(
-            goToBlog = {},
+            goToDetails = {},
             goToAttractions = {},
             markAsFavorite = { _, _ -> },
-            favoriteBlogs = Response.Success(
-                listOf(mockFavoriteAndRecommendedBlog, mockBlog)
-            ),
+            savedEvents = Response.Success(mockSavedEvents),
             onShowQRCode = {},
             upcomingEvents = Response.Success(mockUpcomingEvents)
         )

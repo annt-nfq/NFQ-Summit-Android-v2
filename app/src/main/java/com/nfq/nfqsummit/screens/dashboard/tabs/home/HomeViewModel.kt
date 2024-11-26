@@ -6,12 +6,14 @@ import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.Response
 import com.nfq.data.domain.repository.BlogRepository
 import com.nfq.data.domain.repository.EventRepository
+import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -24,8 +26,10 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-    private var _upcomingEvents = MutableStateFlow<Response<List<UpcomingEventUIModel>>>(Response.Loading)
-    var upcomingEvents : StateFlow<Response<List<UpcomingEventUIModel>>> = _upcomingEvents.asStateFlow()
+    private var _upcomingEvents =
+        MutableStateFlow<Response<List<UpcomingEventUIModel>>>(Response.Loading)
+    var upcomingEvents: StateFlow<Response<List<UpcomingEventUIModel>>> =
+        _upcomingEvents.asStateFlow()
 
     init {
         getUpcomingEvents()
@@ -40,13 +44,18 @@ class HomeViewModel @Inject constructor(
                         name = it.name,
                         imageUrl = it.iconUrl.orEmpty(),
                         date = it.start.format(DateTimeFormatter.ofPattern("dd\nMMM")),
-                        startAndEndTime = "${it.start.format(dateTimeFormatter)} - ${it.end.format(dateTimeFormatter)}",
+                        startAndEndTime = "${it.start.format(dateTimeFormatter)} - ${
+                            it.end.format(
+                                dateTimeFormatter
+                            )
+                        }",
                         isFavorite = false,
                         tag = "\uD83D\uDCBC Summit"
                     )
                 }.orEmpty()
                 Response.Success(events)
             }
+
             is Response.Failure -> Response.Failure(response.e)
             Response.Loading -> Response.Loading
         }
@@ -59,7 +68,25 @@ class HomeViewModel @Inject constructor(
             initialValue = Response.Loading
         )
 
-    val favoriteBlogs = blogRepository.getFavoriteBlogs()
+    val savedEvents = eventRepository.getSavedEvents()
+        .map { response ->
+            when (response) {
+                is Response.Success -> {
+                    Response.Success(response.data?.map { data ->
+                        SavedEventUIModel(
+                            id = data.id,
+                            imageUrl = data.iconUrl.orEmpty(),
+                            name = data.name,
+                            date = data.start.format(DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")),
+                            tag = "\uD83D\uDCBC Summit"
+                        )
+                    }.orEmpty())
+                }
+
+                is Response.Failure -> Response.Failure(response.e)
+                Response.Loading -> Response.Loading
+            }
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),

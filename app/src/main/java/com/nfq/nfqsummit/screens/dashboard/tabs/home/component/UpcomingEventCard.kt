@@ -135,22 +135,10 @@ fun UpcomingEventCard(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                Box(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(8.dp),
-                        )
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = uiModel.tag,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+                TagItem(
+                    modifier = Modifier.padding(start = 16.dp),
+                    tag = uiModel.tag
+                )
             }
         }
     }
