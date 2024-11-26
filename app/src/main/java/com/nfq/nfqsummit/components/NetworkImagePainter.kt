@@ -15,7 +15,6 @@ fun networkImagePainter(
         .data(url)
         .crossfade(true)
         .error(R.drawable.ic_placeholder_default)
-        .placeholder(R.drawable.ic_placeholder_default)
         .size(coil.size.Size.ORIGINAL)
         .build(),
 )
