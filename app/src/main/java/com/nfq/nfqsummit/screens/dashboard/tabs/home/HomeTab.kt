@@ -84,7 +84,9 @@ import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.mocks.mockBlog
 import com.nfq.nfqsummit.mocks.mockEventDay1
 import com.nfq.nfqsummit.mocks.mockFavoriteAndRecommendedBlog
-import com.nfq.nfqsummit.mocks.mockRecommendedBlog
+import com.nfq.nfqsummit.mocks.mockUpcomingEvents
+import com.nfq.nfqsummit.model.UpcomingEventUIModel
+import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.UpcomingEventCard
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.MainNeutral
 import com.nfq.nfqsummit.ui.theme.NFQOrange
@@ -92,7 +94,6 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import com.nfq.nfqsummit.ui.theme.boxShadow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.PI
 import kotlin.math.cos
@@ -116,6 +117,7 @@ fun HomeTab(
 
     val favoriteBlogsState by viewModel.favoriteBlogs.collectAsState()
     val recommendedBlogsState by viewModel.recommendedBlogs.collectAsState()
+    val upcomingEventsState by viewModel.upcomingEvents.collectAsState()
 
     var showQRCodeBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -123,10 +125,10 @@ fun HomeTab(
 
     Scaffold { _ ->
         HomeTabUI(
-            upcomingEvents = viewModel.upcomingEvents,
+
             goToEventDetails = goToEventDetails,
             favoriteBlogs = favoriteBlogsState,
-            recommendedBlogs = recommendedBlogsState,
+            upcomingEvents = upcomingEventsState,
             goToBlog = goToBlog,
             goToAttractions = goToAttractions,
             onShowQRCode = {
@@ -229,9 +231,8 @@ fun QRCodeContent() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeTabUI(
-    upcomingEvents: List<SummitEvent>?,
     goToEventDetails: (String) -> Unit = {},
-    recommendedBlogs: Response<List<Blog>>,
+    upcomingEvents: Response<List<UpcomingEventUIModel>>,
     favoriteBlogs: Response<List<Blog>>,
     goToBlog: (Int) -> Unit,
     goToAttractions: () -> Unit,
@@ -246,7 +247,7 @@ fun HomeTabUI(
                 onShowQRCode()
             }
             HomeRecommendationsSection(
-                recommendedBlogs = recommendedBlogs,
+                upcomingEvents = upcomingEvents,
                 markAsFavorite = markAsFavorite,
                 goToBlog = goToBlog
             )
@@ -319,7 +320,7 @@ fun ShowQRCodeSection(
 
 @Composable
 fun HomeRecommendationsSection(
-    recommendedBlogs: Response<List<Blog>>,
+    upcomingEvents: Response<List<UpcomingEventUIModel>>,
     goToBlog: (Int) -> Unit,
     markAsFavorite: (favorite: Boolean, blog: Blog) -> Unit
 ) {
@@ -330,25 +331,24 @@ fun HomeRecommendationsSection(
     val itemHeight = (226.0 * itemWidth) / 237
     val paddingEnd = 16.dp + itemWidth / 2
 
-    when (recommendedBlogs) {
+    when (upcomingEvents) {
         is Response.Success -> {
-            val pagerState = rememberPagerState { recommendedBlogs.data!!.size }
+            val pagerState = rememberPagerState { upcomingEvents.data!!.size }
             Column {
                 SectionHeader("Upcoming Events") {
 
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 HorizontalPager(
-                    state = pagerState, contentPadding = PaddingValues(
-                        start = 24.dp, end = paddingEnd
-                    ), modifier = Modifier.fillMaxWidth()
+                    state = pagerState,
+                    contentPadding = PaddingValues(start = 24.dp, end = paddingEnd),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    println(recommendedBlogs.data!![it].toString())
-                    HomeRecommendation(
-                        blog = recommendedBlogs.data!![it],
-                        markAsFavorite = markAsFavorite,
-                        goToBlog = goToBlog,
-                        itemHeight = itemHeight,
+                    println(upcomingEvents.data!![it].toString())
+                    UpcomingEventCard(
+                        uiModel = upcomingEvents.data!![it],
+                        goToDetails = {},
+                        markAsFavorite = { _, _ -> }
                     )
                 }
             }
@@ -805,14 +805,6 @@ fun HomeHeader(
 fun HomeTabUIPreview() {
     NFQSnapshotTestThemeForPreview {
         HomeTabUI(
-            upcomingEvents = listOf(
-                SummitEvent(
-                    id = "1",
-                    name = "Event name",
-                    start = LocalDateTime.of(2024, 1, 6, 10, 0),
-                    end = LocalDateTime.of(2024, 1, 6, 11, 0)
-                )
-            ),
             goToBlog = {},
             goToAttractions = {},
             markAsFavorite = { _, _ -> },
@@ -820,11 +812,7 @@ fun HomeTabUIPreview() {
                 listOf(mockFavoriteAndRecommendedBlog, mockBlog)
             ),
             onShowQRCode = {},
-            recommendedBlogs = Response.Success(
-                listOf(
-                    mockFavoriteAndRecommendedBlog, mockRecommendedBlog
-                )
-            )
+            upcomingEvents = Response.Success(mockUpcomingEvents)
         )
     }
 }
@@ -834,9 +822,6 @@ fun HomeTabUIPreview() {
 fun HomeTabUIDarkPreview() {
     NFQSnapshotTestThemeForPreview(darkTheme = true) {
         HomeTabUI(
-            upcomingEvents = listOf(
-                mockEventDay1
-            ),
             goToBlog = {},
             goToAttractions = {},
             markAsFavorite = { _, _ -> },
@@ -844,11 +829,7 @@ fun HomeTabUIDarkPreview() {
                 listOf(mockFavoriteAndRecommendedBlog, mockBlog)
             ),
             onShowQRCode = {},
-            recommendedBlogs = Response.Success(
-                listOf(
-                    mockFavoriteAndRecommendedBlog, mockRecommendedBlog
-                )
-            )
+            upcomingEvents = Response.Success(mockUpcomingEvents)
         )
     }
 }

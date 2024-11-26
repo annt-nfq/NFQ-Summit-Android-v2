@@ -40,7 +40,7 @@ import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
 @Composable
-fun UpcomingEvent(
+fun UpcomingEventCard(
     modifier: Modifier = Modifier,
     uiModel: UpcomingEventUIModel,
     goToDetails: (eventId: String) -> Unit,
@@ -77,7 +77,10 @@ fun UpcomingEvent(
 
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_bookmark),
+                        painter = painterResource(
+                            id = if (uiModel.isFavorite) R.drawable.ic_bookmark
+                            else R.drawable.ic_unbookmark
+                        ),
                         contentDescription = null,
                         modifier = Modifier.width(14.dp)
                     )
@@ -97,7 +100,7 @@ fun UpcomingEvent(
                         .sizeIn(minWidth = 45.dp, minHeight = 45.dp)
                         .clip(RoundedCornerShape(7.dp))
                         .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
-                        .background(color = Color.White.copy(alpha = 0.7f))
+                        .background(color = MaterialTheme.colorScheme.background.copy(alpha = 0.7f))
                         .align(Alignment.TopStart)
                         .padding(8.dp)
                 )
@@ -149,7 +152,6 @@ fun UpcomingEvent(
                     )
                 }
             }
-            Spacer(Modifier.height(8.dp))
         }
     }
 }
@@ -160,7 +162,7 @@ fun UpcomingEvent(
 private fun UpcomingEventPreview() {
     NFQSnapshotTestThemeForPreview {
         Surface {
-            UpcomingEvent(
+            UpcomingEventCard(
                 uiModel = UpcomingEventUIModel(
                     id = "1",
                     name = "Pre-Summit Check-in",

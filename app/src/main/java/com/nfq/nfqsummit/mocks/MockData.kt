@@ -5,6 +5,7 @@ import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.domain.model.Translation
 import com.nfq.data.domain.model.TranslationAudio
+import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -125,3 +126,23 @@ val mockTranslation = Translation(
     )
 )
 
+val mockUpcomingEvents = listOf(
+    UpcomingEventUIModel(
+        id = "1",
+        name = "Pre-Summit Check-in",
+        date = "10\nJun",
+        imageUrl = "",
+        isFavorite = false,
+        startAndEndTime = "10:00 - 12:00",
+        tag = "\uD83D\uDCBC Summit"
+    ),
+    UpcomingEventUIModel(
+        id = "2",
+        name = "Lunch",
+        date = "10\nJun",
+        imageUrl = "",
+        isFavorite = false,
+        startAndEndTime = "12:00 - 13:00",
+        tag = "\uD83D\uDCBC Summit"
+    )
+)
