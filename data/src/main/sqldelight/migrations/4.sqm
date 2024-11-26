@@ -1,0 +1,4 @@
+import kotlin.Boolean;
+
+ALTER TABLE Event ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE Event ADD COLUMN tag TEXT;
