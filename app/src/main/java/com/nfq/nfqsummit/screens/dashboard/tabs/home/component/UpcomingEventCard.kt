@@ -64,27 +64,13 @@ fun UpcomingEventCard(
                         .clip(RoundedCornerShape(8.dp))
                         .aspectRatio(221f / 131f)
                 )
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(30.dp)
-                        .clip(RoundedCornerShape(7.dp))
-                        .clickable { markAsFavorite(!uiModel.isFavorite, uiModel.id) }
-                        .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
-                        .background(color = MaterialTheme.colorScheme.background.copy(alpha = 0.7f))
-                        .align(Alignment.TopEnd)
+                BookmarkItem(
+                    modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
+                    isFavorite = uiModel.isFavorite,
+                    id = uiModel.id,
+                    markAsFavorite = markAsFavorite,
+                )
 
-                ) {
-                    Image(
-                        painter = painterResource(
-                            id = if (uiModel.isFavorite) R.drawable.ic_bookmark
-                            else R.drawable.ic_unbookmark
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.width(14.dp)
-                    )
-                }
                 Text(
                     text = uiModel.date,
                     style = MaterialTheme.typography.bodyMedium.copy(

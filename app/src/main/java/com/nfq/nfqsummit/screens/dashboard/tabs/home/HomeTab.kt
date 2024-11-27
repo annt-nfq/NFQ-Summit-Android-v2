@@ -60,6 +60,7 @@ import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.SavedEventCard
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.UpcomingEventCard
+import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -79,15 +80,16 @@ fun HomeTab(
     WindowCompat.setDecorFitsSystemWindows(window, false)
 
     val uiState by viewModel.uiState.collectAsState()
+    var showEventDetailsBottomSheet by remember { mutableStateOf(false) }
+    var eventId by remember { mutableStateOf("") }
     var showQRCodeBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
 
+
     if (showQRCodeBottomSheet) {
         ModalBottomSheet(
-            onDismissRequest = {
-                showQRCodeBottomSheet = false
-            },
+            onDismissRequest = { showQRCodeBottomSheet = false },
             sheetState = sheetState,
             modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp * 0.7f),
             containerColor = MaterialTheme.colorScheme.primary,
@@ -96,12 +98,25 @@ fun HomeTab(
         }
     }
 
+
+    if (showEventDetailsBottomSheet) {
+        EventDetailsBottomSheet(
+            eventId = eventId,
+            onDismissRequest = { showEventDetailsBottomSheet = false },
+            onViewLocation = { _, _ -> }
+        )
+    }
+
+
     HomeTabUI(
         goToEventDetails = goToEventDetails,
         uiState = uiState,
-        goToDetails = {},
         goToAttractions = goToAttractions,
         markAsFavorite = viewModel::markAsFavorite,
+        goToDetails = {
+            eventId = it
+            showEventDetailsBottomSheet = true
+        },
         onShowQRCode = {
             scope.launch {
                 showQRCodeBottomSheet = true
