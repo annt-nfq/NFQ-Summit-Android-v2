@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -23,18 +24,21 @@ import com.nfq.nfqsummit.ui.theme.boxShadow
 @Composable
 fun BasicCard(
     modifier: Modifier = Modifier,
+    shape: RoundedCornerShape = RoundedCornerShape(16.dp),
+    blurRadius: Dp = 30.dp,
+    shadowColor: Color = Color(0xFF969696),
     onClick: () -> Unit = {},
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
         modifier = modifier
             .boxShadow(
-                color = Color(0xFF969696).copy(alpha = 0.08f),
-                blurRadius = 30.dp,
+                color = shadowColor.copy(alpha = 0.08f),
+                blurRadius = blurRadius,
                 spreadRadius = 0.dp,
                 offset = DpOffset(0.dp, 8.dp)
             )
-            .clip(RoundedCornerShape(16.dp))
+            .clip(shape = shape)
             .clickable(onClick = onClick)
             .background(MaterialTheme.colorScheme.background),
         content = content
