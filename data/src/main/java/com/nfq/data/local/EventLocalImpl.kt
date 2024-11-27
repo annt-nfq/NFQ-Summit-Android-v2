@@ -62,6 +62,8 @@ class EventLocalImpl @Inject constructor(
                     it.speakerPosition,
                     null,
                     it.iconUrl,
+                    it.isFavorite,
+                    it.tag
                 )
             }
         }

@@ -7,6 +7,7 @@ import com.nfq.data.domain.repository.EventRepository
 import com.nfq.data.local.EventLocal
 import com.nfq.data.remote.EventRemote
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -26,16 +27,28 @@ class EventRepositoryImpl @Inject constructor(
 
     override suspend fun fetchAllEvents(forceReload: Boolean): Response<List<SummitEvent>> {
         return try {
-            val cachedEvents = eventLocal.getAllEvents()
+            val savedEvents = eventLocal.savedEvents.first()
             val remoteEvents = eventRemote.getAllEvents()
-            val allEvents = (cachedEvents + remoteEvents).distinctBy { it.id }
-            eventLocal.clearAllEvents()
-            eventLocal.insertEvents(allEvents)
+
+            // Merge remote events with local saved states
+            val allEvents = remoteEvents.map { remoteEvent ->
+                val isFavorite = savedEvents.find { it.id == remoteEvent.id }?.isFavorite ?: false
+                remoteEvent.copy(isFavorite = isFavorite)
+            }
+
+            // Update local cache
+            eventLocal.run {
+                clearAllEvents()
+                insertEvents(allEvents)
+            }
+
+            // Return the updated list as SummitEvent
             Response.Success(allEvents.map { it.toSummitEvent() })
         } catch (e: Exception) {
             Response.Failure(e)
         }
     }
+
 
     override suspend fun getTechRocksEvents(forceReload: Boolean): Response<List<SummitEvent>> {
         val cachedEvents = eventLocal.getTechRocksEvents()
