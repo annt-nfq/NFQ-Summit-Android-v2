@@ -48,6 +48,7 @@ import com.nfq.nfqsummit.components.BasicModalBottomSheet
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.BookmarkItem
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
+import com.nfq.nfqsummit.ui.theme.bottomSheetMedium
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -129,12 +130,12 @@ private fun EventDetailsUI(
                 modifier = Modifier
                     .shadow(
                         elevation = 10.dp,
-                        shape = RoundedCornerShape(24.dp),
+                        shape = MaterialTheme.shapes.bottomSheetMedium,
                         ambientColor = Color(0xFFC3C9D2)
                     )
                     .padding(top = 12.dp)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
+                    .clip(MaterialTheme.shapes.bottomSheetMedium)
                     .fillMaxHeight(0.92f)
 
 

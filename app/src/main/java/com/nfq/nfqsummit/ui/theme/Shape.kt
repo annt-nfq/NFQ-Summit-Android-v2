@@ -13,3 +13,11 @@ val Shapes.bottomSheetLarge: Shape
         bottomStart = CornerSize(0.dp),
         bottomEnd = CornerSize(0.dp)
     )
+
+val Shapes.bottomSheetMedium: Shape
+    get() = RoundedCornerShape(
+        topStart = CornerSize(24.dp),
+        topEnd = CornerSize(24.dp),
+        bottomStart = CornerSize(0.dp),
+        bottomEnd = CornerSize(0.dp)
+    )
