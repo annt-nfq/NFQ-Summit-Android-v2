@@ -93,13 +93,15 @@ fun ScheduleTabUI(
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 16.dp)
             ) {
                 Text(
                     text = "Calendar & Events",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(16.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Box(
