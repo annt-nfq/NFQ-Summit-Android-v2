@@ -1,6 +1,5 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,18 +22,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +40,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -61,14 +55,11 @@ import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.SavedEventCard
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.UpcomingEventCard
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
-import com.nfq.nfqsummit.ui.theme.MainGreen
+import com.nfq.nfqsummit.screens.qrCode.QRCodeBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import com.nfq.nfqsummit.ui.theme.boxShadow
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeTab(
     viewModel: HomeViewModel = hiltViewModel(),
@@ -82,19 +73,12 @@ fun HomeTab(
     var showEventDetailsBottomSheet by remember { mutableStateOf(false) }
     var eventId by remember { mutableStateOf("") }
     var showQRCodeBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val scope = rememberCoroutineScope()
 
 
     if (showQRCodeBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showQRCodeBottomSheet = false },
-            sheetState = sheetState,
-            modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp * 0.7f),
-            containerColor = MaterialTheme.colorScheme.primary,
-        ) {
-            QRCodeContent()
-        }
+        QRCodeBottomSheet(
+            onDismissRequest = { showQRCodeBottomSheet = false }
+        )
     }
 
 
@@ -116,89 +100,11 @@ fun HomeTab(
             showEventDetailsBottomSheet = true
         },
         onShowQRCode = {
-            scope.launch {
-                showQRCodeBottomSheet = true
-            }
+            showQRCodeBottomSheet = true
         }
     )
 }
 
-@Composable
-fun QRCodeContent() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 55.dp)
-    ) {
-        Text(
-            text = "Hermann Hauser", style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.background
-            )
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = "UUID: 255373826", style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.W400, color = MaterialTheme.colorScheme.background
-            )
-        )
-        Spacer(modifier = Modifier.height(26.dp))
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.background)
-                .padding(6.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.sample_qrcode),
-                contentDescription = null,
-                modifier = Modifier.size(220.dp)
-            )
-        }
-        Spacer(modifier = Modifier.height(26.dp))
-        Text(
-            text = "Please show this QR code to our staff\n" + "for check-in.",
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.background,
-                textAlign = TextAlign.Center,
-            )
-        )
-        Spacer(modifier = Modifier.height(30.dp))
-        Text(
-            text = "Please ensure you’ve reserved a seat for each event. For assistance, contact Tris on WhatsApp.",
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.W400, color = MaterialTheme.colorScheme.background,
-                textAlign = TextAlign.Center,
-            )
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(100.dp))
-                .background(MainGreen)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_whatsapp),
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "+76 333 2145", style = MaterialTheme.typography.bodySmall.copy(
-                        fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.background
-                    )
-                )
-            }
-        }
-
-    }
-}
-
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 private fun HomeTabUI(
     uiState: HomeUIState,
@@ -207,7 +113,10 @@ private fun HomeTabUI(
     onShowQRCode: () -> Unit,
     markAsFavorite: (favorite: Boolean, eventId: String) -> Unit
 ) {
-    Scaffold {
+    Surface(
+        color = MaterialTheme.colorScheme.background,
+        modifier = Modifier.fillMaxSize()
+    ) {
         LazyColumn(
             contentPadding = PaddingValues(bottom = 24.dp)
         ) {
