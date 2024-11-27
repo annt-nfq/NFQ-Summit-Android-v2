@@ -31,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -47,7 +48,6 @@ import com.nfq.nfqsummit.components.BasicModalBottomSheet
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.BookmarkItem
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
-import com.nfq.nfqsummit.ui.theme.bottomSheetLarge
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -127,16 +127,24 @@ private fun EventDetailsUI(
 
             Surface(
                 modifier = Modifier
+                    .shadow(
+                        elevation = 10.dp,
+                        shape = RoundedCornerShape(24.dp),
+                        ambientColor = Color(0xFFC3C9D2)
+                    )
                     .padding(top = 12.dp)
                     .fillMaxWidth()
-                    .clip(MaterialTheme.shapes.bottomSheetLarge)
+                    .clip(RoundedCornerShape(24.dp))
                     .fillMaxHeight(0.92f)
+
+
             ) {
 
                 Column(
                     modifier = Modifier
                         .padding(vertical = 32.dp)
                         .padding(horizontal = 24.dp)
+
                 ) {
                     Text(
                         text = event.name,
