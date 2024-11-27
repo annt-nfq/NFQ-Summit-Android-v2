@@ -22,8 +22,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -35,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.SummitEvent
+import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicEvent
 import com.nfq.nfqsummit.components.Schedule
 import com.nfq.nfqsummit.mocks.mockEventDay1
@@ -153,15 +153,14 @@ fun SummitSchedule(
     val coroutineScope = rememberCoroutineScope()
     val verticalScroll = rememberScrollState()
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(top = 24.dp)
+        modifier = modifier.fillMaxSize()
     ) {
         Row(
             verticalAlignment = Alignment.Bottom,
             modifier = Modifier
                 .horizontalScroll(state = rememberScrollState())
                 .animateContentSize()
+                .padding(vertical = 24.dp)
         ) {
             Spacer(modifier = Modifier.width(16.dp))
             dayEventPair.forEach {
@@ -221,37 +220,35 @@ fun ScheduleDays(
     selected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
-    val width = animateFloatAsState(if (selected) 76f else 55f, label = "")
-    val height = animateFloatAsState(if (selected) 62f else 45f, label = "")
-
-
+    val scale = animateFloatAsState(if (selected) 1.4f else 1f, label = "")
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(horizontal = if (selected) 10.dp else 0.dp)
+            .padding(bottom = if (selected) 8.dp else 0.dp)
+            .graphicsLayer {
+                scaleX = scale.value
+                scaleY = scale.value
+            }
     ) {
-        Card(
-            modifier = Modifier
-                .width(width.value.dp)
-                .height(height.value.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp,
-                pressedElevation = 16.dp
-            ),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.background
-            )
+        BasicCard(
+            shape = RoundedCornerShape(10.dp),
+            blurRadius = 20.dp,
+            shadowColor = Color(0xFF1E1C2E)
         ) {
             Column(
                 modifier = Modifier
                     .clickable { onClick() }
                     .clipToBounds()
-                    .fillMaxSize(),
+                    .width(55.dp)
+                    .height(45.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(if (selected) 25.dp else 18.dp)
+                        .height(18.dp)
                         .background(
                             MaterialTheme.colorScheme.primary.copy(
                                 alpha = if (selected) 1f else 0.2f
@@ -274,7 +271,7 @@ fun ScheduleDays(
                     Text(
                         text = date,
                         style = MaterialTheme.typography.bodyLarge,
-                        fontSize = if (selected) 18.sp else 16.sp,
+                        fontSize = 16.sp
                     )
                 }
 
@@ -283,7 +280,10 @@ fun ScheduleDays(
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = if (selected) 3.dp else 5.dp)
+            modifier = Modifier
+                .padding(top = if (selected) 0.dp else 2.dp)
+                .height(12.dp)
+
         ) {
             if (eventCount <= 3)
                 repeat(eventCount) {
@@ -295,7 +295,9 @@ fun ScheduleDays(
                 }
                 Text(
                     text = "+${eventCount - 3}",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 10.sp
                 )
             }
         }
@@ -317,12 +319,17 @@ fun EventCountIndicator() {
 @Composable
 fun ScheduleDaysSelectedPreview() {
     NFQSnapshotTestThemeForPreview {
-        ScheduleDays(
-            selected = true,
-            date = "1",
-            dayOfWeek = "Mon",
-            eventCount = 3
-        )
+        Box(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            ScheduleDays(
+                selected = true,
+                date = "1",
+                dayOfWeek = "Mon",
+                eventCount = 3,
+            )
+        }
+
     }
 }
 
@@ -333,7 +340,7 @@ fun ScheduleDaysUnselectedPreview() {
         ScheduleDays(
             date = "1",
             dayOfWeek = "Mon",
-            eventCount = 5
+            eventCount = 5,
         )
     }
 }
