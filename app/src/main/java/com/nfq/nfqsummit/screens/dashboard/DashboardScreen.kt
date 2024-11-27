@@ -131,7 +131,6 @@ fun DashboardScreen(
             ) {
                 composable(AppDestination.Home.route) {
                     HomeTab(
-                        goToEventDetails = goToEventDetails,
                         goToAttractions = goToAttractions
                     )
                 }

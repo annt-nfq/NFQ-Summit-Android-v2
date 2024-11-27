@@ -72,7 +72,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeTab(
     viewModel: HomeViewModel = hiltViewModel(),
-    goToEventDetails: (String) -> Unit,
     goToAttractions: () -> Unit,
 ) {
     val window = (LocalView.current.context as Activity).window
@@ -109,7 +108,6 @@ fun HomeTab(
 
 
     HomeTabUI(
-        goToEventDetails = goToEventDetails,
         uiState = uiState,
         goToAttractions = goToAttractions,
         markAsFavorite = viewModel::markAsFavorite,
@@ -204,7 +202,6 @@ fun QRCodeContent() {
 @Composable
 private fun HomeTabUI(
     uiState: HomeUIState,
-    goToEventDetails: (String) -> Unit = {},
     goToDetails: (String) -> Unit,
     goToAttractions: () -> Unit,
     onShowQRCode: () -> Unit,
@@ -224,7 +221,7 @@ private fun HomeTabUI(
             )
             savedEventSection(
                 savedEvents = uiState.savedEvents,
-                goToEventDetails = goToEventDetails,
+                goToDetails = goToDetails,
                 goToAttractions = goToAttractions
             )
         }
@@ -370,7 +367,7 @@ fun SectionHeader(
 
 private fun LazyListScope.savedEventSection(
     savedEvents: List<SavedEventUIModel>,
-    goToEventDetails: (String) -> Unit,
+    goToDetails: (String) -> Unit,
     goToAttractions: () -> Unit
 ) {
 
@@ -388,7 +385,7 @@ private fun LazyListScope.savedEventSection(
         items(savedEvents) { uiModel ->
             SavedEventCard(
                 uiModel = uiModel,
-                goToEventDetails = goToEventDetails,
+                goToEventDetails = goToDetails,
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 8.dp)

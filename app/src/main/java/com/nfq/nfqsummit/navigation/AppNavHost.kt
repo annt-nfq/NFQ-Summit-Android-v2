@@ -181,7 +181,6 @@ fun DashboardNavHost(
     NavHost(navController = navController, startDestination = AppDestination.Home.route) {
         composable(AppDestination.Home.route) {
             HomeTab(
-                goToEventDetails = goToEventDetails,
                 goToAttractions = goToAttractions
             )
         }
