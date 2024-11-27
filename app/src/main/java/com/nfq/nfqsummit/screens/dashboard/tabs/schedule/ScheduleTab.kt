@@ -1,6 +1,7 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.schedule
 
 import android.app.Activity
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextAlign
@@ -44,7 +45,6 @@ import com.nfq.nfqsummit.components.Schedule
 import com.nfq.nfqsummit.mocks.mockEventDay1
 import com.nfq.nfqsummit.mocks.mockEventDay2H1
 import com.nfq.nfqsummit.mocks.mockEventDay2H2
-import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -120,8 +120,10 @@ fun SummitSchedule(
     val verticalScroll = rememberScrollState()
     Column(modifier = modifier.fillMaxSize()) {
         Row(
+            verticalAlignment = Alignment.Bottom,
             modifier = Modifier
                 .horizontalScroll(state = rememberScrollState())
+                .animateContentSize()
         ) {
             Spacer(modifier = Modifier.width(16.dp))
             dayEventPair.forEach {
@@ -141,7 +143,7 @@ fun SummitSchedule(
                         }
                     }
                 )
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(21.dp))
             }
             Spacer(modifier = Modifier.width(16.dp))
         }
@@ -181,77 +183,86 @@ fun ScheduleDays(
     selected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
-    val scale = animateFloatAsState(if (selected) 1.2f else 1f, label = "")
+    val width = animateFloatAsState(if (selected) 76f else 55f, label = "")
+    val height = animateFloatAsState(if (selected) 62f else 45f, label = "")
 
-    Card(
-        modifier = Modifier.graphicsLayer {
-            scaleX = scale.value
-            scaleY = scale.value
-        },
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp,
-            pressedElevation = 16.dp
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
-        )
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
+        Card(
             modifier = Modifier
-                .clickable {
-                    onClick()
-                }
-                .clipToBounds()
-                .height(90.dp)
-                .width(90.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .width(width.value.dp)
+                .height(height.value.dp),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 8.dp,
+                pressedElevation = 16.dp
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.background
+            )
         ) {
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        if (selected)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.secondary
-                    )
+                    .clickable { onClick() }
+                    .clipToBounds()
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(if (selected) 25.dp else 18.dp)
+                        .background(
+                            MaterialTheme.colorScheme.primary.copy(
+                                alpha = if (selected) 1f else 0.2f
+                            )
+                        )
+                ) {
+                    Text(
+                        text = dayOfWeek,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (selected) MaterialTheme.colorScheme.onPrimary
+                        else MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    Text(
+                        text = date,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = if (selected) 18.sp else 16.sp,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = if (selected) 3.dp else 5.dp)
+        ) {
+            if (eventCount <= 3)
+                repeat(eventCount) {
+                    EventCountIndicator()
+                }
+            else {
+                repeat(3) {
+                    EventCountIndicator()
+                }
                 Text(
-                    text = dayOfWeek,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = if (selected)
-                            MaterialTheme.colorScheme.onPrimary
-                        else
-                            MaterialTheme.colorScheme.onSecondary
-                    ),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.Center)
+                    text = "+${eventCount - 3}",
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = date,
-                style = MaterialTheme.typography.titleLarge.copy(fontSize = 32.sp),
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (eventCount <= 3)
-                    repeat(eventCount) {
-                        EventCountIndicator()
-                    }
-                else {
-                    repeat(3) {
-                        EventCountIndicator()
-                    }
-                    Text(
-                        text = "+${eventCount - 3}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
+
 }
 
 @Composable
@@ -259,8 +270,8 @@ fun EventCountIndicator() {
     Box(
         modifier = Modifier
             .padding(1.dp)
-            .size(6.dp)
-            .background(MainGreen, CircleShape)
+            .size(4.dp)
+            .background(MaterialTheme.colorScheme.primary, CircleShape)
     )
 }
 
@@ -299,6 +310,18 @@ fun ScheduleTabUIPreview() {
                     mockEventDay1
                 ),
                 LocalDate.of(2024, 1, 2) to listOf(
+                    mockEventDay2H1,
+                    mockEventDay2H2,
+                ),
+                LocalDate.of(2024, 1, 3) to listOf(
+                    mockEventDay2H1,
+                    mockEventDay2H2,
+                ),
+                LocalDate.of(2024, 1, 4) to listOf(
+                    mockEventDay2H1,
+                    mockEventDay2H2,
+                ),
+                LocalDate.of(2024, 1, 5) to listOf(
                     mockEventDay2H1,
                     mockEventDay2H2,
                 )
