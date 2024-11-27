@@ -29,10 +29,11 @@ class EventRepositoryImpl @Inject constructor(
             val cachedEvents = eventLocal.getAllEvents()
             val remoteEvents = eventRemote.getAllEvents()
             val allEvents = (cachedEvents + remoteEvents).distinctBy { it.id }
+            eventLocal.clearAllEvents()
             eventLocal.insertEvents(allEvents)
             Response.Success(allEvents.map { it.toSummitEvent() })
         } catch (e: Exception) {
-            return Response.Failure(e)
+            Response.Failure(e)
         }
     }
 
