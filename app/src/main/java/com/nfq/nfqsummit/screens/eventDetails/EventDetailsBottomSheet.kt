@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -46,6 +47,7 @@ import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
 import com.nfq.nfqsummit.components.networkImagePainter
+import com.nfq.nfqsummit.openMapView
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.BookmarkItem
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import com.nfq.nfqsummit.ui.theme.bottomSheetMedium
@@ -56,12 +58,12 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun EventDetailsBottomSheet(
     eventId: String,
-    onViewLocation: (latitude: Double?, longitude: Double?) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     val skipPartiallyExpanded by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded)
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val viewModel: EventDetailsViewModel = hiltViewModel()
 
@@ -79,10 +81,14 @@ fun EventDetailsBottomSheet(
                     markAsFavorite = { isFavorite, eventId ->
                         viewModel.markEventAsFavorite(isFavorite, eventId)
                     },
-                    onViewLocation = { latitude, longitude ->
+                    onViewLocation = { latitude, longitude, locationName ->
                         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
                             if (!bottomSheetState.isVisible) {
-                                onViewLocation(latitude, longitude)
+                                context.openMapView(
+                                    latitude = latitude,
+                                    longitude = longitude,
+                                    locationName = locationName
+                                )
                             }
                         }
                     }
@@ -97,7 +103,7 @@ fun EventDetailsBottomSheet(
 private fun EventDetailsUI(
     event: SummitEvent,
     markAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit = { _, _ -> },
-    onViewLocation: (latitude: Double?, longitude: Double?) -> Unit,
+    onViewLocation: (latitude: Double?, longitude: Double?, locationName: String) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -184,7 +190,13 @@ private fun EventDetailsUI(
                                 .padding(start = 8.dp)
                                 .size(116.dp, 30.dp)
                                 .clip(RoundedCornerShape(8.dp))
-                                .clickable { onViewLocation(event.latitude, event.longitude) }
+                                .clickable {
+                                    onViewLocation(
+                                        event.latitude,
+                                        event.longitude,
+                                        event.locationName.orEmpty()
+                                    )
+                                }
                                 .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
                                 .background(color = MaterialTheme.colorScheme.primary)
 
@@ -250,7 +262,7 @@ private fun EventDetailsPreview() {
                 speakerPosition = "",
                 isFavorite = false
             ),
-            onViewLocation = { _, _ -> },
+            onViewLocation = { _, _, _ -> },
         )
     }
 }

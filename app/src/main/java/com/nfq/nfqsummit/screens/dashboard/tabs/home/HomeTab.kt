@@ -85,8 +85,7 @@ fun HomeTab(
     if (showEventDetailsBottomSheet) {
         EventDetailsBottomSheet(
             eventId = eventId,
-            onDismissRequest = { showEventDetailsBottomSheet = false },
-            onViewLocation = { _, _ -> }
+            onDismissRequest = { showEventDetailsBottomSheet = false }
         )
     }
 
