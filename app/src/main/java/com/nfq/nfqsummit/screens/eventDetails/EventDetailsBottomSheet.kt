@@ -157,7 +157,9 @@ private fun EventDetailsUI(
                             text = event.locationName ?: "-",
                             style = MaterialTheme.typography.labelSmall,
                             fontSize = 10.sp,
-                            modifier = Modifier.padding(start = 6.dp)
+                            modifier = Modifier
+                                .padding(start = 6.dp)
+                                .padding(end = 8.dp)
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         BookmarkItem(
