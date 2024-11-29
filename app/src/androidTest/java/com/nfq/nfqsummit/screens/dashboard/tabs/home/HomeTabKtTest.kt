@@ -9,7 +9,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.nfq.data.domain.repository.BlogRepository
 import com.nfq.data.domain.repository.EventRepository
-import com.nfq.nfqsummit.MainActivity
+import com.nfq.nfqsummit.entry.MainActivity
 import com.nfq.nfqsummit.di.DataSourceModule
 import com.nfq.nfqsummit.di.FakeBlogRepository
 import com.nfq.nfqsummit.di.FakeEventRepository

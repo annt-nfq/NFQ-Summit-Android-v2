@@ -1,4 +1,4 @@
-package com.nfq.nfqsummit
+package com.nfq.nfqsummit.entry
 
 import android.content.Intent
 import android.os.Bundle
