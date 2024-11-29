@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -161,22 +160,26 @@ private fun EventDetailsUI(
 
                     Row(
                         modifier = Modifier.padding(top = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.Top
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_loaction),
                             contentDescription = null,
-                            modifier = Modifier.padding(start = 8.dp)
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .padding(top = 8.dp)
                         )
                         Text(
                             text = event.locationName ?: "-",
                             style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Medium,
                             fontSize = 10.sp,
                             modifier = Modifier
+                                .weight(1f)
                                 .padding(start = 6.dp)
+                                .padding(top = 8.dp)
                                 .padding(end = 8.dp)
                         )
-                        Spacer(modifier = Modifier.weight(1f))
                         BookmarkItem(
                             isFavorite = event.isFavorite,
                             id = event.id,
@@ -253,7 +256,7 @@ private fun EventDetailsPreview() {
                 latitude = 0.0,
                 longitude = 0.0,
                 coverPhotoUrl = "",
-                locationName = "Saigon, Vietnam",
+                locationName = "Saigon, Vietnam Office ",
                 iconUrl = "",
                 isConference = false,
                 eventType = "",
