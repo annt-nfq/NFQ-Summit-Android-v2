@@ -27,7 +27,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +53,7 @@ import com.nfq.nfqsummit.components.Schedule
 import com.nfq.nfqsummit.mocks.mockEventDay1
 import com.nfq.nfqsummit.mocks.mockEventDay2H1
 import com.nfq.nfqsummit.mocks.mockEventDay2H2
+import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -63,7 +68,15 @@ fun ScheduleTab(
 ) {
     val window = (LocalView.current.context as Activity).window
     window.statusBarColor = Color.Transparent.toArgb()
+    var showEventDetailsBottomSheet by remember { mutableStateOf(false) }
+    var eventId by remember { mutableStateOf("") }
 
+    if (showEventDetailsBottomSheet) {
+        EventDetailsBottomSheet(
+            eventId = eventId,
+            onDismissRequest = { showEventDetailsBottomSheet = false }
+        )
+    }
     ScheduleTabUI(
         dayEventPair = viewModel.dayEventPair,
         currentTime = viewModel.currentTime,
@@ -72,7 +85,8 @@ fun ScheduleTab(
             viewModel.selectedDate = it
         },
         onEventClick = {
-            goToEventDetails(it.id)
+            eventId = it.id
+            showEventDetailsBottomSheet = true
         },
     )
 }
@@ -192,26 +206,24 @@ fun SummitSchedule(
             Column(
                 modifier = Modifier
                     .verticalScroll(state = verticalScroll)
-                    .padding(start = 32.dp)
-                    .padding(top = 18.dp)
+                    .padding(start = 32.dp, end = 16.dp)
+                    .padding(top = 16.dp)
             ) {
-                val dailyEvents = dayEventPair.filter {
-                    it.first.dayOfMonth == selectedDate.dayOfMonth
-                }.flatMap { it.second }
-                if (dailyEvents.isNotEmpty())
+                val dailyEvents = dayEventPair
+                    .filter { it.first.dayOfMonth == selectedDate.dayOfMonth }
+                    .flatMap { it.second }
 
+                if (dailyEvents.isNotEmpty())
                     Schedule(
                         events = dailyEvents.sortedBy { it.name },
                         currentTime = currentTime,
-                        minTime = dailyEvents.minByOrNull { it.start }!!.start.toLocalTime()
+                        minTime = dailyEvents
+                            .minByOrNull { it.start }!!.start.toLocalTime()
                             .minusHours(1),
                         eventContent = {
                             BasicEvent(
                                 positionedEvent = it,
-                                modifier = Modifier
-                                    .clickable {
-                                        onEventClick(it.event)
-                                    }
+                                onEventClick = onEventClick
                             )
                         }
                     )

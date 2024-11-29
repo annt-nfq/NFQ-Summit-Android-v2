@@ -1,6 +1,7 @@
 package com.nfq.nfqsummit.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,7 @@ fun BasicEvent(
     titleMaxLines: Int = 3,
     roundedAvatar: Boolean = false,
     compact: Boolean = false,
+    onEventClick: (SummitEvent) -> Unit = {},
 ) {
     val event = positionedEvent.event
     val topRadius =
@@ -62,7 +64,6 @@ fun BasicEvent(
             .padding(vertical = 4.dp)
             .fillMaxSize()
             .padding(
-                end = 16.dp,
                 bottom = if (positionedEvent.splitType == SplitType.End) 0.dp else 2.dp
             )
             .coloredShadow(
@@ -77,6 +78,7 @@ fun BasicEvent(
                 shape = shape
             )
             .clip(shape = shape)
+            .clickable { onEventClick(event) }
     ) {
         val color = when (event.ordering) {
             1 -> Color(0xFFEF5350) // Red

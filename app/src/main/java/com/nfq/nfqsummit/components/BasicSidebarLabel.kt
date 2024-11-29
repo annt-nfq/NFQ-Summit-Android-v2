@@ -32,7 +32,7 @@ fun BasicSidebarLabel(
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Normal,
             modifier = modifier
-                .padding(horizontal = 4.dp),
+                .padding(end = 10.dp),
             textAlign = TextAlign.Left
         )
     }
