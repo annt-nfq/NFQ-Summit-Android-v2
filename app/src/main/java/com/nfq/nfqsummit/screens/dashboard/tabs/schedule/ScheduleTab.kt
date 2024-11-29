@@ -3,6 +3,7 @@ package com.nfq.nfqsummit.screens.dashboard.tabs.schedule
 import android.app.Activity
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -97,81 +99,73 @@ fun ScheduleTabUI(
     currentTime: LocalTime,
     selectedDate: LocalDate,
     onDayClick: (LocalDate) -> Unit,
-    onEventClick: (SummitEvent) -> Unit,
-    modifier: Modifier = Modifier
+    onEventClick: (SummitEvent) -> Unit
 ) {
-    Surface {
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 16.dp)
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
-                Text(
-                    text = "Calendar & Events",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.background)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .clickable {
 
-                        }
-                ) {
-                    Text(
-                        text = "Today",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(13.dp)
-                    )
-                }
-            }
+    val verticalScroll = rememberScrollState()
 
-            SummitSchedule(
+    Scaffold(
+        topBar = {
+            ScheduleHeader(
                 dayEventPair = dayEventPair,
-                currentTime = currentTime,
                 selectedDate = selectedDate,
-                onDayClick = {
-                    onDayClick(it)
-                },
-                onEventClick = { onEventClick(it) },
-                modifier = modifier
+                verticalScroll = verticalScroll,
+                onDayClick = onDayClick
             )
         }
+    ) { innerPadding ->
+        SummitSchedules(
+            dayEventPair = dayEventPair,
+            currentTime = currentTime,
+            selectedDate = selectedDate,
+            onEventClick = { onEventClick(it) },
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }
 
 @Composable
-fun SummitSchedule(
+private fun ScheduleHeader(
     dayEventPair: List<Pair<LocalDate, List<SummitEvent>>>,
-    currentTime: LocalTime,
     selectedDate: LocalDate,
+    verticalScroll: ScrollState = rememberScrollState(),
     onDayClick: (LocalDate) -> Unit,
-    onEventClick: (SummitEvent) -> Unit,
-    modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val verticalScroll = rememberScrollState()
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(top = 16.dp)
+        ) {
+            Text(
+                text = "Calendar & Events",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .clickable {
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
+                    }
+            ) {
+                Text(
+                    text = "Today",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(13.dp)
+                )
+            }
+        }
         Row(
             verticalAlignment = Alignment.Bottom,
             modifier = Modifier
@@ -202,34 +196,47 @@ fun SummitSchedule(
             Spacer(modifier = Modifier.width(16.dp))
         }
         HorizontalDivider(color = Color(0xFFCFCAE4), thickness = 1.dp)
-        Surface {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(state = verticalScroll)
-                    .padding(start = 32.dp, end = 16.dp)
-                    .padding(top = 16.dp)
-            ) {
-                val dailyEvents = dayEventPair
-                    .filter { it.first.dayOfMonth == selectedDate.dayOfMonth }
-                    .flatMap { it.second }
+    }
+}
 
-                if (dailyEvents.isNotEmpty())
-                    Schedule(
-                        events = dailyEvents.sortedBy { it.name },
-                        currentTime = currentTime,
-                        minTime = dailyEvents
-                            .minByOrNull { it.start }!!.start.toLocalTime()
-                            .minusHours(1),
-                        eventContent = {
-                            BasicEvent(
-                                positionedEvent = it,
-                                onEventClick = onEventClick
-                            )
-                        }
-                    )
-            }
-            Spacer(modifier = Modifier.height(100.dp))
+@Composable
+fun SummitSchedules(
+    dayEventPair: List<Pair<LocalDate, List<SummitEvent>>>,
+    currentTime: LocalTime,
+    selectedDate: LocalDate,
+    verticalScroll: ScrollState = rememberScrollState(),
+    onEventClick: (SummitEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+
+    Surface(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(state = verticalScroll)
+                .padding(start = 32.dp, end = 16.dp)
+                .padding(top = 16.dp)
+        ) {
+            val dailyEvents = dayEventPair
+                .filter { it.first.dayOfMonth == selectedDate.dayOfMonth }
+                .flatMap { it.second }
+
+            if (dailyEvents.isNotEmpty())
+                Schedule(
+                    events = dailyEvents.sortedBy { it.name },
+                    currentTime = currentTime,
+                    minTime = dailyEvents
+                        .minByOrNull { it.start }!!.start.toLocalTime()
+                        .minusHours(1),
+                    eventContent = {
+                        BasicEvent(
+                            positionedEvent = it,
+                            onEventClick = onEventClick
+                        )
+                    }
+                )
         }
+        Spacer(modifier = Modifier.height(100.dp))
     }
 
 }
