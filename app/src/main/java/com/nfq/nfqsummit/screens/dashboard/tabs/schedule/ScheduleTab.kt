@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,6 +71,8 @@ fun ScheduleTab(
 ) {
     val window = (LocalView.current.context as Activity).window
     window.statusBarColor = Color.Transparent.toArgb()
+
+    val uiState by viewModel.uiState.collectAsState()
     var showEventDetailsBottomSheet by remember { mutableStateOf(false) }
     var eventId by remember { mutableStateOf("") }
 
@@ -80,12 +83,8 @@ fun ScheduleTab(
         )
     }
     ScheduleTabUI(
-        dayEventPair = viewModel.dayEventPair,
-        currentTime = viewModel.currentTime,
-        selectedDate = viewModel.selectedDate,
-        onDayClick = {
-            viewModel.selectedDate = it
-        },
+        uiState = uiState,
+        onDayClick = viewModel::onDateSelected,
         onEventClick = {
             eventId = it.id
             showEventDetailsBottomSheet = true
@@ -95,9 +94,7 @@ fun ScheduleTab(
 
 @Composable
 fun ScheduleTabUI(
-    dayEventPair: List<Pair<LocalDate, List<SummitEvent>>>,
-    currentTime: LocalTime,
-    selectedDate: LocalDate,
+    uiState: ScheduleUIState,
     onDayClick: (LocalDate) -> Unit,
     onEventClick: (SummitEvent) -> Unit
 ) {
@@ -107,17 +104,16 @@ fun ScheduleTabUI(
     Scaffold(
         topBar = {
             ScheduleHeader(
-                dayEventPair = dayEventPair,
-                selectedDate = selectedDate,
+                dayEventPairs = uiState.dayEventPairs,
+                selectedDate = uiState.selectedDate,
                 verticalScroll = verticalScroll,
                 onDayClick = onDayClick
             )
         }
     ) { innerPadding ->
         SummitSchedules(
-            dayEventPair = dayEventPair,
-            currentTime = currentTime,
-            selectedDate = selectedDate,
+            dailyEvents = uiState.dailyEvents,
+            currentTime = uiState.currentTime,
             onEventClick = { onEventClick(it) },
             modifier = Modifier.padding(innerPadding)
         )
@@ -126,7 +122,7 @@ fun ScheduleTabUI(
 
 @Composable
 private fun ScheduleHeader(
-    dayEventPair: List<Pair<LocalDate, List<SummitEvent>>>,
+    dayEventPairs: List<Pair<LocalDate, List<SummitEvent>>>,
     selectedDate: LocalDate,
     verticalScroll: ScrollState = rememberScrollState(),
     onDayClick: (LocalDate) -> Unit,
@@ -154,7 +150,7 @@ private fun ScheduleHeader(
                         shape = RoundedCornerShape(8.dp)
                     )
                     .clickable {
-
+                        onDayClick(LocalDate.now())
                     }
             ) {
                 Text(
@@ -174,17 +170,17 @@ private fun ScheduleHeader(
                 .padding(vertical = 24.dp)
         ) {
             Spacer(modifier = Modifier.width(16.dp))
-            dayEventPair.forEach {
+            dayEventPairs.forEach { (date, events) ->
                 ScheduleDays(
-                    date = it.first.dayOfMonth.toString(),
-                    dayOfWeek = it.first.dayOfWeek.getDisplayName(
+                    date = date.dayOfMonth.toString(),
+                    dayOfWeek = date.dayOfWeek.getDisplayName(
                         TextStyle.SHORT,
                         Locale.getDefault()
                     ),
-                    eventCount = it.second.size,
-                    selected = selectedDate.dayOfMonth == it.first.dayOfMonth,
+                    eventCount = events.size,
+                    selected = selectedDate.dayOfMonth == date.dayOfMonth,
                     onClick = {
-                        onDayClick(selectedDate.withDayOfMonth(it.first.dayOfMonth))
+                        onDayClick(selectedDate.withDayOfMonth(date.dayOfMonth))
 
                         coroutineScope.launch {
                             verticalScroll.animateScrollTo(0)
@@ -201,15 +197,12 @@ private fun ScheduleHeader(
 
 @Composable
 fun SummitSchedules(
-    dayEventPair: List<Pair<LocalDate, List<SummitEvent>>>,
+    dailyEvents: List<SummitEvent>,
     currentTime: LocalTime,
-    selectedDate: LocalDate,
     verticalScroll: ScrollState = rememberScrollState(),
     onEventClick: (SummitEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
-
     Surface(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -217,9 +210,6 @@ fun SummitSchedules(
                 .padding(start = 32.dp, end = 16.dp)
                 .padding(top = 16.dp)
         ) {
-            val dailyEvents = dayEventPair
-                .filter { it.first.dayOfMonth == selectedDate.dayOfMonth }
-                .flatMap { it.second }
 
             if (dailyEvents.isNotEmpty())
                 Schedule(
@@ -263,7 +253,7 @@ fun ScheduleDays(
         BasicCard(
             shape = RoundedCornerShape(10.dp),
             blurRadius = 20.dp,
-            shadowColor = Color(0xFF1E1C2E)
+            shadowColor = MaterialTheme.colorScheme.secondary
         ) {
             Column(
                 modifier = Modifier
@@ -374,34 +364,42 @@ fun ScheduleDaysUnselectedPreview() {
     }
 }
 
+val dayEventPair = listOf(
+    LocalDate.of(2024, 1, 1) to listOf(
+        mockEventDay1
+    ),
+    LocalDate.of(2024, 1, 2) to listOf(
+        mockEventDay2H1,
+        mockEventDay2H2,
+    ),
+    LocalDate.of(2024, 1, 3) to listOf(
+        mockEventDay2H1,
+        mockEventDay2H2,
+    ),
+    LocalDate.of(2024, 1, 4) to listOf(
+        mockEventDay2H1,
+        mockEventDay2H2,
+    ),
+    LocalDate.of(2024, 1, 5) to listOf(
+        mockEventDay2H1,
+        mockEventDay2H2,
+    )
+)
+
+val uiState = ScheduleUIState(
+    dailyEvents = dayEventPair.flatMap { it.second },
+    dayEventPairs = dayEventPair,
+    currentTime = LocalTime.of(11, 0),
+    selectedDate = LocalDate.of(2024, 1, 1),
+)
+
 @Preview
 @Composable
 fun ScheduleTabUIPreview() {
     NFQSnapshotTestThemeForPreview {
+
         ScheduleTabUI(
-            dayEventPair = listOf(
-                LocalDate.of(2024, 1, 1) to listOf(
-                    mockEventDay1
-                ),
-                LocalDate.of(2024, 1, 2) to listOf(
-                    mockEventDay2H1,
-                    mockEventDay2H2,
-                ),
-                LocalDate.of(2024, 1, 3) to listOf(
-                    mockEventDay2H1,
-                    mockEventDay2H2,
-                ),
-                LocalDate.of(2024, 1, 4) to listOf(
-                    mockEventDay2H1,
-                    mockEventDay2H2,
-                ),
-                LocalDate.of(2024, 1, 5) to listOf(
-                    mockEventDay2H1,
-                    mockEventDay2H2,
-                )
-            ),
-            currentTime = LocalTime.of(11, 0),
-            selectedDate = LocalDate.of(2024, 1, 1),
+            uiState = uiState,
             onDayClick = {},
             onEventClick = {}
         )
@@ -413,17 +411,7 @@ fun ScheduleTabUIPreview() {
 fun ScheduleTabUIDarkPreview() {
     NFQSnapshotTestThemeForPreview(darkTheme = true) {
         ScheduleTabUI(
-            dayEventPair = listOf(
-                LocalDate.of(2024, 1, 1) to listOf(
-                    mockEventDay1
-                ),
-                LocalDate.of(2024, 1, 2) to listOf(
-                    mockEventDay2H1,
-                    mockEventDay2H2,
-                )
-            ),
-            currentTime = LocalTime.of(10, 30),
-            selectedDate = LocalDate.of(2024, 1, 2),
+            uiState = uiState,
             onDayClick = {},
             onEventClick = {}
         )

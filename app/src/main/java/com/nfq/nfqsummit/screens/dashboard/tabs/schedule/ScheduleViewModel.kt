@@ -1,15 +1,15 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.schedule
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nfq.data.domain.model.Response
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.domain.repository.EventRepository
 import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
@@ -19,53 +19,76 @@ import javax.inject.Inject
 class ScheduleViewModel @Inject constructor(
     private val eventRepository: EventRepository
 ) : ViewModel() {
-    var events by mutableStateOf(listOf<SummitEvent>())
-        private set
 
-    var selectedDate: LocalDate by mutableStateOf(LocalDate.now())
+    private val _selectedDate = MutableStateFlow<LocalDate?>(null)
 
-    val currentTime: LocalTime by mutableStateOf(LocalTime.now())
+    val uiState = combine(_selectedDate, eventRepository.events) { oldSelectedDate, events ->
+        if (events.isNotEmpty()) {
+            val today = LocalDate.now()
+            val firstEventDate = events.first().start.toLocalDate()
+            val lastEventDate = events.last().end.toLocalDate()
 
-    var dayEventPair by mutableStateOf(listOf<Pair<LocalDate, List<SummitEvent>>>())
+            val selectedDate = when {
+                oldSelectedDate != null -> oldSelectedDate
+                today < firstEventDate -> firstEventDate
+                today > lastEventDate -> lastEventDate
+                else -> today
+            }
+            // Generate a sorted list of unique event dates
+            val distinctDates = events
+                .map { it.start.toLocalDate() }
+                .distinct()
+                .sorted()
+
+            // Pair each date with its corresponding non-conference events
+            val dayEventPairs = distinctDates.map { date ->
+                date to events.filter { event ->
+                    event.start.toLocalDate() == date && !event.isConference
+                }.sortedBy { it.start }
+            }
+
+            // Extract events for the selected date
+            val dailyEvents = dayEventPairs
+                .filter { (date, _) -> date.dayOfMonth == selectedDate.dayOfMonth }
+                .flatMap { (_, events) -> events }
+
+            ScheduleUIState(
+                events = events,
+                selectedDate = selectedDate,
+                dayEventPairs = dayEventPairs,
+                dailyEvents = dailyEvents
+            )
+        } else {
+            ScheduleUIState()
+        }
+
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = ScheduleUIState()
+    )
 
     init {
         getEvents()
     }
 
+
+    fun onDateSelected(date: LocalDate) {
+        _selectedDate.value = date
+    }
+
     private fun getEvents() = viewModelScope.launch {
-        eventRepository.fetchAllEvents()
-            .onFailure {
-                // Handle failure by resetting events
-                events = emptyList()
-                // Optionally log or notify the user of the failure
-                UserMessageManager.showMessage(it)
-            }
-            .onSuccess { result ->
-                // Sort events by start time
-                events = result.sortedBy { it.start }
-
-                if (events.isNotEmpty()) {
-                    // Determine the selected date
-                    val today = LocalDate.now()
-                    val firstEventDate = events.first().start.toLocalDate()
-                    val lastEventDate = events.last().end.toLocalDate()
-
-                    selectedDate = when {
-                        today < firstEventDate -> firstEventDate
-                        today > lastEventDate -> lastEventDate
-                        else -> today
-                    }
-
-                    // Generate a list of unique event dates
-                    val distinctDates = events.map { it.start.toLocalDate() }.distinct().sorted()
-
-                    // Create pairs of dates and corresponding events
-                    dayEventPair = distinctDates.map { date ->
-                        date to events.filter { event ->
-                            event.start.toLocalDate() == date && !event.isConference
-                        }.sortedBy { it.start }
-                    }
-                }
-            }
+        eventRepository
+            .fetchAllEvents()
+            .onFailure { UserMessageManager.showMessage(it) }
     }
 }
+
+data class ScheduleUIState(
+    val isLoading: Boolean = false,
+    val events: List<SummitEvent> = emptyList(),
+    val selectedDate: LocalDate = LocalDate.now(),
+    val currentTime: LocalTime = LocalTime.now(),
+    val dayEventPairs: List<Pair<LocalDate, List<SummitEvent>>> = emptyList(),
+    val dailyEvents: List<SummitEvent> = emptyList()
+)
