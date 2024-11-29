@@ -5,10 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.repository.EventRepository
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
+import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -19,12 +22,15 @@ class HomeViewModel @Inject constructor(
     private val eventRepository: EventRepository
 ) : ViewModel() {
     private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    private val loadingFlow = MutableStateFlow(false)
 
     val uiState = combine(
         eventRepository.events,
-        eventRepository.savedEvents
-    ) { events, savedEvents ->
+        eventRepository.savedEvents,
+        loadingFlow
+    ) { events, savedEvents, isLoading ->
         HomeUIState(
+            isLoading = isLoading,
             upcomingEvents = events.sortedBy { it.start }.take(3).map {
                 UpcomingEventUIModel(
                     id = it.id,
@@ -62,8 +68,22 @@ class HomeViewModel @Inject constructor(
 
     private fun fetchUpcomingEvents() {
         viewModelScope.launch(Dispatchers.IO) {
-            eventRepository.fetchAllEvents()
+            updateLoadingStateIfNeeded()
+            eventRepository
+                .fetchAllEvents()
+                .onFailure {
+                    loadingFlow.value = false
+                    UserMessageManager.showMessage(it)
+                }
+                .onSuccess {
+                    loadingFlow.value = false
+                }
         }
+    }
+
+    private suspend fun updateLoadingStateIfNeeded() {
+        val events = eventRepository.events.firstOrNull()
+        loadingFlow.value = events.isNullOrEmpty()
     }
 
     fun markAsFavorite(favorite: Boolean, eventId: String) {

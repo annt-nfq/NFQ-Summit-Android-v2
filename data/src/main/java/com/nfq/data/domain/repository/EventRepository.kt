@@ -9,7 +9,7 @@ interface EventRepository {
 
     val savedEvents: Flow<List<SummitEvent>>
 
-    suspend fun fetchAllEvents(forceReload: Boolean = false): Response<List<SummitEvent>>
+    suspend fun fetchAllEvents(forceReload: Boolean = false): Result<List<SummitEvent>>
 
     suspend fun getTechRocksEvents(forceReload: Boolean = false): Response<List<SummitEvent>>
 

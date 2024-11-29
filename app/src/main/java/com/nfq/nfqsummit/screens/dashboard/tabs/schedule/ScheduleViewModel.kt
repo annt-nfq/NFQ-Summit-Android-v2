@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.model.Response
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.domain.repository.EventRepository
+import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -17,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
     private val eventRepository: EventRepository
-): ViewModel() {
+) : ViewModel() {
     var events by mutableStateOf(listOf<SummitEvent>())
         private set
 
@@ -32,31 +33,39 @@ class ScheduleViewModel @Inject constructor(
     }
 
     private fun getEvents() = viewModelScope.launch {
-        val response = eventRepository.fetchAllEvents()
-        events = when (response) {
-            is Response.Success -> response.data?.sortedBy { it.start }
-                ?: listOf()
-
-            is Response.Failure -> listOf()
-            is Response.Loading -> listOf()
-        }
-        if (events.isNotEmpty()) {
-            selectedDate =
-                if (LocalDate.now() < events.first().start.toLocalDate()) {
-                    events.first().start.toLocalDate()
-                } else if (LocalDate.now() > events.last().end.toLocalDate()) {
-                    events.last().end.toLocalDate()
-                } else {
-                    LocalDate.now()
-                }
-            val dates = events.map { it.start.toLocalDate() }.distinct().sortedBy { it }
-            dayEventPair = dates.map { date ->
-                Pair(
-                    date,
-                    events.filter { it.start.toLocalDate() == date && !it.isConference }
-                        .sortedBy { it.start }
-                )
+        eventRepository.fetchAllEvents()
+            .onFailure {
+                // Handle failure by resetting events
+                events = emptyList()
+                // Optionally log or notify the user of the failure
+                UserMessageManager.showMessage(it)
             }
-        }
+            .onSuccess { result ->
+                // Sort events by start time
+                events = result.sortedBy { it.start }
+
+                if (events.isNotEmpty()) {
+                    // Determine the selected date
+                    val today = LocalDate.now()
+                    val firstEventDate = events.first().start.toLocalDate()
+                    val lastEventDate = events.last().end.toLocalDate()
+
+                    selectedDate = when {
+                        today < firstEventDate -> firstEventDate
+                        today > lastEventDate -> lastEventDate
+                        else -> today
+                    }
+
+                    // Generate a list of unique event dates
+                    val distinctDates = events.map { it.start.toLocalDate() }.distinct().sorted()
+
+                    // Create pairs of dates and corresponding events
+                    dayEventPair = distinctDates.map { date ->
+                        date to events.filter { event ->
+                            event.start.toLocalDate() == date && !event.isConference
+                        }.sortedBy { it.start }
+                    }
+                }
+            }
     }
 }

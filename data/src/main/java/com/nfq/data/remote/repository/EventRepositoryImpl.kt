@@ -25,7 +25,7 @@ class EventRepositoryImpl @Inject constructor(
             .savedEvents
             .map { it.map { event -> event.toSummitEvent() } }
 
-    override suspend fun fetchAllEvents(forceReload: Boolean): Response<List<SummitEvent>> {
+    override suspend fun fetchAllEvents(forceReload: Boolean): Result<List<SummitEvent>> {
         return try {
             val savedEvents = eventLocal.savedEvents.first()
             val remoteEvents = eventRemote.getAllEvents()
@@ -43,9 +43,9 @@ class EventRepositoryImpl @Inject constructor(
             }
 
             // Return the updated list as SummitEvent
-            Response.Success(allEvents.map { it.toSummitEvent() })
+            Result.success(allEvents.map { it.toSummitEvent() })
         } catch (e: Exception) {
-            Response.Failure(e)
+            Result.failure(e)
         }
     }
 

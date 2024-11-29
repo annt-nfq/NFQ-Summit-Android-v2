@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.times
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.mocks.mockSavedEvents
 import com.nfq.nfqsummit.mocks.mockUpcomingEvents
 import com.nfq.nfqsummit.model.SavedEventUIModel
@@ -74,6 +75,9 @@ fun HomeTab(
     var eventId by remember { mutableStateOf("") }
     var showQRCodeBottomSheet by remember { mutableStateOf(false) }
 
+    if (uiState.isLoading) {
+        Loading()
+    }
 
     if (showQRCodeBottomSheet) {
         QRCodeBottomSheet(
