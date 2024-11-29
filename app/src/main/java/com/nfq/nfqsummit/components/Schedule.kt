@@ -74,7 +74,6 @@ fun Schedule(
                     modifier = Modifier
                         .onGloballyPositioned { sidebarWidth = it.size.width }
                         .align(Alignment.TopStart)
-                        .background(MaterialTheme.colorScheme.background)
 //                        .background(Color(0x66FF0000))
                 )
                 BasicSchedule(

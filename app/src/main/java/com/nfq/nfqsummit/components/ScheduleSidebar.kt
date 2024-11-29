@@ -1,9 +1,11 @@
 package com.nfq.nfqsummit.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,7 +30,7 @@ fun ScheduleSidebar(
     val firstHourOffsetMinutes = if (firstHour == minTime) 0 else ChronoUnit.MINUTES.between(minTime, firstHour.plusHours(1))
     val firstHourOffset = hourHeight * (firstHourOffsetMinutes / 60f)
     val startTime = if (firstHour == minTime) firstHour else firstHour.plusHours(1)
-    Column(modifier = modifier) {
+    Column(modifier = modifier.background(MaterialTheme.colorScheme.surface)) {
         Spacer(modifier = Modifier.height(firstHourOffset))
         repeat(numHours) { i ->
             Box(modifier = Modifier.height(hourHeight)) {

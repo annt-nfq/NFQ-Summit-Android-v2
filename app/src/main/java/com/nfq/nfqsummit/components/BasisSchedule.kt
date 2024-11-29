@@ -1,12 +1,12 @@
 package com.nfq.nfqsummit.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -163,14 +163,14 @@ fun CurrentTimeIndicator(
                     modifier = Modifier
                         .size(12.dp)
                         .clip(CircleShape)
-                        .background(Color.Red)
+                        .background(MaterialTheme.colorScheme.primary)
                         .align(Alignment.CenterStart)
                 )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Color.Red)
+                        .height(2.dp)
+                        .background(MaterialTheme.colorScheme.primary)
                         .align(Alignment.Center)
                 )
             }
@@ -209,22 +209,25 @@ fun BasicSchedulePreview() {
         BasicSchedule(
             events = listOf(
                 SummitEvent(
-                    "1",
-                    "Event 1",
-                    LocalDate.now().atTime(9, 0),
-                    LocalDate.now().atTime(10, 0)
+                    id = "1",
+                    name = "Event 1",
+                    start = LocalDate.now().atTime(9, 0),
+                    end = LocalDate.now().atTime(10, 0),
+                    tag = "\uD83D\uDCBC Summit"
                 ),
                 SummitEvent(
-                    "2",
-                    "Event 2",
-                    LocalDate.now().atTime(10, 0),
-                    LocalDate.now().atTime(11, 0)
+                    id = "2",
+                    name = "Event 2",
+                    start = LocalDate.now().atTime(10, 0),
+                    end = LocalDate.now().atTime(11, 0),
+                    tag = "\uD83D\uDCBC Summit"
                 ),
                 SummitEvent(
-                    "3",
-                    "Event 3",
-                    LocalDate.now().atTime(10, 0),
-                    LocalDate.now().atTime(12, 0)
+                    id = "3",
+                    name = "Event 3",
+                    start = LocalDate.now().atTime(10, 0),
+                    end = LocalDate.now().atTime(12, 0),
+                    tag = "\uD83D\uDCBC Summit"
                 ),
             ), dayWidth = 300.dp, hourHeight = 100.dp
         )

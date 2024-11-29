@@ -31,7 +31,8 @@ data class SummitEvent(
     val ordering: Int = 0,
     val speakerName: String? = null,
     val speakerPosition: String? = null,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val tag: String
 )
 
 object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
@@ -66,6 +67,7 @@ fun SummitEventRemoteModel.toSummitEvent(): SummitEvent {
         ordering = ordering ?: 0,
         speakerName = speakerName ?: "",
         speakerPosition = speakerPosition,
-        isFavorite = isFavorite ?: false
+        isFavorite = isFavorite ?: false,
+        tag = tag ?: "\uD83D\uDCBC Summit"
     )
 }

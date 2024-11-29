@@ -260,7 +260,8 @@ private fun EventDetailsPreview() {
                 ordering = 0,
                 speakerName = "",
                 speakerPosition = "",
-                isFavorite = false
+                isFavorite = false,
+                tag = "\uD83D\uDCBC Summit"
             ),
             onViewLocation = { _, _, _ -> },
         )

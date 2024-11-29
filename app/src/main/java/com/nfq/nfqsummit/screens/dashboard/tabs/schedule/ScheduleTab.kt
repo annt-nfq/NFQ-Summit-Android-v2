@@ -22,8 +22,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -86,17 +86,17 @@ fun ScheduleTabUI(
     onEventClick: (SummitEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold { paddingValues ->
+    Surface {
         Column(
             modifier = Modifier
-                .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
                     .padding(top = 16.dp)
+                    .background(MaterialTheme.colorScheme.background)
             ) {
                 Text(
                     text = "Calendar & Events",
@@ -152,8 +152,11 @@ fun SummitSchedule(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val verticalScroll = rememberScrollState()
+
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Row(
             verticalAlignment = Alignment.Bottom,
@@ -184,13 +187,19 @@ fun SummitSchedule(
             }
             Spacer(modifier = Modifier.width(16.dp))
         }
-        Spacer(modifier = Modifier.height(20.dp))
-        Column(modifier = Modifier.verticalScroll(state = verticalScroll)) {
-            val dailyEvents = dayEventPair.filter {
-                it.first.dayOfMonth == selectedDate.dayOfMonth
-            }.flatMap { it.second }
-            if (dailyEvents.isNotEmpty())
-                Surface(color = MaterialTheme.colorScheme.background) {
+        HorizontalDivider(color = Color(0xFFCFCAE4), thickness = 1.dp)
+        Surface {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(state = verticalScroll)
+                    .padding(start = 32.dp)
+                    .padding(top = 18.dp)
+            ) {
+                val dailyEvents = dayEventPair.filter {
+                    it.first.dayOfMonth == selectedDate.dayOfMonth
+                }.flatMap { it.second }
+                if (dailyEvents.isNotEmpty())
+
                     Schedule(
                         events = dailyEvents.sortedBy { it.name },
                         currentTime = currentTime,
@@ -206,10 +215,11 @@ fun SummitSchedule(
                             )
                         }
                     )
-                }
+            }
             Spacer(modifier = Modifier.height(100.dp))
         }
     }
+
 }
 
 @Composable
