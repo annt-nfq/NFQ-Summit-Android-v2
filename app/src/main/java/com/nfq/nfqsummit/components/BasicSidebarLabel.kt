@@ -12,11 +12,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.nfq.nfqsummit.convertTimeFormat
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-private val HourFormatter = DateTimeFormatter.ofPattern("HH:mm")
+private val HourFormatter = DateTimeFormatter.ofPattern("h a")
 private val AMPMFormatter = DateTimeFormatter.ofPattern("a")
 
 @Composable
@@ -28,15 +30,15 @@ fun BasicSidebarLabel(
         horizontalAlignment = Alignment.End
     ) {
         Text(
-            text = time.format(HourFormatter),
+            text = time.format(HourFormatter).convertTimeFormat(),
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Normal,
-            modifier = modifier
-                .padding(end = 10.dp),
+            fontSize = 15.sp,
+            modifier = modifier.padding(end = 10.dp),
             textAlign = TextAlign.Left
         )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
