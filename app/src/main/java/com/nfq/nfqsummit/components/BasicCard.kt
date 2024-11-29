@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -18,7 +19,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
-import com.nfq.nfqsummit.ui.theme.ThemePreviews
 import com.nfq.nfqsummit.ui.theme.boxShadow
 
 @Composable
@@ -26,6 +26,7 @@ fun BasicCard(
     modifier: Modifier = Modifier,
     shape: RoundedCornerShape = RoundedCornerShape(16.dp),
     blurRadius: Dp = 30.dp,
+    contentAlignment: Alignment = Alignment.TopStart,
     shadowColor: Color = Color(0xFF969696),
     onClick: () -> Unit = {},
     content: @Composable BoxScope.() -> Unit
@@ -41,6 +42,7 @@ fun BasicCard(
             .clip(shape = shape)
             .clickable(onClick = onClick)
             .background(MaterialTheme.colorScheme.background),
+        contentAlignment = contentAlignment,
         content = content
     )
 }
