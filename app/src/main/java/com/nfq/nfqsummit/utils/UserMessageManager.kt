@@ -13,6 +13,12 @@ object UserMessageManager {
             _messages.value = message
         }
     }
+    fun showMessage(e: Throwable) {
+        val message = e.message ?: e.localizedMessage
+        if (message.isNotBlank() && message != "Job was cancelled") {
+            _messages.value = message
+        }
+    }
 
     fun userMessageShown() {
         _messages.value = null
