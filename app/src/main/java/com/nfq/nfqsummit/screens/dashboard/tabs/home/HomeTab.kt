@@ -63,6 +63,7 @@ import com.nfq.nfqsummit.ui.theme.boxShadow
 fun HomeTab(
     viewModel: HomeViewModel = hiltViewModel(),
     goToAttractions: () -> Unit,
+    seeAllSavedEvents: () -> Unit = {},
 ) {
     val window = (LocalView.current.context as Activity).window
     window.statusBarColor = Color.Transparent.toArgb()
@@ -96,6 +97,7 @@ fun HomeTab(
         uiState = uiState,
         goToAttractions = goToAttractions,
         markAsFavorite = viewModel::markAsFavorite,
+        seeAllSavedEvents = seeAllSavedEvents,
         goToDetails = {
             eventId = it
             showEventDetailsBottomSheet = true
@@ -111,6 +113,7 @@ private fun HomeTabUI(
     uiState: HomeUIState,
     goToDetails: (String) -> Unit,
     goToAttractions: () -> Unit,
+    seeAllSavedEvents: () -> Unit = {},
     onShowQRCode: () -> Unit,
     markAsFavorite: (favorite: Boolean, eventId: String) -> Unit
 ) {
@@ -132,7 +135,8 @@ private fun HomeTabUI(
             savedEventSection(
                 savedEvents = uiState.savedEvents,
                 goToDetails = goToDetails,
-                goToAttractions = goToAttractions
+                goToAttractions = goToAttractions,
+                seeAllSavedEvents = seeAllSavedEvents
             )
         }
     }
@@ -259,13 +263,14 @@ fun SectionHeader(
 private fun LazyListScope.savedEventSection(
     savedEvents: List<SavedEventUIModel>,
     goToDetails: (String) -> Unit,
-    goToAttractions: () -> Unit
+    goToAttractions: () -> Unit,
+    seeAllSavedEvents: () -> Unit = {}
 ) {
 
     item {
         SectionHeader(
             title = "Saved Event",
-            onSeeAll = {},
+            onSeeAll = seeAllSavedEvents,
             modifier = Modifier
                 .padding(top = 24.dp)
                 .padding(bottom = 16.dp)

@@ -20,6 +20,8 @@ sealed class AppDestination(var route: String) {
 
     data object Explore: AppDestination(route = "explore")
 
+    data object SavedEvents: AppDestination(route = "savedEvents")
+
     data object Splash : AppDestination(route = "splash")
 
     data object Payment : AppDestination(route = "payment")

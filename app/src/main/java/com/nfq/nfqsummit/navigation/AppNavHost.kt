@@ -18,6 +18,7 @@ import com.nfq.nfqsummit.screens.dashboard.tabs.techRocks.TechRocksTab
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsScreen
 import com.nfq.nfqsummit.screens.onboarding.OnboardingScreen
 import com.nfq.nfqsummit.screens.payment.PaymentScreen
+import com.nfq.nfqsummit.screens.savedEvents.SavedEventScreen
 import com.nfq.nfqsummit.screens.signIn.SignInScreen
 import com.nfq.nfqsummit.screens.splash.SplashScreen
 import com.nfq.nfqsummit.screens.survival.SurvivalScreen

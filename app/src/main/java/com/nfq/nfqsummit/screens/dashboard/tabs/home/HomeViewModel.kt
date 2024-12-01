@@ -3,6 +3,8 @@ package com.nfq.nfqsummit.screens.dashboard.tabs.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.repository.EventRepository
+import com.nfq.nfqsummit.mapper.toSavedEventUIModels
+import com.nfq.nfqsummit.mapper.toUpcomingEventUIModels
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.utils.UserMessageManager
@@ -14,14 +16,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val eventRepository: EventRepository
 ) : ViewModel() {
-    private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     private val loadingFlow = MutableStateFlow(false)
 
     val uiState = combine(
@@ -31,30 +31,8 @@ class HomeViewModel @Inject constructor(
     ) { events, savedEvents, isLoading ->
         HomeUIState(
             isLoading = isLoading,
-            upcomingEvents = events.sortedBy { it.start }.take(3).map {
-                UpcomingEventUIModel(
-                    id = it.id,
-                    name = it.name,
-                    imageUrl = it.coverPhotoUrl.orEmpty(),
-                    date = it.start.format(DateTimeFormatter.ofPattern("dd\nMMM")),
-                    startAndEndTime = "${it.start.format(dateTimeFormatter)} - ${
-                        it.end.format(
-                            dateTimeFormatter
-                        )
-                    }",
-                    isFavorite = it.isFavorite,
-                    tag = "\uD83D\uDCBC Summit"
-                )
-            },
-            savedEvents = savedEvents.map { data ->
-                SavedEventUIModel(
-                    id = data.id,
-                    imageUrl = data.coverPhotoUrl.orEmpty(),
-                    name = data.name,
-                    date = data.start.format(DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")),
-                    tag = "\uD83D\uDCBC Summit"
-                )
-            }
+            upcomingEvents = events.sortedBy { it.start }.take(3).toUpcomingEventUIModels(),
+            savedEvents = savedEvents.toSavedEventUIModels()
         )
     }.stateIn(
         scope = viewModelScope,

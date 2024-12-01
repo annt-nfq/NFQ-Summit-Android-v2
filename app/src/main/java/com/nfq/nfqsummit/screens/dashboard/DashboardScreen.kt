@@ -58,7 +58,7 @@ import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.HomeTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
-import com.nfq.nfqsummit.screens.dashboard.tabs.techRocks.TechRocksTab
+import com.nfq.nfqsummit.screens.savedEvents.SavedEventScreen
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.coroutines.launch
@@ -68,7 +68,7 @@ fun DashboardScreen(
     goToEventDetails: (eventId: String) -> Unit,
     goToDestination: (destination: AppDestination) -> Unit,
     goToDetails: (eventId: Int) -> Unit,
-    goToAttractions: () -> Unit
+    goToAttractions: () -> Unit,
 ) {
     val window = (LocalView.current.context as Activity).window
     window.statusBarColor = Color.Transparent.toArgb()
@@ -81,7 +81,7 @@ fun DashboardScreen(
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Schedule,
-        BottomNavItem.TechRocks,
+        BottomNavItem.SavedEvents,
         BottomNavItem.Explore
     )
 
@@ -139,6 +139,9 @@ fun DashboardScreen(
                 composable(AppDestination.Home.route) {
                     HomeTab(
                         goToAttractions = goToAttractions,
+                        seeAllSavedEvents = {
+                            navController.navigate(AppDestination.SavedEvents.route)
+                        }
                     )
                 }
                 composable(AppDestination.Schedule.route) {
@@ -146,14 +149,14 @@ fun DashboardScreen(
                         goToEventDetails = goToEventDetails
                     )
                 }
-                composable(AppDestination.TechRocks.route) {
-                    TechRocksTab(
-                        goToEventDetails = goToEventDetails
-                    )
-                }
                 composable(AppDestination.Explore.route) {
                     ExploreTab(
                         goToDestination = goToDestination
+                    )
+                }
+                composable(AppDestination.SavedEvents.route) {
+                    SavedEventScreen(
+                        navigateUp = { navController.navigateUp() }
                     )
                 }
             }
@@ -334,8 +337,8 @@ sealed class BottomNavItem(
     data object Schedule :
         BottomNavItem("Calendar & Events", R.drawable.ic_schedule, AppDestination.Schedule)
 
-    data object TechRocks :
-        BottomNavItem("Saved Event", R.drawable.ic_tra, AppDestination.TechRocks)
+    data object SavedEvents :
+        BottomNavItem("Saved Event", R.drawable.ic_tra, AppDestination.SavedEvents)
 
     data object Explore : BottomNavItem("Explore", R.drawable.ic_explore, AppDestination.Explore)
 }
