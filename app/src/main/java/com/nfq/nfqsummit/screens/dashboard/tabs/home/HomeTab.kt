@@ -36,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,7 +43,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.nfqsummit.R
@@ -126,7 +124,7 @@ private fun HomeTabUI(
             showQRCodeSection(
                 onShowQRCode = onShowQRCode
             )
-            homeRecommendationsSection(
+            upcomingEventsSection(
                 upcomingEvents = uiState.upcomingEvents,
                 markAsFavorite = markAsFavorite,
                 goToDetails = goToDetails
@@ -196,53 +194,31 @@ private fun LazyListScope.showQRCodeSection(
     }
 }
 
-fun LazyListScope.homeRecommendationsSection(
+fun LazyListScope.upcomingEventsSection(
     upcomingEvents: List<UpcomingEventUIModel>,
     goToDetails: (String) -> Unit,
     markAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit
 ) {
     item {
-        val configuration = LocalConfiguration.current
-
-        val screenWidth = configuration.screenWidthDp.dp
-        val itemWidth = (237.0 * screenWidth) / 393
-        val paddingEnd = 16.dp + itemWidth / 2
-
         val pagerState = rememberPagerState { upcomingEvents.size }
         Column {
             SectionHeader(title = "Upcoming Events", onSeeAll = {})
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalPager(
                 state = pagerState,
-                contentPadding = PaddingValues(start = 24.dp, end = paddingEnd),
+                contentPadding = PaddingValues(start = 24.dp, end = 134.dp),
+                pageSpacing = 16.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 println(upcomingEvents[it].toString())
                 UpcomingEventCard(
                     uiModel = upcomingEvents[it],
                     goToDetails = goToDetails,
-                    markAsFavorite = markAsFavorite
+                    markAsFavorite = markAsFavorite,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
-
-        /*when (upcomingEvents) {
-            is Response.Success -> {
-
-            }
-
-            is Response.Failure -> {
-                Text(
-                    text = "Failed to load recommendations", style = MaterialTheme.typography.bodyMedium
-                )
-            }
-
-            is Response.Loading -> {
-                Text(
-                    text = "Loading recommendations...", style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }*/
     }
 }
 

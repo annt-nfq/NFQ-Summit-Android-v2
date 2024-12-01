@@ -47,7 +47,7 @@ fun UpcomingEventCard(
     markAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit
 ) {
     BasicCard(
-        modifier = modifier.width(237.dp),
+        modifier = modifier,
         onClick = { goToDetails(uiModel.id) }
     ) {
         Column(
