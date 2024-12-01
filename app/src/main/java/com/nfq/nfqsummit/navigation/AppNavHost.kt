@@ -11,6 +11,8 @@ import com.nfq.nfqsummit.screens.attractions.attractionBlogs.AttractionBlogsScre
 import com.nfq.nfqsummit.screens.blog.BlogScreen
 import com.nfq.nfqsummit.screens.bookingNumber.BookingNumberScreen
 import com.nfq.nfqsummit.screens.dashboard.DashboardScreen
+import com.nfq.nfqsummit.screens.dashboard.enterTransition
+import com.nfq.nfqsummit.screens.dashboard.exitTransition
 import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.HomeTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
@@ -30,7 +32,14 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    NavHost(navController = navController, startDestination = AppDestination.Splash.route) {
+    NavHost(
+        navController = navController,
+        startDestination = AppDestination.Splash.route,
+        enterTransition = enterTransition,
+        exitTransition = exitTransition,
+        popEnterTransition = enterTransition,
+        popExitTransition = exitTransition
+    ) {
         composable(AppDestination.Splash.route) {
             SplashScreen(
                 navigateToHome = {

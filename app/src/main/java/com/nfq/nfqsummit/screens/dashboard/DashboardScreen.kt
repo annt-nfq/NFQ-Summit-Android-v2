@@ -2,6 +2,12 @@ package com.nfq.nfqsummit.screens.dashboard
 
 import android.app.Activity
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -134,6 +141,10 @@ fun DashboardScreen(
             NavHost(
                 navController = navController,
                 startDestination = BottomNavItem.Home.destination.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition,
+                popEnterTransition = enterTransition,
+                popExitTransition = exitTransition,
                 modifier = Modifier.weight(1f)
             ) {
                 composable(AppDestination.Home.route) {
@@ -357,3 +368,8 @@ fun DashboardScreenPreview() {
             goToAttractions = {})
     }
 }
+
+val enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
+    { fadeIn(animationSpec = tween(300)) }
+val exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+    { fadeOut(animationSpec = tween(300)) }
