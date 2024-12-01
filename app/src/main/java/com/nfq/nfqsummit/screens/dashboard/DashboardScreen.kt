@@ -141,6 +141,9 @@ fun DashboardScreen(
                         goToAttractions = goToAttractions,
                         seeAllSavedEvents = {
                             navController.navigate(AppDestination.SavedEvents.route)
+                        },
+                        seeAllEvents = {
+                            navController.navigate(AppDestination.Schedule.route)
                         }
                     )
                 }

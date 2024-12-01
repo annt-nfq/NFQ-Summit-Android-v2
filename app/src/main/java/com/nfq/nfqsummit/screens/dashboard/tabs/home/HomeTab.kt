@@ -63,6 +63,7 @@ import com.nfq.nfqsummit.ui.theme.boxShadow
 fun HomeTab(
     viewModel: HomeViewModel = hiltViewModel(),
     goToAttractions: () -> Unit,
+    seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
 ) {
     val window = (LocalView.current.context as Activity).window
@@ -98,6 +99,7 @@ fun HomeTab(
         goToAttractions = goToAttractions,
         markAsFavorite = viewModel::markAsFavorite,
         seeAllSavedEvents = seeAllSavedEvents,
+        seeAllEvents = seeAllEvents,
         goToDetails = {
             eventId = it
             showEventDetailsBottomSheet = true
@@ -113,6 +115,7 @@ private fun HomeTabUI(
     uiState: HomeUIState,
     goToDetails: (String) -> Unit,
     goToAttractions: () -> Unit,
+    seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
     onShowQRCode: () -> Unit,
     markAsFavorite: (favorite: Boolean, eventId: String) -> Unit
@@ -130,7 +133,8 @@ private fun HomeTabUI(
             upcomingEventsSection(
                 upcomingEvents = uiState.upcomingEvents,
                 markAsFavorite = markAsFavorite,
-                goToDetails = goToDetails
+                goToDetails = goToDetails,
+                seeAllEvents = seeAllEvents
             )
             savedEventSection(
                 savedEvents = uiState.savedEvents,
@@ -204,12 +208,13 @@ private fun LazyListScope.showQRCodeSection(
 fun LazyListScope.upcomingEventsSection(
     upcomingEvents: List<UpcomingEventUIModel>,
     goToDetails: (String) -> Unit,
+    seeAllEvents: () -> Unit = {},
     markAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit
 ) {
     item {
         val pagerState = rememberPagerState { upcomingEvents.size }
         Column {
-            SectionHeader(title = "Upcoming Events", onSeeAll = {})
+            SectionHeader(title = "Upcoming Events", onSeeAll = seeAllEvents)
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalPager(
                 state = pagerState,
