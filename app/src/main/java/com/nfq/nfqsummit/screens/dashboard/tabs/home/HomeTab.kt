@@ -143,7 +143,10 @@ private fun LazyListScope.showQRCodeSection(
 ) {
     item {
         Box(
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp)
+                .padding(top = 12.dp)
         ) {
             Box(
                 modifier = Modifier

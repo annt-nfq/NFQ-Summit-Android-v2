@@ -133,7 +133,7 @@ private fun ScheduleHeader(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .padding(top = 16.dp)
+                .padding(top = 12.dp)
         ) {
             Text(
                 text = "Calendar & Events",

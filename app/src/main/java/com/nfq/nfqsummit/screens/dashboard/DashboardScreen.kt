@@ -13,19 +13,22 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
@@ -84,7 +88,10 @@ fun DashboardScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(
+                drawerShape = RoundedCornerShape(0.dp),
+                windowInsets = WindowInsets(0)
+            ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 DrawerContent(
@@ -114,7 +121,7 @@ fun DashboardScreen(
         },
         modifier = Modifier
             .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars)
+
     ) {
         Column {
             DashBoardHeader(
@@ -160,17 +167,20 @@ fun DashBoardHeader(
 ) {
     Row(
         modifier = Modifier
+            .statusBarsPadding()
             .fillMaxWidth()
-            .height(60.dp),
+            .padding(horizontal = 24.dp)
+            .padding(top = 24.dp)
+            .padding(bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.width(24.dp))
         Image(
             painter = painterResource(id = R.drawable.ic_menu),
             contentDescription = null,
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
             modifier = Modifier
                 .width(48.dp)
+                .clip(RoundedCornerShape(12.dp))
                 .clickable {
                     onMenuClick()
                 },
@@ -183,7 +193,6 @@ fun DashBoardHeader(
                 .width(80.dp),
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
         )
-        Spacer(modifier = Modifier.width(24.dp))
     }
 }
 
@@ -200,27 +209,21 @@ fun DrawerContent(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding()
     ) {
-        Box(
+        Image(
+            painter = painterResource(id = R.drawable.ic_nfq_text_white),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
             modifier = Modifier
-                .fillMaxWidth()
-                .height(104.dp)
-                .padding(horizontal = 34.dp, vertical = 20.dp),
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_nfq_text_white),
-                contentDescription = null,
-                modifier = Modifier
-                    .width(80.dp)
-                    .align(Alignment.BottomStart),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-            )
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(0.5.dp)
-                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                .padding(start = 34.dp)
+                .padding(top = 36.dp)
+                .width(80.dp)
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+            thickness = 0.5.dp
         )
         Spacer(modifier = Modifier.height(28.dp))
         menus.forEach {
@@ -235,6 +238,7 @@ fun DrawerContent(
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
+                    shape = RoundedCornerShape(16.0.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
                     ),
@@ -298,22 +302,26 @@ fun DrawerContent(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 24.dp)
+                .navigationBarsPadding(),
         ) {
-            Text(
-                text = "Sign out", style = MaterialTheme.typography.bodyMedium.copy(
+            TextButton(
+                onClick = onSignOutClick,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+                Text(
+                    text = "Sign out",
+                    style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.error,
-                ),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .align(Alignment.CenterEnd)
-            )
+                )
+            }
         }
-        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
