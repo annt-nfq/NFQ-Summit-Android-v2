@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -5,6 +7,9 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.sqldelight)
 }
+
+val p = Properties()
+p.load(project.rootProject.file("local.properties").reader())
 
 android {
     namespace = "com.nfq.data"
@@ -15,6 +20,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        buildConfigField("String", "BASE_URL", "\"${p.getProperty("BASE_URL")}\"")
     }
 
     buildTypes {
@@ -32,6 +38,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = "21"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -52,6 +62,12 @@ dependencies {
     ksp(libs.dagger.compiler)
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.dagger.hilt.android.compiler)
+
+    implementation(libs.kotlinx.serialization)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.kotlin.serialization)
+    implementation(libs.okhttp.logging)
+    implementation(libs.arrow)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

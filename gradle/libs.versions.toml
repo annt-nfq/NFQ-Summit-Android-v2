@@ -34,6 +34,10 @@ compose-markdown = "0.5.2"
 firebase-bom = "33.1.2"
 androidx-splashscreen = "1.0.0"
 foundation = "1.7.5"
+retrofit = "2.9.0"
+retrofitKotlinxSerializationJson = "1.0.0"
+okhttp = "4.12.0"
+coreArrow = "1.1.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -89,6 +93,11 @@ compose-markdown = { group = "com.github.jeziellago", name = "compose-markdown",
 firebase-bom = {group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom"}
 firebase-analytics = {group = "com.google.firebase", name = "firebase-analytics-ktx"}
 firebase-crashlytics = {group = "com.google.firebase", name = "firebase-crashlytics-ktx"}
+
+retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-kotlin-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerializationJson" }
+okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+arrow = { module = "io.arrow-kt:arrow-core", version.ref = "coreArrow" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
