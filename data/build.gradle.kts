@@ -21,6 +21,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "BASE_URL", "\"${p.getProperty("BASE_URL")}\"")
+        buildConfigField("String", "PASS_PHRASE", "\"${p.getProperty("PASS_PHRASE")}\"")
     }
 
     buildTypes {
@@ -68,6 +69,11 @@ dependencies {
     implementation(libs.retrofit.kotlin.serialization)
     implementation(libs.okhttp.logging)
     implementation(libs.arrow)
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    implementation(libs.sqlcipher)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

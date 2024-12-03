@@ -38,6 +38,8 @@ retrofit = "2.9.0"
 retrofitKotlinxSerializationJson = "1.0.0"
 okhttp = "4.12.0"
 coreArrow = "1.1.5"
+room = "2.6.1"
+sqlcipher = "4.5.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -98,6 +100,13 @@ retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.r
 retrofit-kotlin-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerializationJson" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 arrow = { module = "io.arrow-kt:arrow-core", version.ref = "coreArrow" }
+
+#Room
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+
+sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlcipher" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
