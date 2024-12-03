@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -86,6 +87,7 @@ fun Schedule(
                     dayWidth = dayWidth,
                     hourHeight = hourHeight,
                     modifier = Modifier
+                        .padding(top = 10.dp)
                         .align(Alignment.TopEnd)
 //                        .background(Color(0x6600FFAE))
                 )

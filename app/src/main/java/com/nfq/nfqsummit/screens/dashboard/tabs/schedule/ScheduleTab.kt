@@ -208,7 +208,7 @@ fun SummitSchedules(
         Column(
             modifier = Modifier
                 .verticalScroll(state = verticalScroll)
-                .padding(start = 32.dp, end = 16.dp)
+                .padding(start = 32.dp)
                 .padding(top = 16.dp)
         ) {
 

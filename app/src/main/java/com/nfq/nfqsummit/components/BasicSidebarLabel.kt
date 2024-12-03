@@ -1,6 +1,7 @@
 package com.nfq.nfqsummit.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +34,9 @@ fun BasicSidebarLabel(
             text = time.format(HourFormatter).convertTimeFormat(),
             style = MaterialTheme.typography.bodyMedium,
             fontSize = 15.sp,
-            modifier = modifier.padding(end = 10.dp),
+            modifier = modifier
+                .height(20.dp)
+                .padding(end = 10.dp),
             textAlign = TextAlign.Left
         )
     }

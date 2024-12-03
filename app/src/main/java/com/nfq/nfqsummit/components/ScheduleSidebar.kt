@@ -27,7 +27,8 @@ fun ScheduleSidebar(
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes / 60
     val firstHour = minTime.truncatedTo(ChronoUnit.HOURS)
-    val firstHourOffsetMinutes = if (firstHour == minTime) 0 else ChronoUnit.MINUTES.between(minTime, firstHour.plusHours(1))
+    val firstHourOffsetMinutes =
+        if (firstHour == minTime) 0 else ChronoUnit.MINUTES.between(minTime, firstHour.plusHours(1))
     val firstHourOffset = hourHeight * (firstHourOffsetMinutes / 60f)
     val startTime = if (firstHour == minTime) firstHour else firstHour.plusHours(1)
     Column(modifier = modifier.background(MaterialTheme.colorScheme.surface)) {

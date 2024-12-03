@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -157,11 +158,11 @@ fun CurrentTimeIndicator(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(12.dp)
+                    .height(15.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(12.dp)
+                        .size(15.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary)
                         .align(Alignment.CenterStart)
@@ -175,7 +176,7 @@ fun CurrentTimeIndicator(
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier.padding(start = 25.dp)
     ) { measureables, constraints ->
         val height = (hourHeight.toPx() * (numMinutes / 60f)).roundToInt()
         val width = dayWidth.roundToPx() * numDays
@@ -261,7 +262,11 @@ fun BasicSchedule(
     Layout(
         content = {
             positionedEvents.forEach { positionedEvent ->
-                Box(modifier = Modifier.eventData(positionedEvent)) {
+                Box(
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .eventData(positionedEvent)
+                ) {
                     eventContent(positionedEvent)
                 }
             }
