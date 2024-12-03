@@ -3,6 +3,7 @@ package com.nfq.nfqsummit
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import java.time.LocalDate
 
 fun Context.openMapView(latitude: Double?, longitude: Double?, locationName: String) {
     val geoUri = "http://maps.google.com/maps?q=loc:" +
@@ -20,4 +21,8 @@ fun String.convertTimeFormat(): String {
     } else {
         this // Return as is if not AM/PM format
     }
+}
+
+fun LocalDate.isSame(date: LocalDate?): Boolean {
+    return date != null && this.year == date.year && this.month == date.month && this.dayOfMonth == date.dayOfMonth
 }

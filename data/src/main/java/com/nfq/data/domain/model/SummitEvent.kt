@@ -50,6 +50,7 @@ object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
     }
 }
 
+
 fun SummitEventRemoteModel.toSummitEvent(): SummitEvent {
     return SummitEvent(
         id = id,

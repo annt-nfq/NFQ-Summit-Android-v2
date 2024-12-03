@@ -53,6 +53,7 @@ import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicEvent
 import com.nfq.nfqsummit.components.Schedule
+import com.nfq.nfqsummit.isSame
 import com.nfq.nfqsummit.mocks.mockEventDay1
 import com.nfq.nfqsummit.mocks.mockEventDay2H1
 import com.nfq.nfqsummit.mocks.mockEventDay2H2
@@ -178,9 +179,9 @@ private fun ScheduleHeader(
                         Locale.getDefault()
                     ),
                     eventCount = events.size,
-                    selected = selectedDate.dayOfMonth == date.dayOfMonth,
+                    selected = selectedDate.isSame(date),
                     onClick = {
-                        onDayClick(selectedDate.withDayOfMonth(date.dayOfMonth))
+                        onDayClick(date)
 
                         coroutineScope.launch {
                             verticalScroll.animateScrollTo(0)

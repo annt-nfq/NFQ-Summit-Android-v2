@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
@@ -66,7 +67,7 @@ fun EventDetailsBottomSheet(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val viewModel: EventDetailsViewModel = hiltViewModel()
+    val viewModel: EventDetailsBottomSheetViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = eventId) {
         viewModel.getEvent(eventId)
@@ -102,7 +103,7 @@ fun EventDetailsBottomSheet(
 
 @Composable
 private fun EventDetailsUI(
-    event: SummitEvent,
+    event: EventDetailsModel,
     markAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit = { _, _ -> },
     onViewLocation: (latitude: Double?, longitude: Double?, locationName: String) -> Unit,
 ) {
@@ -123,7 +124,7 @@ private fun EventDetailsUI(
                     .align(Alignment.CenterHorizontally)
             )
             Text(
-                text = event.start.format(DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")),
+                text = event.startTime,
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center,
@@ -250,25 +251,21 @@ private fun EventDetailsUI(
 private fun EventDetailsPreview() {
     NFQSnapshotTestThemeForPreview {
         EventDetailsUI(
-            event = SummitEvent(
+            event = EventDetailsModel(
                 id = "1",
                 name = "Pre-Summit Check in @Vietnam Saigon Office",
-                start = LocalDateTime.now(),
-                end = LocalDateTime.now().plusDays(1),
                 description = "Complete this step to confirm your attendance and ensure a smooth entry on the day of the event. Please have your QR code ready for verification.",
                 latitude = 0.0,
                 longitude = 0.0,
                 coverPhotoUrl = "",
                 locationName = "Saigon, Vietnam Office ",
-                iconUrl = "",
-                isConference = false,
-                eventType = "",
-                ordering = 0,
-                speakerName = "",
-                speakerPosition = "",
                 isFavorite = false,
-                tag = "\uD83D\uDCBC Summit"
+                startTime = LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")
+                )
             ),
+
+            markAsFavorite = { _, _ -> },
             onViewLocation = { _, _, _ -> },
         )
     }

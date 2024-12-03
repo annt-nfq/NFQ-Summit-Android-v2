@@ -1,38 +1,67 @@
 package com.nfq.nfqsummit.mapper
 
+import com.nfq.data.changeFormat
+import com.nfq.data.database.EventEntity
 import com.nfq.data.domain.model.SummitEvent
+import com.nfq.data.toLocalDateTime
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
-import java.time.format.DateTimeFormatter
 
-fun List<SummitEvent>.toSavedEventUIModels(): List<SavedEventUIModel> {
+fun List<EventEntity>.toSavedEventUIModels(): List<SavedEventUIModel> {
     return this.map { it.toSavedEventUIModel() }
 }
 
-private fun SummitEvent.toSavedEventUIModel(): SavedEventUIModel {
+private fun EventEntity.toSavedEventUIModel(): SavedEventUIModel {
     return SavedEventUIModel(
-        id = this.id,
-        imageUrl = this.coverPhotoUrl.orEmpty(),
-        name = this.name,
-        date = this.start.format(DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")),
+        id = id,
+        imageUrl = images.find { it.isNotBlank() }.orEmpty(),
+        name = name,
+        date = timeStart.changeFormat(targetPattern = "EEE, MMM d • HH:mm"),
         tag = "\uD83D\uDCBC Summit"
     )
 }
 
-fun List<SummitEvent>.toUpcomingEventUIModels(): List<UpcomingEventUIModel> {
+fun List<EventEntity>.toUpcomingEventUIModels(): List<UpcomingEventUIModel> {
     return this.map { it.toUpcomingEventUIModel() }
 }
 
-private fun SummitEvent.toUpcomingEventUIModel(): UpcomingEventUIModel {
+private fun EventEntity.toUpcomingEventUIModel(): UpcomingEventUIModel {
     return UpcomingEventUIModel(
-        id = this.id,
-        name = this.name,
-        imageUrl = this.coverPhotoUrl.orEmpty(),
-        date = this.start.format(DateTimeFormatter.ofPattern("dd\nMMM")),
-        startAndEndTime = "${this.start.format(DateTimeFormatter.ofPattern("HH:mm"))} - ${
-            this.end.format(DateTimeFormatter.ofPattern("HH:mm"))
+        id = id,
+        name = name,
+        imageUrl = images.find { it.isNotBlank() }.orEmpty(),
+        date = timeStart.changeFormat(targetPattern = "dd\nMMM"),
+        startAndEndTime = "${timeStart.changeFormat(targetPattern = "HH:mm")} - ${
+            timeEnd.changeFormat(targetPattern = "HH:mm")
         }",
-        isFavorite = this.isFavorite,
+        isFavorite = isFavorite,
         tag = "\uD83D\uDCBC Summit"
+    )
+}
+
+
+fun List<EventEntity>.toSubmitEvents(): List<SummitEvent> {
+    return this.map { it.toSubmitEvent() }
+}
+
+private fun EventEntity.toSubmitEvent(): SummitEvent {
+    return SummitEvent(
+        id = id,
+        name = name,
+        start = timeStart.toLocalDateTime(),
+        end = timeEnd.toLocalDateTime(),
+        description = description,
+        latitude = latitude,
+        longitude = longitude,
+        coverPhotoUrl = images.find { it.isNotBlank() }.orEmpty(),
+        locationName = location,
+        iconUrl = images.find { it.isNotBlank() }.orEmpty(),
+        isConference = isMain,
+        eventType = category,
+        ordering = order,
+        speakerName = gatherLocation,
+        speakerPosition = gatherTime,
+        isFavorite = isFavorite,
+        tag = "\uD83D\uDCBC Summit"
     )
 }

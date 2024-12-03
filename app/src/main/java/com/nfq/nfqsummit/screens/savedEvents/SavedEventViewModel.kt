@@ -3,6 +3,7 @@ package com.nfq.nfqsummit.screens.savedEvents
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.repository.EventRepository
+import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.nfqsummit.mapper.toSavedEventUIModels
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -12,10 +13,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SavedEventViewModel @Inject constructor(
-    eventRepository: EventRepository
+    nfqSummitRepository: NFQSummitRepository
 ) : ViewModel() {
 
-    val savedEvents = eventRepository
+    val savedEvents = nfqSummitRepository
         .savedEvents
         .map { it.toSavedEventUIModels() }
         .stateIn(

@@ -8,13 +8,12 @@ fun String.prefixBearer() = "Bearer $this"
 fun tokenInterceptor(
     chain: Interceptor.Chain
 ): Response {
-    val accessToken = "BuildConfig.ACCESS_TOKEN.prefixBearer()"
     val originalRequest = chain.request()
     val request = originalRequest.newBuilder()
-        .addHeader("Content-Type", "application/json-patch+json")
-        .addHeader("Authorization", accessToken.prefixBearer())
-        .addHeader("accept", "text/plain")
+        .addHeader("Content-Type", "application/json")
+        .addHeader("Accept", "application/json")
+        .addHeader("X-App-Type", "summit-app")
+        .addHeader("Token", "6|PQpuioTJIobBHUNrCKfRxPYskZKJNW5eyR8jFNRm7c08a57e")
         .build()
     return chain.proceed(request = request)
 }
-

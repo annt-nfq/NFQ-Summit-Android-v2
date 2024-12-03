@@ -3,12 +3,15 @@ package com.nfq.nfqsummit.screens.dashboard.tabs.schedule
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.model.SummitEvent
-import com.nfq.data.domain.repository.EventRepository
+import com.nfq.data.domain.repository.NFQSummitRepository
+import com.nfq.nfqsummit.isSame
+import com.nfq.nfqsummit.mapper.toSubmitEvents
 import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -17,12 +20,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
-    private val eventRepository: EventRepository
+    private val repository: NFQSummitRepository
 ) : ViewModel() {
 
     private val _selectedDate = MutableStateFlow<LocalDate?>(null)
 
-    val uiState = combine(_selectedDate, eventRepository.events) { oldSelectedDate, events ->
+    val uiState = combine(
+        _selectedDate,
+        repository.events.map { it.toSubmitEvents() }
+    ) { oldSelectedDate, events ->
         if (events.isNotEmpty()) {
             val today = LocalDate.now()
             val firstEventDate = events.first().start.toLocalDate()
@@ -36,7 +42,7 @@ class ScheduleViewModel @Inject constructor(
             }
             // Generate a sorted list of unique event dates
             val distinctDates = events
-                .map { it.start.toLocalDate() }
+                .mapNotNull { it.start.toLocalDate() }
                 .distinct()
                 .sorted()
 
@@ -49,12 +55,12 @@ class ScheduleViewModel @Inject constructor(
 
             // Extract events for the selected date
             val dailyEvents = dayEventPairs
-                .filter { (date, _) -> date.dayOfMonth == selectedDate.dayOfMonth }
+                .filter { (date, _) -> date.isSame(selectedDate) }
                 .flatMap { (_, events) -> events }
 
             ScheduleUIState(
                 events = events,
-                selectedDate = selectedDate,
+                selectedDate = selectedDate!!,
                 dayEventPairs = dayEventPairs,
                 dailyEvents = dailyEvents
             )
@@ -69,7 +75,7 @@ class ScheduleViewModel @Inject constructor(
     )
 
     init {
-        getEvents()
+        fetchEventActivities()
     }
 
 
@@ -77,10 +83,10 @@ class ScheduleViewModel @Inject constructor(
         _selectedDate.value = date
     }
 
-    private fun getEvents() = viewModelScope.launch {
-        eventRepository
-            .fetchAllEvents()
-            .onFailure { UserMessageManager.showMessage(it) }
+    private fun fetchEventActivities() = viewModelScope.launch {
+        repository
+            .fetchEventActivities()
+            .onLeft { UserMessageManager.showMessage(it) }
     }
 }
 

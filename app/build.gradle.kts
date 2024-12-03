@@ -183,6 +183,7 @@ dependencies {
     implementation(libs.supabase.gotrue)
 
     implementation(libs.compose.markdown)
+    implementation(libs.arrow)
 
     implementation(project(":data"))
 

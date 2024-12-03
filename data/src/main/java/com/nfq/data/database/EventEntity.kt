@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Entity(tableName = "event_entity")
 data class EventEntity(
-    @PrimaryKey val id: Int,
+    @PrimaryKey val id: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo("code") val code: String,
     @ColumnInfo("title") val title: String,
@@ -20,15 +20,15 @@ data class EventEntity(
     @ColumnInfo("isTimeLate") val isTimeLate: Boolean,
     @ColumnInfo("description") val description: String,
     @ColumnInfo("location") val location: String,
-    @ColumnInfo("latitude") val latitude: String,
-    @ColumnInfo("longitude") val longitude: String,
+    @ColumnInfo("latitude") val latitude: Double,
+    @ColumnInfo("longitude") val longitude: Double,
     @ColumnInfo("gatherTime") val gatherTime: String,
     @ColumnInfo("gatherLocation") val gatherLocation: String,
     @ColumnInfo("leavingTime") val leavingTime: String,
     @ColumnInfo("leavingLocation") val leavingLocation: String,
     @ColumnInfo("adminNotes") val adminNotes: String,
     @ColumnInfo("images") val images: List<String>,
-    @ColumnInfo("order") val order: String,
+    @ColumnInfo("order") val order: Int,
     @ColumnInfo("category") val category: String,
     @ColumnInfo("eventDay") val eventDay: EventDayResponse?,
     @ColumnInfo("qrCodeUrl") val qrCodeUrl: String,

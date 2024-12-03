@@ -1,6 +1,7 @@
 package com.nfq.data.remote.repository
 
 import arrow.core.Either
+import com.nfq.data.changeFormat
 import com.nfq.data.database.EventDao
 import com.nfq.data.database.EventEntity
 import com.nfq.data.domain.model.EventDetailsModel
@@ -50,7 +51,7 @@ class NFQSummitRepositoryImpl @Inject constructor(
         favoriteEvents: List<EventEntity>
     ): List<EventActivityResponse> {
         return latestEvents.map { event ->
-            event.copy(isFavorite = favoriteEvents.any { favoriteEvent -> favoriteEvent.id == event.id })
+            event.copy(isFavorite = favoriteEvents.any { favoriteEvent -> favoriteEvent.id == event.id.toString() })
         }
     }
 
@@ -61,16 +62,32 @@ class NFQSummitRepositoryImpl @Inject constructor(
                 .let {
                     EventDetailsModel(
                         id = it.id,
-                        startTime = it.timeStart.format(DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")),
+                        startTime = it.timeStart.changeFormat(
+                            targetPattern = "EEE, MMM d • HH:mm",
+                            isUTC = true
+                        ),
                         name = it.name,
                         description = it.description,
                         locationName = it.location,
                         latitude = it.latitude,
                         longitude = it.longitude,
-                        isFavorite = false
+                        isFavorite = it.isFavorite,
+                        coverPhotoUrl = it.images.find { it.isNotBlank() }.orEmpty()
                     )
                 }
             Either.Right(details)
+        } catch (e: Exception) {
+            Either.Left(DataException.Api(e.message ?: e.localizedMessage ?: "Unknown error"))
+        }
+    }
+
+    override suspend fun updateFavorite(
+        eventId: String,
+        isFavorite: Boolean
+    ): Either<DataException, Unit> {
+        return try {
+            eventDao.updateFavorite(eventId, isFavorite)
+            Either.Right(Unit)
         } catch (e: Exception) {
             Either.Left(DataException.Api(e.message ?: e.localizedMessage ?: "Unknown error"))
         }

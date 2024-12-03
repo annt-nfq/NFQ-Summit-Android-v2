@@ -22,7 +22,7 @@ interface NFQSummitService {
     @GET("auth/profile")
     suspend fun getProfile(): Response<BaseResponse<ProfileResponse>>
 
-    @GET("event-activities")
+    @GET("event-activities?detailed=1")
     suspend fun getEventActivities(): Response<BaseResponse<List<EventActivityResponse>>>
 
     @GET("event-activities/{id}")
