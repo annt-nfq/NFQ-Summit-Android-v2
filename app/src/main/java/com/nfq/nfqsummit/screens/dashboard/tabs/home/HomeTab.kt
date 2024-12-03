@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
 import android.app.Activity
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -212,6 +215,7 @@ fun LazyListScope.upcomingEventsSection(
     markAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit
 ) {
     item {
+        if(upcomingEvents.isEmpty()) return@item
         val pagerState = rememberPagerState { upcomingEvents.size }
         Column {
             SectionHeader(title = "Upcoming Events", onSeeAll = seeAllEvents)
@@ -271,7 +275,6 @@ private fun LazyListScope.savedEventSection(
     goToAttractions: () -> Unit,
     seeAllSavedEvents: () -> Unit = {}
 ) {
-
     item {
         SectionHeader(
             title = "Saved Event",
