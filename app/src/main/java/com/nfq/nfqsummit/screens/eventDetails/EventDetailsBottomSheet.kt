@@ -48,6 +48,7 @@ import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
+import com.nfq.nfqsummit.components.HtmlText
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.openMapView
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.BookmarkItem
@@ -225,8 +226,8 @@ private fun EventDetailsUI(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 24.dp)
                     )
-                    Text(
-                        text = event.description.orEmpty(),
+                    HtmlText(
+                        html = event.description,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(top = 24.dp)
                     )
@@ -254,7 +255,7 @@ private fun EventDetailsPreview() {
             event = EventDetailsModel(
                 id = "1",
                 name = "Pre-Summit Check in @Vietnam Saigon Office",
-                description = "Complete this step to confirm your attendance and ensure a smooth entry on the day of the event. Please have your QR code ready for verification.",
+                description = "<p>Kicking off your morning at 8 AM with an hour of Muay Thai with our professional trainer . It's your personal dose of adrenaline, focus, and sweat. Let&rsquo;s learn the art of Thai boxing and get stronger together! I know, 8am is hard especially with Jet Lag. As we pay the trainer only for you - if you sign up you must be there! Otherwise I will personally send the Muay Thai Trainer to kick you out of the bed.<\\/p>",
                 latitude = 0.0,
                 longitude = 0.0,
                 coverPhotoUrl = "",
