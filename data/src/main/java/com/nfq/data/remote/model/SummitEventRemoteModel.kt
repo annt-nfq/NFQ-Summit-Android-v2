@@ -7,37 +7,37 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SummitEventRemoteModel(
     @SerialName("id")
-    var id: String,
+    val id: String,
     @SerialName("created_at")
-    var createdAt: String,
+    val createdAt: String,
     @SerialName("title")
-    var title: String? = null,
+    val title: String? = null,
     @SerialName("description")
-    var description: String? = null,
+    val description: String? = null,
     @SerialName("event_start_time")
-    var eventStartTime: String? = null,
+    val eventStartTime: String? = null,
     @SerialName("event_end_time")
-    var eventEndTime: String? = null,
+    val eventEndTime: String? = null,
     @SerialName("cover_photo_url")
-    var coverPhotoUrl: String? = null,
+    val coverPhotoUrl: String? = null,
     @SerialName("location_name")
-    var locationName: String? = null,
+    val locationName: String? = null,
     @SerialName("icon")
-    var iconUrl: String? = null,
+    val iconUrl: String? = null,
     @SerialName("is_conference")
-    var isConference: Boolean? = null,
+    val isConference: Boolean? = null,
     @SerialName("event_type")
-    var eventType: String? = null,
+    val eventType: String? = null,
     @SerialName("ordering")
-    var ordering: Int? = null,
+    val ordering: Int? = null,
     @SerialName("speaker_name")
-    var speakerName: String? = null,
+    val speakerName: String? = null,
     @SerialName("speaker_position")
-    var speakerPosition: String? = null,
+    val speakerPosition: String? = null,
     @SerialName("is_favorite")
-    var isFavorite: Boolean? = null,
+    val isFavorite: Boolean? = null,
     @SerialName("tag")
-    var tag: String? = null
+    val tag: String? = null
 )
 
 fun Event.toSummitEventRemoteModel(): SummitEventRemoteModel =

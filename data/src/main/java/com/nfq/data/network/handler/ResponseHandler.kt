@@ -17,7 +17,7 @@ const val ERROR_DATA_NOT_FOUNT = "Data not fount. Please try again."
 
 suspend fun <T, R> handleCall(
     apiCall: ApiCall<BaseResponse<T>>,
-    mapper: suspend (T?, String?) -> R,
+    mapper: suspend (T, String?) -> R,
     onDataNull: (BaseResponse<T>?) -> Either<DataException, R> = {
         Either.Left(
             DataException.Api(

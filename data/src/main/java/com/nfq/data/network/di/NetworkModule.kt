@@ -4,6 +4,9 @@ import android.content.Context
 import com.nfq.data.BuildConfig
 import com.nfq.data.network.utils.createOkHttpClient
 import com.nfq.data.network.utils.createRetrofitClient
+import com.nfq.data.remote.datasource.NFQSummitDataSource
+import com.nfq.data.remote.datasource.NFQSummitDataSourceImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -56,4 +59,9 @@ abstract class NetworkModule {
             return createRetrofitClient(BuildConfig.BASE_URL, okHttpClient, networkJson)
         }
     }
+
+    @Binds
+    abstract fun bindNFQSummitDataSource(
+        nfqSummitDataSourceImpl: NFQSummitDataSourceImpl
+    ): NFQSummitDataSource
 }
