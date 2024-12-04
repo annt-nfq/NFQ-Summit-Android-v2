@@ -3,6 +3,7 @@ package com.nfq.nfqsummit.mapper
 import com.nfq.data.changeFormat
 import com.nfq.data.database.EventEntity
 import com.nfq.data.domain.model.SummitEvent
+import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTime
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
@@ -16,7 +17,7 @@ private fun EventEntity.toSavedEventUIModel(): SavedEventUIModel {
         id = id,
         imageUrl = images.find { it.isNotBlank() }.orEmpty(),
         name = name,
-        date = timeStart.changeFormat(targetPattern = "EEE, MMM d • HH:mm"),
+        date = timeStart.toFormattedDateTimeString(targetPattern = "EEE, MMM d • HH:mm"),
         tag = "\uD83D\uDCBC Summit"
     )
 }
@@ -30,9 +31,9 @@ private fun EventEntity.toUpcomingEventUIModel(): UpcomingEventUIModel {
         id = id,
         name = name,
         imageUrl = images.find { it.isNotBlank() }.orEmpty(),
-        date = timeStart.changeFormat(targetPattern = "dd\nMMM"),
-        startAndEndTime = "${timeStart.changeFormat(targetPattern = "HH:mm")} - ${
-            timeEnd.changeFormat(targetPattern = "HH:mm")
+        date = timeStart.toFormattedDateTimeString(targetPattern = "dd\nMMM"),
+        startAndEndTime = "${timeStart.toFormattedDateTimeString(targetPattern = "HH:mm")} - ${
+            timeEnd.toFormattedDateTimeString(targetPattern = "HH:mm")
         }",
         isFavorite = isFavorite,
         tag = "\uD83D\uDCBC Summit"

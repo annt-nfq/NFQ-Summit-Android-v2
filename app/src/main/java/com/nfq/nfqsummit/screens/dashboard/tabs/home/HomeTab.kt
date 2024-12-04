@@ -1,9 +1,9 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
-import android.app.Activity
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,15 +38,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.Loading
@@ -69,10 +67,6 @@ fun HomeTab(
     seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
 ) {
-    val window = (LocalView.current.context as Activity).window
-    window.statusBarColor = Color.Transparent.toArgb()
-    WindowCompat.setDecorFitsSystemWindows(window, false)
-
     val uiState by viewModel.uiState.collectAsState()
     var showEventDetailsBottomSheet by remember { mutableStateOf(false) }
     var eventId by remember { mutableStateOf("") }
@@ -87,7 +81,6 @@ fun HomeTab(
             onDismissRequest = { showQRCodeBottomSheet = false }
         )
     }
-
 
     if (showEventDetailsBottomSheet) {
         EventDetailsBottomSheet(
@@ -128,7 +121,7 @@ private fun HomeTabUI(
         modifier = Modifier.fillMaxSize()
     ) {
         LazyColumn(
-            contentPadding = PaddingValues(bottom = 24.dp)
+            contentPadding = PaddingValues(bottom = 24.dp),
         ) {
             showQRCodeSection(
                 onShowQRCode = onShowQRCode
@@ -215,7 +208,7 @@ fun LazyListScope.upcomingEventsSection(
     markAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit
 ) {
     item {
-        if(upcomingEvents.isEmpty()) return@item
+        if (upcomingEvents.isEmpty()) return@item
         val pagerState = rememberPagerState { upcomingEvents.size }
         Column {
             SectionHeader(title = "Upcoming Events", onSeeAll = seeAllEvents)
@@ -291,6 +284,14 @@ private fun LazyListScope.savedEventSection(
                 uiModel = uiModel,
                 goToEventDetails = goToDetails,
                 modifier = Modifier
+                    .animateItem(
+                        fadeInSpec =  spring(stiffness = Spring.StiffnessMediumLow),
+                        placementSpec = spring(
+                            stiffness = Spring.StiffnessMediumLow,
+                            visibilityThreshold = IntOffset.VisibilityThreshold
+                        ),
+                        fadeOutSpec =  spring(stiffness = Spring.StiffnessMediumLow)
+                    )
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 8.dp)
             )

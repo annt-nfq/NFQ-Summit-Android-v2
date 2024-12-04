@@ -2,6 +2,8 @@ package com.nfq.data.mapper
 
 import com.nfq.data.database.EventEntity
 import com.nfq.data.remote.model.response.EventActivityResponse
+import com.nfq.data.toLocalDateTime
+import com.nfq.data.toLocalDateTimeInMillis
 
 fun List<EventActivityResponse>.toEventEntities(): List<EventEntity> {
     return this.map { it.toEventEntity() }
@@ -15,8 +17,8 @@ fun EventActivityResponse.toEventEntity(): EventEntity {
         name = name.orEmpty(),
         quantity = quantity ?: 0,
         isMain = isMain ?: false,
-        timeStart = timeStart.orEmpty(),
-        timeEnd = timeEnd.orEmpty(),
+        timeStart = timeStart.toLocalDateTimeInMillis(),
+        timeEnd = timeEnd.toLocalDateTimeInMillis(),
         isTimeLate = isTimeLate ?: false,
         description = description.orEmpty(),
         location = location.orEmpty(),

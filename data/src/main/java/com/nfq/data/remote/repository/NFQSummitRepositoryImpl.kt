@@ -10,6 +10,7 @@ import com.nfq.data.mapper.toEventEntities
 import com.nfq.data.network.exception.DataException
 import com.nfq.data.remote.datasource.NFQSummitDataSource
 import com.nfq.data.remote.model.response.EventActivityResponse
+import com.nfq.data.toFormattedDateTimeString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import java.time.format.DateTimeFormatter
@@ -60,19 +61,19 @@ class NFQSummitRepositoryImpl @Inject constructor(
             val details = eventDao
                 .getEventById(id)
                 .let {
+                    val startTime = it
+                        .timeStart
+                        .toFormattedDateTimeString(targetPattern = "EEE, MMM d • HH:mm")
                     EventDetailsModel(
                         id = it.id,
-                        startTime = it.timeStart.changeFormat(
-                            targetPattern = "EEE, MMM d • HH:mm",
-                            isUTC = true
-                        ),
+                        startTime = startTime,
                         name = it.name,
                         description = it.description,
                         locationName = it.location,
                         latitude = it.latitude,
                         longitude = it.longitude,
                         isFavorite = it.isFavorite,
-                        coverPhotoUrl = it.images.find { it.isNotBlank() }.orEmpty()
+                        coverPhotoUrl = it.images.find { image -> image.isNotBlank() }.orEmpty()
                     )
                 }
             Either.Right(details)
