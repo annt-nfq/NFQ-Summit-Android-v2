@@ -22,7 +22,7 @@ fun BasicModalBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(),
     shape: Shape = MaterialTheme.shapes.bottomSheetLarge,
-    properties: ModalBottomSheetProperties = ModalBottomSheetDefaults.properties(),
+    properties: ModalBottomSheetProperties = ModalBottomSheetDefaults.properties,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     ModalBottomSheet(
@@ -31,7 +31,7 @@ fun BasicModalBottomSheet(
         sheetState = sheetState,
         shape = shape,
         dragHandle = null,
-        windowInsets = WindowInsets(0),
+        contentWindowInsets = { WindowInsets(0) },
         tonalElevation = 0.dp,
         properties = properties,
         content = content

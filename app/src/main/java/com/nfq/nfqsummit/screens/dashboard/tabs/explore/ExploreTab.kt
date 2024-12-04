@@ -1,6 +1,5 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.explore
 
-import android.annotation.SuppressLint
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -35,7 +34,6 @@ import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ExploreTab(
     goToDestination: (destination: AppDestination) -> Unit = {}
