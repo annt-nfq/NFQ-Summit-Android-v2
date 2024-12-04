@@ -198,11 +198,11 @@ private fun ScheduleHeader(
 
 @Composable
 fun SummitSchedules(
+    modifier: Modifier = Modifier,
     dailyEvents: List<SummitEvent>,
     currentTime: LocalTime,
     verticalScroll: ScrollState = rememberScrollState(),
-    onEventClick: (SummitEvent) -> Unit,
-    modifier: Modifier = Modifier
+    onEventClick: (SummitEvent) -> Unit
 ) {
     Surface(modifier = modifier.fillMaxSize()) {
         Column(
