@@ -3,6 +3,7 @@ package com.nfq.data.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.nfq.data.remote.model.response.CategoryResponse
 import com.nfq.data.remote.model.response.EventDayResponse
 import kotlinx.serialization.Serializable
 
@@ -29,7 +30,7 @@ data class EventEntity(
     @ColumnInfo("adminNotes") val adminNotes: String,
     @ColumnInfo("images") val images: List<String>,
     @ColumnInfo("order") val order: Int,
-    @ColumnInfo("category") val category: String,
+    @ColumnInfo("category") val category: CategoryResponse?,
     @ColumnInfo("eventDay") val eventDay: EventDayResponse?,
     @ColumnInfo("qrCodeUrl") val qrCodeUrl: String,
     @ColumnInfo("isFavorite") val isFavorite: Boolean

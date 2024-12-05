@@ -1,7 +1,6 @@
 package com.nfq.data.remote.repository
 
 import arrow.core.Either
-import com.nfq.data.changeFormat
 import com.nfq.data.database.EventDao
 import com.nfq.data.database.EventEntity
 import com.nfq.data.domain.model.EventDetailsModel
@@ -13,7 +12,6 @@ import com.nfq.data.remote.model.response.EventActivityResponse
 import com.nfq.data.toFormattedDateTimeString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class NFQSummitRepositoryImpl @Inject constructor(

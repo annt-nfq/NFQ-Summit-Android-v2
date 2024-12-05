@@ -1,6 +1,5 @@
 package com.nfq.nfqsummit.mapper
 
-import com.nfq.data.changeFormat
 import com.nfq.data.database.EventEntity
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.toFormattedDateTimeString
@@ -58,7 +57,7 @@ private fun EventEntity.toSubmitEvent(): SummitEvent {
         locationName = location,
         iconUrl = images.find { it.isNotBlank() }.orEmpty(),
         isConference = isMain,
-        eventType = category,
+        eventType = category?.name,
         ordering = order,
         speakerName = gatherLocation,
         speakerPosition = gatherTime,

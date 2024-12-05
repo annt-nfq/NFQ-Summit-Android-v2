@@ -2,7 +2,6 @@ package com.nfq.data.mapper
 
 import com.nfq.data.database.EventEntity
 import com.nfq.data.remote.model.response.EventActivityResponse
-import com.nfq.data.toLocalDateTime
 import com.nfq.data.toLocalDateTimeInMillis
 
 fun List<EventActivityResponse>.toEventEntities(): List<EventEntity> {
@@ -31,7 +30,7 @@ fun EventActivityResponse.toEventEntity(): EventEntity {
         adminNotes = adminNotes.orEmpty(),
         images = images.orEmpty(),
         order = order ?: 0,
-        category = category.orEmpty(),
+        category = category,
         eventDay = eventDay,
         qrCodeUrl = qrCodeUrl.orEmpty(),
         isFavorite = isFavorite ?: false
