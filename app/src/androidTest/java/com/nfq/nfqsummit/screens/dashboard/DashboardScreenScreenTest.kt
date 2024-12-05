@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import com.nfq.nfqsummit.entry.MainActivity
+import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.navigation.AppNavHost
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -34,7 +35,7 @@ class DashboardScreenScreenTest {
             composeTestRule.activity.setContent {
                 navController = TestNavHostController(LocalContext.current)
                 navController.navigatorProvider.addNavigator(ComposeNavigator())
-                AppNavHost(navController = navController)
+                AppNavHost(navController = navController, startDestination = AppDestination.Splash.route)
             }
         }
     }
