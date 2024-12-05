@@ -1,6 +1,5 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
@@ -78,6 +77,7 @@ fun HomeTab(
 
     if (showQRCodeBottomSheet) {
         QRCodeBottomSheet(
+            user = uiState.user!!,
             onDismissRequest = { showQRCodeBottomSheet = false }
         )
     }
@@ -123,9 +123,12 @@ private fun HomeTabUI(
         LazyColumn(
             contentPadding = PaddingValues(bottom = 24.dp),
         ) {
-            showQRCodeSection(
-                onShowQRCode = onShowQRCode
-            )
+            if (uiState.user != null) {
+                showQRCodeSection(
+                    onShowQRCode = onShowQRCode
+                )
+            }
+
             upcomingEventsSection(
                 upcomingEvents = uiState.upcomingEvents,
                 markAsFavorite = markAsFavorite,
@@ -285,12 +288,12 @@ private fun LazyListScope.savedEventSection(
                 goToEventDetails = goToDetails,
                 modifier = Modifier
                     .animateItem(
-                        fadeInSpec =  spring(stiffness = Spring.StiffnessMediumLow),
+                        fadeInSpec = spring(stiffness = Spring.StiffnessMediumLow),
                         placementSpec = spring(
                             stiffness = Spring.StiffnessMediumLow,
                             visibilityThreshold = IntOffset.VisibilityThreshold
                         ),
-                        fadeOutSpec =  spring(stiffness = Spring.StiffnessMediumLow)
+                        fadeOutSpec = spring(stiffness = Spring.StiffnessMediumLow)
                     )
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 8.dp)

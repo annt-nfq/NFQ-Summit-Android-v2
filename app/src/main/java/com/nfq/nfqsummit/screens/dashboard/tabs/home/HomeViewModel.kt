@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.nfqsummit.mapper.toSavedEventUIModels
 import com.nfq.nfqsummit.mapper.toUpcomingEventUIModels
+import com.nfq.nfqsummit.mapper.toUserUIModel
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
+import com.nfq.nfqsummit.model.UserUIModel
 import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,17 +22,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val nfqSummitRepository: NFQSummitRepository
+    private val repository: NFQSummitRepository
 ) : ViewModel() {
     private val loadingFlow = MutableStateFlow(false)
 
     val uiState = combine(
-        nfqSummitRepository.events,
-        nfqSummitRepository.savedEvents,
+        repository.user,
+        repository.events,
+        repository.savedEvents,
         loadingFlow
-    ) { events, savedEvents, isLoading ->
+    ) { user, events, savedEvents, isLoading ->
         HomeUIState(
             isLoading = isLoading,
+            user = user?.toUserUIModel(),
             upcomingEvents = events.sortedBy { it.timeStart }.take(3).toUpcomingEventUIModels(),
             savedEvents = savedEvents.toSavedEventUIModels()
         )
@@ -47,32 +51,33 @@ class HomeViewModel @Inject constructor(
     private fun fetchUpcomingEvents() {
         viewModelScope.launch(Dispatchers.IO) {
             updateLoadingStateIfNeeded()
-            nfqSummitRepository
+            repository
                 .fetchEventActivities()
                 .onLeft { e ->
                     loadingFlow.value = false
                     UserMessageManager.showMessage(e)
                 }
-                .onRight{
+                .onRight {
                     loadingFlow.value = false
                 }
         }
     }
 
     private suspend fun updateLoadingStateIfNeeded() {
-        val events = nfqSummitRepository.events.firstOrNull()
+        val events = repository.events.firstOrNull()
         loadingFlow.value = events.isNullOrEmpty()
     }
 
     fun markAsFavorite(favorite: Boolean, eventId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            nfqSummitRepository.updateFavorite(eventId, favorite)
+            repository.updateFavorite(eventId, favorite)
         }
     }
 }
 
 
 data class HomeUIState(
+    val user: UserUIModel? = null,
     val upcomingEvents: List<UpcomingEventUIModel> = emptyList(),
     val savedEvents: List<SavedEventUIModel> = emptyList(),
     val isLoading: Boolean = false

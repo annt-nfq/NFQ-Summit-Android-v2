@@ -1,11 +1,13 @@
 package com.nfq.nfqsummit.mapper
 
 import com.nfq.data.database.entity.EventEntity
+import com.nfq.data.database.entity.UserEntity
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTime
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
+import com.nfq.nfqsummit.model.UserUIModel
 
 fun List<EventEntity>.toSavedEventUIModels(): List<SavedEventUIModel> {
     return this.map { it.toSavedEventUIModel() }
@@ -63,5 +65,15 @@ private fun EventEntity.toSubmitEvent(): SummitEvent {
         speakerPosition = gatherTime,
         isFavorite = isFavorite,
         tag = "\uD83D\uDCBC Summit"
+    )
+}
+
+fun UserEntity.toUserUIModel(): UserUIModel {
+    return UserUIModel(
+        id = id,
+        name = "$firstName $lastName",
+        email = email,
+        qrCodeUrl = qrCodeUrl,
+        attendeeCode = attendeeCode
     )
 }

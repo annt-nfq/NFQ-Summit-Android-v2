@@ -35,11 +35,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
+import com.nfq.nfqsummit.components.networkImagePainter
+import com.nfq.nfqsummit.model.UserUIModel
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
 @Composable
 fun QRCodeBottomSheet(
+    user: UserUIModel,
     onDismissRequest: () -> Unit
 ) {
     val skipPartiallyExpanded by remember { mutableStateOf(true) }
@@ -49,14 +52,15 @@ fun QRCodeBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = bottomSheetState,
         content = {
-            QRCodeContent()
+            QRCodeContent(userUIModel = user)
         }
     )
 }
 
 @Composable
 private fun QRCodeContent(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    userUIModel: UserUIModel
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -76,14 +80,14 @@ private fun QRCodeContent(
                 .align(Alignment.CenterHorizontally)
         )
         Text(
-            text = "Hermann Hauser",
+            text = userUIModel.name,
             style = MaterialTheme.typography.headlineMedium,
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onPrimary
         )
         Text(
-            text = "UUID: 255373826",
+            text = userUIModel.attendeeCode,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.onPrimary
@@ -96,7 +100,7 @@ private fun QRCodeContent(
                 .padding(6.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.sample_qrcode),
+                painter = networkImagePainter(userUIModel.qrCodeUrl),
                 contentDescription = null,
                 modifier = Modifier.size(220.dp)
             )
@@ -149,7 +153,14 @@ private fun QRCodeContent(
 private fun QRCodeContentPreview() {
     NFQSnapshotTestThemeForPreview {
         QRCodeContent(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            userUIModel = UserUIModel(
+                id = "1",
+                name = "Hermann Hauser",
+                attendeeCode = "255373826",
+                qrCodeUrl = "",
+                email = "wine@nfq.com"
+            )
         )
     }
 }
