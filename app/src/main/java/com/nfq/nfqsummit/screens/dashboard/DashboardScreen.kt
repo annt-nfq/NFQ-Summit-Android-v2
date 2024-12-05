@@ -392,6 +392,6 @@ fun DashboardScreenPreview() {
 }
 
 val enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
-    { fadeIn(animationSpec = tween(300)) }
+    { fadeIn(animationSpec = tween(100)) }
 val exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
-    { fadeOut(animationSpec = tween(300)) }
+    { fadeOut(animationSpec = tween(100)) }
