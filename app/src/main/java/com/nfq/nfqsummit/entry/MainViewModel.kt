@@ -1,21 +1,41 @@
 package com.nfq.nfqsummit.entry
 
 import androidx.lifecycle.viewModelScope
+import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.nfqsummit.base.BaseViewModel
 import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor() : BaseViewModel<MainEvent>() {
+class MainViewModel @Inject constructor(
+    repository: NFQSummitRepository
+) : BaseViewModel<MainEvent>() {
     private val userMessageManager by lazy { UserMessageManager }
 
     init {
         handelUserMessage()
     }
+
+    val screenState: StateFlow<ScreenState> = repository
+        .user
+        .map { user ->
+            when {
+                user != null -> ScreenState.DashboardScreen
+                else -> ScreenState.SignInScreen
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            ScreenState.SplashScreen
+        )
 
     private fun handelUserMessage() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -34,4 +54,11 @@ class MainViewModel @Inject constructor() : BaseViewModel<MainEvent>() {
     fun userMessageShown() {
         userMessageManager.userMessageShown()
     }
+}
+
+sealed interface ScreenState {
+    data object SplashScreen : ScreenState
+    data object SignInScreen : ScreenState
+    data object OnBoardingScreen : ScreenState
+    data object DashboardScreen : ScreenState
 }

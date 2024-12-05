@@ -1,11 +1,14 @@
 package com.nfq.data.remote.repository
 
 import arrow.core.Either
-import com.nfq.data.database.EventDao
-import com.nfq.data.database.EventEntity
+import com.nfq.data.database.dao.EventDao
+import com.nfq.data.database.dao.UserDao
+import com.nfq.data.database.entity.EventEntity
+import com.nfq.data.database.entity.UserEntity
 import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.data.mapper.toEventEntities
+import com.nfq.data.mapper.toUserEntity
 import com.nfq.data.network.exception.DataException
 import com.nfq.data.remote.datasource.NFQSummitDataSource
 import com.nfq.data.remote.model.response.EventActivityResponse
@@ -16,23 +19,20 @@ import javax.inject.Inject
 
 class NFQSummitRepositoryImpl @Inject constructor(
     private val dataSource: NFQSummitDataSource,
-    private val eventDao: EventDao
+    private val eventDao: EventDao,
+    private val userDao: UserDao
 ) : NFQSummitRepository {
     override val events: Flow<List<EventEntity>>
         get() = eventDao.getAllEvents()
     override val savedEvents: Flow<List<EventEntity>>
         get() = eventDao.getFavoriteEvents()
+    override val user: Flow<UserEntity?>
+        get() = userDao.getUser()
 
     override suspend fun authenticateWithAttendeeCode(attendeeCode: String): Either<DataException, Unit> {
         return dataSource
             .authenticateWithAttendeeCode(attendeeCode)
-            .map { }
-    }
-
-    override suspend fun fetchProfile(): Either<DataException, Unit> {
-        return dataSource
-            .getProfile()
-            .map { }
+            .map { userDao.insertUser(it.toUserEntity()) }
     }
 
     override suspend fun fetchEventActivities(): Either<DataException, Unit> {

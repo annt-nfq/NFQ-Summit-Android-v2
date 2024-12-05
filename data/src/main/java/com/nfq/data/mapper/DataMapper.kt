@@ -1,6 +1,8 @@
 package com.nfq.data.mapper
 
-import com.nfq.data.database.EventEntity
+import com.nfq.data.database.entity.EventEntity
+import com.nfq.data.database.entity.UserEntity
+import com.nfq.data.remote.model.response.AttendeeResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
 import com.nfq.data.toLocalDateTimeInMillis
 
@@ -34,5 +36,17 @@ fun EventActivityResponse.toEventEntity(): EventEntity {
         eventDay = eventDay,
         qrCodeUrl = qrCodeUrl.orEmpty(),
         isFavorite = isFavorite ?: false
+    )
+}
+
+fun AttendeeResponse.toUserEntity() : UserEntity{
+    return UserEntity(
+        id = id.toString(),
+        firstName = firstName.orEmpty(),
+        lastName = lastName.orEmpty(),
+        email = email.orEmpty(),
+        qrCodeUrl = qrCodeUrl.orEmpty(),
+        attendeeCode = attendeeCode.orEmpty(),
+        tk = tk.orEmpty()
     )
 }

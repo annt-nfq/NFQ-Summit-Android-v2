@@ -18,7 +18,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class DashboardScreenTest {
+class DashboardScreenScreenTest {
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 

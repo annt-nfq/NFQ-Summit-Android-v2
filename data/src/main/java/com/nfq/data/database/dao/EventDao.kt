@@ -1,8 +1,9 @@
-package com.nfq.data.database
+package com.nfq.data.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.nfq.data.database.entity.EventEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

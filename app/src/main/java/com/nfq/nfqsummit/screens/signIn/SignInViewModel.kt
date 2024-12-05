@@ -1,44 +1,35 @@
 package com.nfq.nfqsummit.screens.signIn
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nfq.data.domain.repository.NFQSummitRepository
+import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-
-enum class SignInStatus {
-    initial, loading, success, failed,
-}
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
+    private val repository: NFQSummitRepository
 ) : ViewModel() {
 
-    private val _signInStatus = MutableSharedFlow<SignInStatus>()
-    val signInStatus = _signInStatus.asSharedFlow()
+    val loading = MutableStateFlow(false)
 
-    fun signIn(id: String) {
-        viewModelScope.launch {
-            _signInStatus.emit(SignInStatus.loading)
-            delay(2000)
 
-            if (id.isNotEmpty()) {
-                _signInStatus.emit(SignInStatus.success)
-            } else {
-                _signInStatus.emit(SignInStatus.failed)
-            }
-        }
-    }
+    fun signIn(attendeeCode: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            loading.value = true
+            repository
+                .authenticateWithAttendeeCode(attendeeCode)
+                .onLeft {
+                    loading.value = false
+                    UserMessageManager.showMessage(it)
+                }.onRight {
+                    loading.value = false
+                }
 
-    fun resetState() {
-        viewModelScope.launch {
-            _signInStatus.emit(SignInStatus.initial)
         }
     }
 }

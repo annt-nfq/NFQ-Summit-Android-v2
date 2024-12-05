@@ -28,12 +28,14 @@ import com.nfq.nfqsummit.screens.transportation.TransportationScreen
 @SuppressLint("NewApi")
 @Composable
 fun AppNavHost(
+    startDestination: String,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     NavHost(
+        modifier = modifier,
         navController = navController,
-        startDestination = AppDestination.Splash.route,
+        startDestination = startDestination,
         enterTransition = enterTransition,
         exitTransition = exitTransition,
         popEnterTransition = enterTransition,
@@ -70,11 +72,6 @@ fun AppNavHost(
         composable(AppDestination.SignIn.route) {
             SignInScreen(
                 continueAsGuest = {
-                    navController.navigate(AppDestination.Dashboard.route) {
-                        popUpTo(AppDestination.SignIn.route) { inclusive = true }
-                    }
-                },
-                onSignInSuccess = {
                     navController.navigate(AppDestination.Dashboard.route) {
                         popUpTo(AppDestination.SignIn.route) { inclusive = true }
                     }

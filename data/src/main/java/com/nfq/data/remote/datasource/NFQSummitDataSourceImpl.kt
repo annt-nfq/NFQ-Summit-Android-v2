@@ -19,8 +19,8 @@ class NFQSummitDataSourceImpl @Inject constructor(
             apiCall = {
                 service.authenticateWithAttendeeCode(AttendeeRequest(attendeeCode))
             },
-            mapper = { data, _ ->
-                data
+            mapper = { data, _, tk ->
+                data.copy(tk = tk)
             }
         )
     }

@@ -1,5 +1,6 @@
 package com.nfq.data.remote.service
 
+import com.nfq.data.remote.model.BaseAttendeeResponse
 import com.nfq.data.remote.model.BaseResponse
 import com.nfq.data.remote.model.request.AttendeeRequest
 import com.nfq.data.remote.model.response.AttendeeResponse
@@ -16,7 +17,7 @@ interface NFQSummitService {
     @POST("attendees/auth")
     suspend fun authenticateWithAttendeeCode(
         @Body request: AttendeeRequest
-    ): Response<BaseResponse<AttendeeResponse>>
+    ): Response<BaseAttendeeResponse<AttendeeResponse>>
 
 
     @GET("auth/profile")

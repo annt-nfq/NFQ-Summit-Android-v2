@@ -2,7 +2,9 @@ package com.nfq.nfqsummit.components
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,14 +25,11 @@ fun Loading() {
             dismissOnClickOutside = false
         )
     ) {
-        BasicCard(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.size(90.dp),
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(35.dp)
-            )
-        }
+        CircularProgressIndicator(
+            modifier = Modifier.width(64.dp),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
     }
 }
 

@@ -2,7 +2,8 @@ package com.nfq.data.database.di
 
 import android.content.Context
 import com.nfq.data.database.AppDatabase
-import com.nfq.data.database.EventDao
+import com.nfq.data.database.dao.EventDao
+import com.nfq.data.database.dao.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,6 +32,13 @@ abstract class DatabaseModule {
         @Singleton
         fun provideEventDao(appDatabase: AppDatabase): EventDao {
             return appDatabase.eventDao()
+        }
+
+
+        @Provides
+        @Singleton
+        fun provideUserDao(appDatabase: AppDatabase): UserDao {
+            return appDatabase.userDao()
         }
     }
 }

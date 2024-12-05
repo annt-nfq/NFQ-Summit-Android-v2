@@ -1,6 +1,6 @@
 package com.nfq.nfqsummit.mapper
 
-import com.nfq.data.database.EventEntity
+import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTime

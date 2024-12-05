@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,9 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -47,25 +43,23 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import com.nfq.nfqsummit.ui.theme.boxShadow
 
 @Composable
 fun SignInScreen(
     continueAsGuest: () -> Unit,
-    onSignInSuccess: () -> Unit,
     viewModel: SignInViewModel = hiltViewModel()
 ) {
-    val signInStatus by viewModel.signInStatus.collectAsState(SignInStatus.initial)
+    val loading by viewModel.loading.collectAsState()
+    if (loading) Loading()
 
     SignInUI(
-        signInStatus = signInStatus,
         onEvent = { event ->
             when (event) {
                 is SignInEvent.SignIn -> viewModel.signIn(event.attendeeCode)
-                SignInEvent.SignInSuccess -> onSignInSuccess()
                 SignInEvent.ContinueAsGuest -> continueAsGuest()
-                SignInEvent.ResetState -> viewModel.resetState()
             }
         }
     )
@@ -73,19 +67,11 @@ fun SignInScreen(
 
 @Composable
 private fun SignInUI(
-    signInStatus: SignInStatus,
     onEvent: (SignInEvent) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     var text by remember { mutableStateOf("") }
 
-    if (signInStatus == SignInStatus.success) {
-        onEvent(SignInEvent.SignInSuccess)
-    }
-
-    if (signInStatus == SignInStatus.failed) {
-        SignInErrorDialog(onEvent)
-    }
 
     Scaffold { paddingValues ->
         Box {
@@ -162,28 +148,7 @@ private fun SignInUI(
                 }
             }
         }
-        if (signInStatus == SignInStatus.loading) {
-            LoadingIndicator()
-        }
     }
-}
-
-@Composable
-private fun SignInErrorDialog(onEvent: (SignInEvent) -> Unit) {
-    AlertDialog(
-        onDismissRequest = {},
-        confirmButton = {
-            Button(onClick = { onEvent(SignInEvent.ResetState) }) {
-                Text(text = "OK", style = MaterialTheme.typography.bodyMedium)
-            }
-        },
-        title = {
-            Text(text = "Error", style = MaterialTheme.typography.bodyLarge)
-        },
-        text = {
-            Text(text = "Booking ID invalid!", style = MaterialTheme.typography.bodyMedium)
-        },
-    )
 }
 
 @Composable
@@ -279,28 +244,11 @@ private fun ContinueAsGuestButton(onEvent: (SignInEvent) -> Unit) {
     }
 }
 
-@Composable
-private fun LoadingIndicator() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
-    ) {
-        CircularProgressIndicator(
-            modifier = Modifier
-                .width(64.dp)
-                .align(Alignment.Center),
-            color = MaterialTheme.colorScheme.primary,
-            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-        )
-    }
-}
-
 
 @Preview
 @Composable
 private fun SignInUIPreview() {
     NFQSnapshotTestThemeForPreview {
-        SignInUI(signInStatus = SignInStatus.initial, onEvent = {})
+        SignInUI(onEvent = {})
     }
 }

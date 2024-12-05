@@ -13,12 +13,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.nfq.nfqsummit.components.BasicAlertDialog
@@ -26,13 +30,15 @@ import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.navigation.AppNavHost
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
     private val viewModel: MainViewModel by viewModels()
-
+    private var screenState: ScreenState by mutableStateOf(ScreenState.SplashScreen)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -43,15 +49,36 @@ class MainActivity : ComponentActivity() {
             ) { false },
         )
         super.onCreate(savedInstanceState)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.screenState
+                    .collectLatest {
+                        screenState = it
+                    }
+            }
+        }
         setContent {
             navController = rememberNavController()
+            val startDestination by remember {
+                derivedStateOf {
+                    when (screenState) {
+                        is ScreenState.DashboardScreen -> AppDestination.Dashboard.route
+                        is ScreenState.OnBoardingScreen -> AppDestination.Onboarding.route
+                        is ScreenState.SignInScreen -> AppDestination.SignIn.route
+                        else -> AppDestination.Splash.route
+                    }
+                }
+            }
             NFQSnapshotTestTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppNavHost(navController = navController)
+                    AppNavHost(
+                        navController = navController,
+                        startDestination = startDestination
+                    )
                     HandleUserMessage(viewModel)
                 }
             }

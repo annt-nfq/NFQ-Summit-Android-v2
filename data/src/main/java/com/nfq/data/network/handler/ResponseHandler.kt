@@ -3,6 +3,7 @@ package com.nfq.data.network.handler
 import android.accounts.NetworkErrorException
 import arrow.core.Either
 import com.nfq.data.network.exception.DataException
+import com.nfq.data.remote.model.BaseAttendeeResponse
 import com.nfq.data.remote.model.BaseResponse
 import java.net.UnknownHostException
 import kotlinx.serialization.SerializationException
@@ -76,4 +77,66 @@ suspend fun <T, R> handleCall(
     }
 }
 
+
+suspend fun <T, R> handleCall(
+    apiCall: ApiCall<BaseAttendeeResponse<T>>,
+    mapper: suspend (T, String?, String?) -> R,
+    onDataNull: (BaseAttendeeResponse<T>?) -> Either<DataException, R> = {
+        Either.Left(
+            DataException.Api(
+                title = ERROR_TITLE_GENERAL,
+                message = it?.message ?: ERROR_MESSAGE_GENERAL,
+                errorCode = -1
+            )
+        )
+    }
+): Either<DataException, R> = try {
+    apiCall().let {
+        val body = it.body()
+        when {
+            body?.success == true -> {
+                if (body.data != null) {
+                    Either.Right(
+                        mapper(
+                            body.data,
+                            body.message,
+                            body.token
+                        )
+                    )
+                } else {
+                    onDataNull(body)
+                }
+            }
+
+            else -> Either.Left(
+                DataException.Api(
+                    title = ERROR_TITLE_GENERAL,
+                    message = ERROR_DATA_NOT_FOUNT,
+                    errorCode = -1
+                )
+            )
+        }
+    }
+} catch (e: Exception) {
+    when (e) {
+        is NetworkErrorException, is UnknownHostException -> Either.Left(DataException.Network)
+        is SerializationException -> {
+            Either.Left(
+                DataException.Api(
+                    message = e.message ?: ERROR_JSON_CONVERSION,
+                    title = ERROR_TITLE_GENERAL,
+                    errorCode = -1
+                )
+            )
+        }
+
+        else -> Either.Left(
+            DataException.Api(
+                message = e.message ?: ERROR_MESSAGE_GENERAL,
+                title = ERROR_TITLE_GENERAL,
+                errorCode = -1
+            )
+        )
+    }
+}
 

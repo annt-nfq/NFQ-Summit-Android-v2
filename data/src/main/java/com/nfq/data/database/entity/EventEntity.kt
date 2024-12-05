@@ -1,4 +1,4 @@
-package com.nfq.data.database
+package com.nfq.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
