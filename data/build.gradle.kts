@@ -22,6 +22,8 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "BASE_URL", "\"${p.getProperty("BASE_URL")}\"")
         buildConfigField("String", "PASS_PHRASE", "\"${p.getProperty("PASS_PHRASE")}\"")
+        buildConfigField("String", "BASIC_TOKEN", "\"${p.getProperty("BASIC_TOKEN")}\"")
+
     }
 
     buildTypes {
