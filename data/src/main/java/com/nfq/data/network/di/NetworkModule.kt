@@ -2,6 +2,7 @@ package com.nfq.data.network.di
 
 import android.content.Context
 import com.nfq.data.BuildConfig
+import com.nfq.data.database.dao.UserDao
 import com.nfq.data.network.utils.createOkHttpClient
 import com.nfq.data.network.utils.createRetrofitClient
 import com.nfq.data.remote.datasource.NFQSummitDataSource
@@ -45,11 +46,13 @@ abstract class NetworkModule {
         @Singleton
         fun provideOkHttpClient(
             @ApplicationContext
-            context: Context
+            context: Context,
+            userDao: UserDao
         ): OkHttpClient {
             return createOkHttpClient(
-                context,
-                HttpLoggingInterceptor()
+                context = context,
+                userDao = userDao,
+                httpLoggingInterceptor = HttpLoggingInterceptor()
             )
         }
 

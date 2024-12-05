@@ -25,6 +25,20 @@ class NFQSummitDataSourceImpl @Inject constructor(
         )
     }
 
+    override suspend fun logout(): Either<DataException, String> {
+        return handleCall(
+            apiCall = {
+                service.logout()
+            },
+            mapper = { _, message ->
+                message.orEmpty()
+            },
+            onDataNull = {
+                Either.Right(it?.message ?: "Logout successful")
+            }
+        )
+    }
+
     override suspend fun getProfile(): Either<DataException, ProfileResponse> {
         return handleCall(
             apiCall = {

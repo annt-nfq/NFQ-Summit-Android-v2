@@ -19,6 +19,8 @@ interface NFQSummitService {
         @Body request: AttendeeRequest
     ): Response<BaseAttendeeResponse<AttendeeResponse>>
 
+    @POST("attendees/logout")
+    suspend fun logout(): Response<BaseResponse<String>>
 
     @GET("auth/profile")
     suspend fun getProfile(): Response<BaseResponse<ProfileResponse>>

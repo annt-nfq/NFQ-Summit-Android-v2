@@ -13,6 +13,8 @@ interface NFQSummitDataSource {
         attendeeCode: String
     ): Either<DataException, AttendeeResponse>
 
+    suspend fun logout(): Either<DataException, String>
+
     suspend fun getProfile(): Either<DataException, ProfileResponse>
 
     suspend fun getEventActivities(): Either<DataException, List<EventActivityResponse>>

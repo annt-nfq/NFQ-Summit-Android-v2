@@ -1,6 +1,5 @@
 package com.nfq.nfqsummit.screens.dashboard
 
-import android.app.Activity
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
@@ -37,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,13 +47,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -61,6 +59,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.HomeTab
@@ -77,13 +76,12 @@ fun DashboardScreen(
     goToDetails: (eventId: Int) -> Unit,
     goToAttractions: () -> Unit,
 ) {
-    val window = (LocalView.current.context as Activity).window
-    window.statusBarColor = Color.Transparent.toArgb()
-    WindowCompat.setDecorFitsSystemWindows(window, false)
 
     val navController = rememberNavController()
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val viewModel: DashboardViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
 
     val items = listOf(
         BottomNavItem.Home,
@@ -91,6 +89,8 @@ fun DashboardScreen(
         BottomNavItem.SavedEvents,
         BottomNavItem.Explore
     )
+
+    if (uiState.loading) Loading()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -102,6 +102,7 @@ fun DashboardScreen(
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 DrawerContent(
+                    isLoggedIn = uiState.isLoggedIn,
                     menus = items,
                     onMenuClick = {
                         coroutineScope.launch {
@@ -118,7 +119,7 @@ fun DashboardScreen(
                         }
                     },
                     onSignOutClick = {
-
+                        viewModel.logout()
                     },
                     isSelected = { item ->
                         currentDestination?.hierarchy?.any { it.route == item.destination.route } == true
@@ -215,6 +216,7 @@ fun DashBoardHeader(
 
 @Composable
 fun DrawerContent(
+    isLoggedIn: Boolean,
     menus: List<BottomNavItem>,
     onMenuClick: (String) -> Unit,
     onSignOutClick: () -> Unit,
@@ -319,7 +321,6 @@ fun DrawerContent(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -327,18 +328,31 @@ fun DrawerContent(
                 .padding(bottom = 24.dp)
                 .navigationBarsPadding(),
         ) {
-            TextButton(
-                onClick = onSignOutClick,
-                modifier = Modifier.align(Alignment.CenterEnd)
-            ) {
-                Text(
-                    text = "Sign out",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.error,
+            if (isLoggedIn) {
+                SignOutButton(
+                    onSignOutClick = onSignOutClick,
+                    modifier = Modifier.align(Alignment.CenterEnd)
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SignOutButton(
+    modifier: Modifier = Modifier, onSignOutClick: () -> Unit
+) {
+
+    TextButton(
+        onClick = onSignOutClick,
+        modifier = modifier
+    ) {
+        Text(
+            text = "Sign out",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.error,
+        )
     }
 }
 

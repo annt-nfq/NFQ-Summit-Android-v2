@@ -35,6 +35,12 @@ class NFQSummitRepositoryImpl @Inject constructor(
             .map { userDao.insertUser(it.toUserEntity()) }
     }
 
+    override suspend fun logout(): Either<DataException, Unit> {
+        return dataSource
+            .logout()
+            .map { userDao.deleteUser() }
+    }
+
     override suspend fun fetchEventActivities(): Either<DataException, Unit> {
         return dataSource
             .getEventActivities()
