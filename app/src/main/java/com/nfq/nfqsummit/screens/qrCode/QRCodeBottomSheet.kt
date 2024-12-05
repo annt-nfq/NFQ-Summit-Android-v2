@@ -48,7 +48,6 @@ fun QRCodeBottomSheet(
     BasicModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = bottomSheetState,
-        modifier = Modifier.fillMaxHeight(0.85f),
         content = {
             QRCodeContent()
         }
@@ -56,12 +55,14 @@ fun QRCodeBottomSheet(
 }
 
 @Composable
-private fun QRCodeContent() {
+private fun QRCodeContent(
+    modifier: Modifier = Modifier
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier = modifier
             .background(MaterialTheme.colorScheme.primary)
-            .fillMaxSize()
+            .fillMaxHeight(0.85f)
             .padding(horizontal = 55.dp)
     ) {
         Box(
@@ -147,6 +148,8 @@ private fun QRCodeContent() {
 @Composable
 private fun QRCodeContentPreview() {
     NFQSnapshotTestThemeForPreview {
-        QRCodeContent()
+        QRCodeContent(
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
