@@ -152,10 +152,18 @@ fun DashboardScreen(
                     HomeTab(
                         goToAttractions = goToAttractions,
                         seeAllSavedEvents = {
-                            navController.navigate(AppDestination.SavedEvents.route)
+                            navController.navigate(AppDestination.SavedEvents.route) {
+                                popUpTo(AppDestination.Home.route) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         },
                         seeAllEvents = {
-                            navController.navigate(AppDestination.Schedule.route)
+                            navController.navigate(AppDestination.Schedule.route) {
+                                popUpTo(AppDestination.Home.route) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
                     )
                 }
