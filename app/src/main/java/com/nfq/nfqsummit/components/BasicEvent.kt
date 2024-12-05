@@ -80,12 +80,13 @@ fun BasicEvent(
             .clip(shape = shape)
             .clickable { onEventClick(event) }
     ) {
-        val color = when (event.ordering) {
-            1 -> Color(0xFFEF5350) // Red
-            2 -> Color(0xFF66BB6A) // Green
-            3 -> Color(0xFF26C6DA) // Blue
-            else -> Color(0xFFFFE1CC)      // Default color
-        }
+        /* val color = when (event.ordering) {
+             1 -> Color(0xFFEF5350) // Red
+             2 -> Color(0xFF66BB6A) // Green
+             3 -> Color(0xFF26C6DA) // Blue
+             else -> Color(0xFFFFE1CC)      // Default color
+         }*/
+        val color = Color(0xFFFFE1CC)
 
         Box(
             modifier = Modifier
