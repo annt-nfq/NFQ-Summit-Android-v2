@@ -61,6 +61,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             navController = rememberNavController()
+
             val startDestination by remember {
                 derivedStateOf {
                     when (screenState) {
@@ -71,7 +72,19 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-            NFQSnapshotTestTheme {
+            var darkThemeMutableState by remember { mutableStateOf(false) }
+
+            darkThemeMutableState = when (screenState) {
+                is ScreenState.OnBoardingScreen,
+                is ScreenState.SplashScreen -> true
+                else -> false
+            }
+
+            val darkTheme by remember { derivedStateOf { darkThemeMutableState } }
+
+            NFQSnapshotTestTheme(
+                darkTheme = darkTheme
+            ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

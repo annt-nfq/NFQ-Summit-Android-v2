@@ -77,6 +77,9 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.sqlcipher)
 
+    implementation(libs.androidx.dataStore.core)
+    implementation(libs.androidx.dataStore.pref)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

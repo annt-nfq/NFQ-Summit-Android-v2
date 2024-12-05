@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,18 +24,20 @@ class MainViewModel @Inject constructor(
         handelUserMessage()
     }
 
-    val screenState: StateFlow<ScreenState> = repository
-        .user
-        .map { user ->
-            when {
-                user != null -> ScreenState.DashboardScreen
-                else -> ScreenState.SignInScreen
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            ScreenState.SplashScreen
-        )
+    val screenState: StateFlow<ScreenState> = combine(
+        repository.user,
+        repository.isCompletedOnboarding
+    ) { user, isCompletedOnboarding ->
+        when {
+            !isCompletedOnboarding -> ScreenState.OnBoardingScreen
+            user != null -> ScreenState.DashboardScreen
+            else -> ScreenState.SignInScreen
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        ScreenState.SplashScreen
+    )
 
     private fun handelUserMessage() {
         viewModelScope.launch(Dispatchers.IO) {

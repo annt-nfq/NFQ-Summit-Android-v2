@@ -5,6 +5,7 @@ import com.nfq.data.database.dao.EventDao
 import com.nfq.data.database.dao.UserDao
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
+import com.nfq.data.datastore.PreferencesDataSource
 import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.data.mapper.toEventEntities
@@ -15,10 +16,12 @@ import com.nfq.data.remote.model.response.EventActivityResponse
 import com.nfq.data.toFormattedDateTimeString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class NFQSummitRepositoryImpl @Inject constructor(
     private val dataSource: NFQSummitDataSource,
+    private val preferencesDataSource: PreferencesDataSource,
     private val eventDao: EventDao,
     private val userDao: UserDao
 ) : NFQSummitRepository {
@@ -28,6 +31,10 @@ class NFQSummitRepositoryImpl @Inject constructor(
         get() = eventDao.getFavoriteEvents()
     override val user: Flow<UserEntity?>
         get() = userDao.getUser()
+    override val isCompletedOnboarding: Flow<Boolean>
+        get() = preferencesDataSource
+            .appConfigDataFlow
+            .map { it.isCompletedOnboarding }
 
     override suspend fun authenticateWithAttendeeCode(attendeeCode: String): Either<DataException, Unit> {
         return dataSource
@@ -96,5 +103,9 @@ class NFQSummitRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Either.Left(DataException.Api(e.message ?: e.localizedMessage ?: "Unknown error"))
         }
+    }
+
+    override suspend fun updateOnboardingStatus(isCompletedOnboarding: Boolean) {
+        preferencesDataSource.updateOnboardingStatus(isCompletedOnboarding)
     }
 }

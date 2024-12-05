@@ -39,6 +39,8 @@ okhttp = "4.12.0"
 coreArrow = "1.1.5"
 room = "2.6.1"
 sqlcipher = "4.5.3"
+androidxDataStore = "1.1.1"
+androidxDataStorePref = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -106,6 +108,10 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 
 sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlcipher" }
+
+# Datastore
+androidx-dataStore-core = { group = "androidx.datastore", name = "datastore", version.ref = "androidxDataStore" }
+androidx-dataStore-pref = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidxDataStorePref" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
