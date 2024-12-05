@@ -42,18 +42,7 @@ fun AppNavHost(
         popExitTransition = exitTransition
     ) {
         composable(AppDestination.Splash.route) {
-            SplashScreen(
-                navigateToHome = {
-                    navController.navigate(AppDestination.SignIn.route) {
-                        popUpTo(AppDestination.Splash.route) { inclusive = true }
-                    }
-                },
-                navigateToOnboarding = {
-                    navController.navigate(AppDestination.Onboarding.route) {
-                        popUpTo(AppDestination.Splash.route) { inclusive = true }
-                    }
-                },
-            )
+            SplashScreen()
         }
         composable(AppDestination.Onboarding.route) {
             OnboardingScreen(

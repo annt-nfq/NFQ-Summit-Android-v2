@@ -39,24 +39,28 @@ class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
     private val viewModel: MainViewModel by viewModels()
     private var screenState: ScreenState by mutableStateOf(ScreenState.SplashScreen)
+    private val statusBarStyle = SystemBarStyle.auto(
+        android.graphics.Color.TRANSPARENT,
+        android.graphics.Color.TRANSPARENT,
+    ) { false }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(
-                android.graphics.Color.TRANSPARENT,
-                android.graphics.Color.TRANSPARENT,
-            ) { false },
-        )
+        val splashScreen = installSplashScreen()
+        enableEdgeToEdge(statusBarStyle = statusBarStyle)
         super.onCreate(savedInstanceState)
+
+        splashScreen.setKeepOnScreenCondition {
+            screenState !is ScreenState.SplashScreen
+        }
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.screenState
-                    .collectLatest {
-                        screenState = it
-                    }
+                viewModel
+                    .screenState
+                    .collectLatest { screenState = it }
             }
         }
+
         setContent {
             navController = rememberNavController()
             val startDestination by remember {
