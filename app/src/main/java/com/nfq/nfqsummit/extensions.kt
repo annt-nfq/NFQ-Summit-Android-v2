@@ -26,3 +26,9 @@ fun String.convertTimeFormat(): String {
 fun LocalDate.isSame(date: LocalDate?): Boolean {
     return date != null && this.year == date.year && this.month == date.month && this.dayOfMonth == date.dayOfMonth
 }
+
+fun Context.openWhatsapp(phoneNumber: String) {
+    val intent = Intent(Intent.ACTION_VIEW)
+    intent.data = Uri.parse("https://wa.me/$phoneNumber")
+    startActivity(intent)
+}

@@ -4,6 +4,7 @@ package com.nfq.nfqsummit.screens.qrCode
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +39,7 @@ import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.model.UserUIModel
+import com.nfq.nfqsummit.openWhatsapp
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
@@ -62,6 +65,8 @@ private fun QRCodeContent(
     modifier: Modifier = Modifier,
     userUIModel: UserUIModel
 ) {
+    val context = LocalContext.current
+    val phoneNumber = "+76 333 2145"
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -126,7 +131,9 @@ private fun QRCodeContent(
             modifier = Modifier
                 .clip(RoundedCornerShape(100.dp))
                 .background(MainGreen)
+                .clickable { context.openWhatsapp(phoneNumber) }
                 .padding(horizontal = 16.dp, vertical = 8.dp)
+
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -138,7 +145,7 @@ private fun QRCodeContent(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "+76 333 2145",
+                    text = phoneNumber,
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.background
