@@ -49,9 +49,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge(statusBarStyle = statusBarStyle)
         super.onCreate(savedInstanceState)
 
-        splashScreen.setKeepOnScreenCondition {
-            screenState !is ScreenState.SplashScreen
-        }
+        splashScreen.setKeepOnScreenCondition { false }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
