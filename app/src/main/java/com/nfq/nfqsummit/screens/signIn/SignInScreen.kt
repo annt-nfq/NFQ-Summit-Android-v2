@@ -13,13 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -59,6 +60,7 @@ fun SignInScreen(
         onEvent = { event ->
             when (event) {
                 is SignInEvent.SignIn -> viewModel.signIn(event.attendeeCode)
+                is SignInEvent.UploadMyQRCode -> {}
                 SignInEvent.ContinueAsGuest -> continueAsGuest()
             }
         }
@@ -73,78 +75,71 @@ private fun SignInUI(
     var text by remember { mutableStateOf("") }
 
 
-    Scaffold { paddingValues ->
-        Box {
-            Column(
+    Surface(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.statusBarsPadding()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_nfq_text_white),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                modifier = Modifier
+                    .padding(top = 73.dp)
+                    .width(162.dp)
+                    .height(48.dp)
+            )
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .padding(horizontal = 40.dp)
+                    .padding(top = 112.dp),
             ) {
-                Spacer(modifier = Modifier.height(75.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.ic_nfq_text_white),
-                    contentDescription = null,
-                    modifier = Modifier.width(162.dp),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-                )
-                Spacer(modifier = Modifier.height(100.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 40.dp),
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Column(
+                    OutlinedTextField(
+                        value = text,
+                        onValueChange = { text = it },
+                        leadingIcon = {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_mail),
+                                contentDescription = null,
+                                modifier = Modifier.width(22.dp),
+                            )
+                        },
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        shape = RoundedCornerShape(16.dp),
+                        placeholder = {
+                            Text(
+                                text = "Attendee Code",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFF747688)
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = Color(0xFFE4DFDF)
+                        ),
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        OutlinedTextField(
-                            value = text,
-                            onValueChange = { text = it },
-                            leadingIcon = {
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_mail),
-                                    contentDescription = null,
-                                    modifier = Modifier.width(22.dp),
-                                )
-                            },
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
-                            ),
-                            shape = RoundedCornerShape(16.dp),
-                            placeholder = {
-                                Text(
-                                    text = "Attendee Code",
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
-                                            alpha = 0.7f
-                                        ),
-                                    ),
-                                )
-                            },
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        SignInButton(text, focusManager, onEvent)
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Text(
-                            text = "Please check your email for your booking number or upload your booking QR code here to sign in.",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
-                                fontWeight = FontWeight.W400,
-                                textAlign = TextAlign.Center
-                            ),
-                        )
-                        Spacer(modifier = Modifier.height(24.dp))
-                        UploadQRCodeButton()
-                        Spacer(modifier = Modifier.weight(1f))
-                        ContinueAsGuestButton(onEvent)
-                        Spacer(modifier = Modifier.height(56.dp))
-                    }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    SignInButton(text, focusManager, onEvent)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = "Please check your email for your booking number or upload your booking QR code here to sign in.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    UploadQRCodeButton()
+                    Spacer(modifier = Modifier.weight(1f))
+                    ContinueAsGuestButton(onEvent)
+                    Spacer(modifier = Modifier.height(56.dp))
                 }
             }
         }
@@ -176,10 +171,9 @@ private fun SignInButton(
     ) {
         Text(
             text = "Sign In",
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = MaterialTheme.colorScheme.background,
-                fontWeight = FontWeight.Bold,
-            ),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.Center)
         )
         Row(modifier = Modifier.align(Alignment.CenterEnd)) {
@@ -202,19 +196,21 @@ private fun SignInButton(
 }
 
 @Composable
-private fun UploadQRCodeButton() {
+private fun UploadQRCodeButton(
+    onEvent: (SignInEvent) -> Unit = {}
+) {
+    val shape = RoundedCornerShape(16.dp)
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(58.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.background)
+            .clip(shape)
             .border(
                 width = 2.dp,
                 color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(16.dp)
+                shape = shape
             )
-            .clickable { }
+            .clickable { onEvent(SignInEvent.UploadMyQRCode("")) }
     ) {
         Text(
             text = "Upload My QR Code",
