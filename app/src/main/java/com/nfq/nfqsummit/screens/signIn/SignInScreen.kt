@@ -192,6 +192,7 @@ private fun SignInButton(
             )
             .clip(RoundedCornerShape(16.dp))
             .clickable {
+                if (text.isBlank()) return@clickable
                 focusManager.clearFocus()
                 onEvent(SignInEvent.SignIn(text))
             }
