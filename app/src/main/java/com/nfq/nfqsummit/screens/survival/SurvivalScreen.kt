@@ -16,9 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.Translation
 import com.nfq.data.domain.model.TranslationAudio
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.BasicTopAppBar
 import com.nfq.nfqsummit.mocks.mockTranslation
 import com.nfq.nfqsummit.mocks.mockTranslationAudio
 import com.nfq.nfqsummit.ui.theme.NFQOrange
@@ -98,22 +96,9 @@ fun SurvivalScreenUI(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "Survival Guide",
-                        style = MaterialTheme.typography.headlineLarge
-                    )
-                },
-                navigationIcon = {
-                    // Back button
-                    IconButton(onClick = goBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
+            BasicTopAppBar(
+                title = "Survival Guide",
+                navigationUp = goBack
             )
         }
     ) { paddingValues ->
