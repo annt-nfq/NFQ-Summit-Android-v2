@@ -42,7 +42,7 @@ fun ExploreTab(
     val pagerState = rememberPagerState { 2 }
     val scope = rememberCoroutineScope()
 
-    val exploreItems = listOf(
+    val exploreTHBItems = listOf(
         ExploreItem(
             drawable = R.drawable.explore_transportation,
             title = "Transportation \uD83D\uDE90",
@@ -55,6 +55,28 @@ fun ExploreTab(
         ),
         ExploreItem(
             drawable = R.drawable.explore_attraction,
+            title = "Attraction ⭐",
+            destination = AppDestination.Attractions
+        ),
+        ExploreItem(
+            drawable = R.drawable.explore_survival_kit,
+            title = "Survival Kit \uD83D\uDEE0\uFE0F",
+            destination = AppDestination.Survival
+        )
+    )
+    val exploreVDItems = listOf(
+        ExploreItem(
+            drawable = R.drawable.explore_transportation_vd,
+            title = "Transportation \uD83D\uDE90",
+            destination = AppDestination.Transportations
+        ),
+        ExploreItem(
+            drawable = R.drawable.explore_payment,
+            title = "Payment \uD83D\uDCB8",
+            destination = AppDestination.Payment
+        ),
+        ExploreItem(
+            drawable = R.drawable.explore_attraction_vd,
             title = "Attraction ⭐",
             destination = AppDestination.Attractions
         ),
@@ -91,7 +113,7 @@ fun ExploreTab(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(
-                    items = exploreItems,
+                    items = if (pagerState.currentPage == 0) exploreTHBItems else exploreVDItems,
                     key = { it.title },
                     contentType = { "ExploreItem" }
                 ) { exploreItem ->
