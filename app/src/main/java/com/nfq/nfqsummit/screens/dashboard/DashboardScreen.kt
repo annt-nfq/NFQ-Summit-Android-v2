@@ -1,13 +1,8 @@
 package com.nfq.nfqsummit.screens.dashboard
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,7 +48,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -61,12 +56,14 @@ import androidx.navigation.compose.rememberNavController
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.navigation.AppDestination
+import com.nfq.nfqsummit.navigation.MainTransition
 import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.HomeTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
 import com.nfq.nfqsummit.screens.savedEvents.SavedEventTab
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -90,17 +87,26 @@ fun DashboardScreen(
         BottomNavItem.Explore
     )
 
+    var showModalDrawerSheet by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(500L)
+        showModalDrawerSheet = true
+    }
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
     if (uiState.loading) Loading()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = false,
         drawerContent = {
             ModalDrawerSheet(
+                drawerState = drawerState,
                 drawerShape = RoundedCornerShape(0.dp),
                 windowInsets = WindowInsets(0)
             ) {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
                 DrawerContent(
                     isLoggedIn = uiState.isLoggedIn,
                     menus = items,
@@ -131,7 +137,9 @@ fun DashboardScreen(
             .fillMaxSize()
 
     ) {
-        Column {
+        Column(
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+        ) {
             DashBoardHeader(
                 onMenuClick = {
                     coroutineScope.launch {
@@ -142,10 +150,10 @@ fun DashboardScreen(
             NavHost(
                 navController = navController,
                 startDestination = BottomNavItem.Home.destination.route,
-                enterTransition = enterTransition,
-                exitTransition = exitTransition,
-                popEnterTransition = enterTransition,
-                popExitTransition = exitTransition,
+                enterTransition = MainTransition.enterTransition,
+                exitTransition = MainTransition.exitTransition,
+                popEnterTransition = MainTransition.enterTransition,
+                popExitTransition = MainTransition.exitTransition,
                 modifier = Modifier.weight(1f)
             ) {
                 composable(AppDestination.Home.route) {
@@ -391,8 +399,3 @@ fun DashboardScreenPreview() {
             goToAttractions = {})
     }
 }
-
-val enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
-    { fadeIn(animationSpec = tween(100)) }
-val exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
-    { fadeOut(animationSpec = tween(100)) }

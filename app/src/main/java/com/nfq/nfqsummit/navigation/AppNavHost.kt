@@ -1,8 +1,17 @@
 package com.nfq.nfqsummit.navigation
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,8 +20,6 @@ import com.nfq.nfqsummit.screens.attractions.attractionBlogs.AttractionBlogsScre
 import com.nfq.nfqsummit.screens.blog.BlogScreen
 import com.nfq.nfqsummit.screens.bookingNumber.BookingNumberScreen
 import com.nfq.nfqsummit.screens.dashboard.DashboardScreen
-import com.nfq.nfqsummit.screens.dashboard.enterTransition
-import com.nfq.nfqsummit.screens.dashboard.exitTransition
 import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.HomeTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
@@ -36,10 +43,10 @@ fun AppNavHost(
         modifier = modifier,
         navController = navController,
         startDestination = startDestination,
-        enterTransition = enterTransition,
-        exitTransition = exitTransition,
-        popEnterTransition = enterTransition,
-        popExitTransition = exitTransition
+        enterTransition = SlideTransition.enterTransition,
+        exitTransition = SlideTransition.exitTransition,
+        popEnterTransition = SlideTransition.popEnterTransition,
+        popExitTransition = SlideTransition.popExitTransition
     ) {
         composable(AppDestination.Splash.route) {
             SplashScreen()
@@ -76,7 +83,13 @@ fun AppNavHost(
                 }
             )
         }
-        composable(AppDestination.Dashboard.route) {
+        composable(
+            route = AppDestination.Dashboard.route,
+            enterTransition = MainTransition.enterTransition,
+            exitTransition = MainTransition.exitTransition,
+            popEnterTransition = MainTransition.enterTransition,
+            popExitTransition = MainTransition.exitTransition
+        ) {
             DashboardScreen(
                 goToEventDetails = {
                     navController.navigate(
@@ -195,4 +208,49 @@ fun DashboardNavHost(
             )
         }
     }
+}
+
+const val durationMillis = 100
+const val slideDurationMillis = 400
+
+object MainTransition {
+
+    val enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
+        { fadeIn(tween(durationMillis)) }
+    val exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+        { fadeOut(tween(durationMillis)) }
+}
+
+object SlideTransition {
+    val enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
+        {
+            slideInHorizontally(
+                initialOffsetX = { 1500 },
+                animationSpec = tween(slideDurationMillis)
+            )
+        }
+    val exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+        {
+            slideOutHorizontally(
+                targetOffsetX = { -300 },
+                animationSpec = tween(slideDurationMillis)
+            )
+        }
+
+
+    val popEnterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
+        {
+            slideInHorizontally(
+                initialOffsetX = { -300 },
+                animationSpec = tween(slideDurationMillis)
+            )
+
+        }
+    val popExitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+        {
+            slideOutHorizontally(
+                targetOffsetX = { 1500 },
+                animationSpec = tween(slideDurationMillis)
+            )
+        }
 }
