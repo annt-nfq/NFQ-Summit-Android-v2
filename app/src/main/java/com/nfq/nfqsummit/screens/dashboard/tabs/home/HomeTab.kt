@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.mocks.mockSavedEvents
@@ -302,17 +303,9 @@ private fun LazyListScope.savedEventSection(
         }
     } else {
         item {
-            Box(
+            BasicCard(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .boxShadow(
-                        color = Color(0xFF575C8A).copy(alpha = 0.06f),
-                        blurRadius = 35.dp,
-                        spreadRadius = 0.dp,
-                        offset = DpOffset(0.dp, 10.dp)
-                    )
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.background)
             ) {
                 Column(
                     modifier = Modifier
@@ -341,32 +334,7 @@ private fun LazyListScope.savedEventSection(
                 }
             }
         }
-
-
-        /*when (savedEvents) {
-            is Response.Success -> {
-                if (savedEvents.data?.isNotEmpty() == true) {
-
-                } else {
-
-                }
-            }
-
-            is Response.Failure -> {
-                Text(
-                    text = "Failed to load favorites", style = MaterialTheme.typography.bodyMedium
-                )
-            }
-
-            is Response.Loading -> {
-                Text(
-                    text = "Loading favorites...", style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }*/
     }
-
-
 }
 
 @Preview(showBackground = true)

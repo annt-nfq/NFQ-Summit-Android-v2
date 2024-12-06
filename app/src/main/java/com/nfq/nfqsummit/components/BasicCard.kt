@@ -28,7 +28,7 @@ fun BasicCard(
     blurRadius: Dp = 30.dp,
     contentAlignment: Alignment = Alignment.TopStart,
     shadowColor: Color = Color(0xFF969696),
-    onClick: () -> Unit = {},
+    onClick: () -> Unit,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
@@ -48,14 +48,38 @@ fun BasicCard(
     )
 }
 
+@Composable
+fun BasicCard(
+    modifier: Modifier = Modifier,
+    shape: RoundedCornerShape = RoundedCornerShape(16.dp),
+    blurRadius: Dp = 30.dp,
+    contentAlignment: Alignment = Alignment.TopStart,
+    shadowColor: Color = Color(0xFF969696),
+    content: @Composable BoxScope.() -> Unit
+) {
+    Box(
+        modifier = modifier
+            .boxShadow(
+                color = shadowColor.copy(alpha = 0.08f),
+                blurRadius = blurRadius,
+                spreadRadius = 0.dp,
+                offset = DpOffset(0.dp, 8.dp)
+            )
+            .clip(shape = shape)
+            .background(MaterialTheme.colorScheme.surface),
+        contentAlignment = contentAlignment,
+        content = content
+    )
+}
+
 
 @Preview
 @Composable
 private fun BasicCardPreview() {
     NFQSnapshotTestThemeForPreview {
-        Surface (
+        Surface(
             modifier = Modifier.fillMaxSize()
-        ){
+        ) {
             BasicCard(
                 modifier = Modifier.size(200.dp)
             ) {}
