@@ -45,7 +45,7 @@ fun ExploreTab(
         ExploreItem(
             drawable = R.drawable.explore_transportation,
             title = "Transportation \uD83D\uDE90",
-            destination = AppDestination.Attractions
+            destination = AppDestination.Transportations
         ),
         ExploreItem(
             drawable = R.drawable.explore_payment,
