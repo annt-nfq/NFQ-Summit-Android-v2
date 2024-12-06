@@ -131,7 +131,7 @@ private fun ScheduleHeader(
     onDayClick: (LocalDate) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    Surface{
+    Surface {
         Column {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -210,29 +210,44 @@ fun SummitSchedules(
     onEventClick: (SummitEvent) -> Unit
 ) {
 
+    if (dailyEvents.isEmpty()) {
+        Text(
+            text = "No events for today",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxSize()
+        )
+        return
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(state = verticalScroll)
-            .navigationBarsPadding()
             .padding(start = 32.dp)
             .padding(top = 16.dp)
+            .navigationBarsPadding()
+
     ) {
 
-        if (dailyEvents.isNotEmpty())
-            Schedule(
-                events = dailyEvents.sortedBy { it.name },
-                currentTime = currentTime,
-                minTime = dailyEvents
-                    .minByOrNull { it.start }!!.start.toLocalTime()
-                    .minusHours(1),
-                eventContent = {
-                    BasicEvent(
-                        positionedEvent = it,
-                        onEventClick = onEventClick
-                    )
-                }
-            )
+        Schedule(
+            events = dailyEvents.sortedBy { it.name },
+            currentTime = currentTime,
+            modifier = Modifier
+                .fillMaxWidth(),
+            minTime = dailyEvents
+                .minByOrNull { it.start }!!.start.toLocalTime()
+                .minusHours(1),
+            eventContent = {
+                BasicEvent(
+                    positionedEvent = it,
+                    onEventClick = onEventClick
+                )
+            }
+        )
     }
 }
 
