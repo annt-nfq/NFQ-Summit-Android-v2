@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -129,70 +130,72 @@ private fun ScheduleHeader(
     onDayClick: (LocalDate) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 12.dp)
-        ) {
-            Text(
-                text = "Calendar & Events",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Box(
+    Surface{
+        Column {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .clickable {
-                        onDayClick(LocalDate.now())
-                    }
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 12.dp)
             ) {
                 Text(
-                    text = "Today",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = "Calendar & Events",
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(13.dp)
                 )
-            }
-        }
-        Row(
-            verticalAlignment = Alignment.Bottom,
-            modifier = Modifier
-                .horizontalScroll(state = rememberScrollState())
-                .animateContentSize()
-                .padding(vertical = 24.dp)
-        ) {
-            Spacer(modifier = Modifier.width(16.dp))
-            dayEventPairs.forEach { (date, events) ->
-                ScheduleDays(
-                    date = date.dayOfMonth.toString(),
-                    dayOfWeek = date.dayOfWeek.getDisplayName(
-                        TextStyle.SHORT,
-                        Locale.getDefault()
-                    ),
-                    eventCount = events.size,
-                    selected = selectedDate.isSame(date),
-                    onClick = {
-                        onDayClick(date)
-
-                        coroutineScope.launch {
-                            verticalScroll.animateScrollTo(0)
+                Spacer(modifier = Modifier.weight(1f))
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .clickable {
+                            onDayClick(LocalDate.now())
                         }
-                    }
-                )
-                Spacer(modifier = Modifier.width(21.dp))
+                ) {
+                    Text(
+                        text = "Today",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(13.dp)
+                    )
+                }
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier
+                    .horizontalScroll(state = rememberScrollState())
+                    .animateContentSize()
+                    .padding(vertical = 24.dp)
+            ) {
+                Spacer(modifier = Modifier.width(16.dp))
+                dayEventPairs.forEach { (date, events) ->
+                    ScheduleDays(
+                        date = date.dayOfMonth.toString(),
+                        dayOfWeek = date.dayOfWeek.getDisplayName(
+                            TextStyle.SHORT,
+                            Locale.getDefault()
+                        ),
+                        eventCount = events.size,
+                        selected = selectedDate.isSame(date),
+                        onClick = {
+                            onDayClick(date)
+
+                            coroutineScope.launch {
+                                verticalScroll.animateScrollTo(0)
+                            }
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(21.dp))
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+            }
+            HorizontalDivider(color = Color(0xFFCFCAE4), thickness = 1.dp)
         }
-        HorizontalDivider(color = Color(0xFFCFCAE4), thickness = 1.dp)
     }
 }
 
@@ -204,32 +207,31 @@ fun SummitSchedules(
     verticalScroll: ScrollState = rememberScrollState(),
     onEventClick: (SummitEvent) -> Unit
 ) {
-    Surface(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .verticalScroll(state = verticalScroll)
-                .padding(start = 32.dp)
-                .padding(top = 16.dp)
-        ) {
 
-            if (dailyEvents.isNotEmpty())
-                Schedule(
-                    events = dailyEvents.sortedBy { it.name },
-                    currentTime = currentTime,
-                    minTime = dailyEvents
-                        .minByOrNull { it.start }!!.start.toLocalTime()
-                        .minusHours(1),
-                    eventContent = {
-                        BasicEvent(
-                            positionedEvent = it,
-                            onEventClick = onEventClick
-                        )
-                    }
-                )
-        }
-        Spacer(modifier = Modifier.height(100.dp))
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(state = verticalScroll)
+            .navigationBarsPadding()
+            .padding(start = 32.dp)
+            .padding(top = 16.dp)
+    ) {
+
+        if (dailyEvents.isNotEmpty())
+            Schedule(
+                events = dailyEvents.sortedBy { it.name },
+                currentTime = currentTime,
+                minTime = dailyEvents
+                    .minByOrNull { it.start }!!.start.toLocalTime()
+                    .minusHours(1),
+                eventContent = {
+                    BasicEvent(
+                        positionedEvent = it,
+                        onEventClick = onEventClick
+                    )
+                }
+            )
     }
-
 }
 
 @Composable

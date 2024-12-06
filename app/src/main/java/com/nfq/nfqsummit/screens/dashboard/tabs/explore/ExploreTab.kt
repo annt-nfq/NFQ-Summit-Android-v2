@@ -64,6 +64,7 @@ fun ExploreTab(
         )
     )
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             SegmentedControl(
                 items = listOf(

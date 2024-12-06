@@ -32,7 +32,7 @@ import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
 @Composable
-fun SavedEventScreen(
+fun SavedEventTab(
     navigateUp: () -> Unit
 ) {
     val viewModel: SavedEventViewModel = hiltViewModel()
@@ -64,6 +64,7 @@ private fun SavedEventUI(
     goToDetails: (String) -> Unit,
 ) {
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

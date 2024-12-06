@@ -41,7 +41,7 @@ fun BasicCard(
             )
             .clip(shape = shape)
             .clickable(onClick = onClick)
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.surface),
         contentAlignment = contentAlignment,
         content = content
     )

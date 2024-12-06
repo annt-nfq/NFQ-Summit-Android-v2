@@ -117,7 +117,6 @@ private fun HomeTabUI(
     markAsFavorite: (favorite: Boolean, eventId: String) -> Unit
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.background,
         modifier = Modifier.fillMaxSize()
     ) {
         LazyColumn(
@@ -167,7 +166,7 @@ private fun LazyListScope.showQRCodeSection(
                     )
                     .clip(RoundedCornerShape(32.dp))
                     .clickable { onShowQRCode() }
-                    .background(MaterialTheme.colorScheme.background)) {
+                    .background(MaterialTheme.colorScheme.surface)) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()

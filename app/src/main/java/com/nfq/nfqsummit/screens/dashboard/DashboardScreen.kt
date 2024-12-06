@@ -8,7 +8,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +29,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -64,7 +64,7 @@ import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.HomeTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
-import com.nfq.nfqsummit.screens.savedEvents.SavedEventScreen
+import com.nfq.nfqsummit.screens.savedEvents.SavedEventTab
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.coroutines.launch
@@ -178,7 +178,7 @@ fun DashboardScreen(
                     )
                 }
                 composable(AppDestination.SavedEvents.route) {
-                    SavedEventScreen(
+                    SavedEventTab(
                         navigateUp = { navController.navigateUp() }
                     )
                 }
@@ -232,115 +232,116 @@ fun DrawerContent(
 ) {
     var switchCheckedState by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_nfq_text_white),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+    Surface {
+        Column(
             modifier = Modifier
-                .padding(start = 34.dp)
-                .padding(top = 36.dp)
-                .width(80.dp)
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-            thickness = 0.5.dp
-        )
-        Spacer(modifier = Modifier.height(28.dp))
-        menus.forEach {
-            val selected = isSelected(it)
-            Row(
+                .fillMaxSize()
+                .statusBarsPadding()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_nfq_text_white),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                modifier = Modifier
+                    .padding(start = 34.dp)
+                    .padding(top = 36.dp)
+                    .width(80.dp)
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                thickness = 0.5.dp
+            )
+            Spacer(modifier = Modifier.height(28.dp))
+            menus.forEach {
+                val selected = isSelected(it)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                ) {
+                    Spacer(modifier = Modifier.width(19.dp))
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.0.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                        ),
+                        onClick = {
+                            onMenuClick(it.destination.route)
+                        },
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 16.dp),
+                        ) {
+                            Text(
+                                text = it.title, style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.W400,
+                                    color = if (selected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground,
+                                ),
+                                modifier = Modifier.align(Alignment.CenterStart)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(49.dp))
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .padding(start = 19.dp, end = 16.dp),
             ) {
-                Spacer(modifier = Modifier.width(19.dp))
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.0.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                    ),
-                    onClick = {
-                        onMenuClick(it.destination.route)
-                    },
+                Row(
+                    verticalAlignment = Alignment.Top
                 ) {
-                    Box(
+                    Switch(
+                        checked = switchCheckedState,
+                        onCheckedChange = { switchCheckedState = it },
+                        colors = SwitchDefaults.colors(
+                            checkedTrackColor = MainGreen
+                        ),
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(start = 16.dp),
+                            .weight(1f),
                     ) {
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = it.title, style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = if (selected) FontWeight.Bold else FontWeight.W400,
-                                color = if (selected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground,
+                            text = "Push Notification",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onBackground,
                             ),
-                            modifier = Modifier.align(Alignment.CenterStart)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Turning this on will send a notification to your device as a reminder of the event time.",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                            ),
                         )
                     }
                 }
-                Spacer(modifier = Modifier.width(49.dp))
             }
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 19.dp, end = 16.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.Top
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 24.dp)
+                    .navigationBarsPadding(),
             ) {
-                Switch(
-                    checked = switchCheckedState,
-                    onCheckedChange = { switchCheckedState = it },
-                    colors = SwitchDefaults.colors(
-                        checkedTrackColor = MainGreen
-                    ),
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(
-                    modifier = Modifier
-                        .weight(1f),
-                ) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Push Notification",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onBackground,
-                        ),
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Turning this on will send a notification to your device as a reminder of the event time.",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                        ),
+                if (isLoggedIn) {
+                    SignOutButton(
+                        onSignOutClick = onSignOutClick,
+                        modifier = Modifier.align(Alignment.CenterEnd)
                     )
                 }
-            }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 24.dp)
-                .navigationBarsPadding(),
-        ) {
-            if (isLoggedIn) {
-                SignOutButton(
-                    onSignOutClick = onSignOutClick,
-                    modifier = Modifier.align(Alignment.CenterEnd)
-                )
             }
         }
     }
