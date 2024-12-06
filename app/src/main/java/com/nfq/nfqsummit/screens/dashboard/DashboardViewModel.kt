@@ -3,7 +3,6 @@ package com.nfq.nfqsummit.screens.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.repository.NFQSummitRepository
-import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,9 +37,8 @@ class DashboardViewModel @Inject constructor(
             _uiState.update { it.copy(loading = true) }
             repository
                 .logout()
-                .onLeft { e ->
+                .onLeft {
                     _uiState.update { it.copy(loading = false) }
-                    UserMessageManager.showMessage(e)
                 }
                 .onRight {
                     _uiState.update { it.copy(loading = false) }
