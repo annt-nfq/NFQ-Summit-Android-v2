@@ -106,8 +106,6 @@ fun BlogGridItem(
                 color = Color.White,
                 fontWeight = FontWeight(600)
             ),
-            maxLines = 2,
-            minLines = 2,
             textAlign = TextAlign.Center
         )
         AsyncImage(
@@ -116,7 +114,7 @@ fun BlogGridItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp),
-            contentScale = ContentScale.FillWidth,
+            contentScale = ContentScale.Fit,
             alignment = Alignment.BottomCenter
         )
     }

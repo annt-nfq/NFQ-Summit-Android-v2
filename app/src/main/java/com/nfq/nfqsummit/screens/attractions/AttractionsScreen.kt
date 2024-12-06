@@ -112,7 +112,7 @@ fun AttractionListItem(
             model = attraction.icon,
             contentDescription = null,
             modifier = Modifier.size(100.dp),
-            contentScale = ContentScale.Inside
+            contentScale = ContentScale.Fit
         )
         Spacer(modifier = Modifier.width(24.dp))
     }
