@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
 @Composable
@@ -35,6 +36,7 @@ fun BookmarkItem(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(30.dp)
+            .bounceClick()
             .clip(RoundedCornerShape(7.dp))
             .clickable { markAsFavorite(!isFavorite, id) }
             .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))

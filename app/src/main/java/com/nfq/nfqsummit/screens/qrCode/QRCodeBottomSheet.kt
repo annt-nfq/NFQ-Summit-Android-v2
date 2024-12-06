@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.model.UserUIModel
 import com.nfq.nfqsummit.openWhatsapp
@@ -129,6 +130,7 @@ private fun QRCodeContent(
         Spacer(modifier = Modifier.height(32.dp))
         Box(
             modifier = Modifier
+                .bounceClick()
                 .clip(RoundedCornerShape(100.dp))
                 .background(MainGreen)
                 .clickable { context.openWhatsapp(phoneNumber) }

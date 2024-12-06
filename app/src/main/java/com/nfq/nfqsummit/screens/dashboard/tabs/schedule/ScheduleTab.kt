@@ -54,6 +54,7 @@ import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicEvent
 import com.nfq.nfqsummit.components.Schedule
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.isSame
 import com.nfq.nfqsummit.mocks.mockEventDay1
 import com.nfq.nfqsummit.mocks.mockEventDay2H1
@@ -146,6 +147,7 @@ private fun ScheduleHeader(
                 Spacer(modifier = Modifier.weight(1f))
                 Box(
                     modifier = Modifier
+                        .bounceClick()
                         .clip(RoundedCornerShape(8.dp))
                         .border(
                             width = 1.dp,

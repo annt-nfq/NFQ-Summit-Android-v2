@@ -47,6 +47,7 @@ import com.nfq.data.domain.model.Attraction
 import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.Response
 import com.nfq.nfqsummit.components.BasicTopAppBar
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.mocks.mockAttraction
 import com.nfq.nfqsummit.mocks.mockBlog
 import com.nfq.nfqsummit.mocks.mockFavoriteAndRecommendedBlog
@@ -135,6 +136,7 @@ fun BlogListItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .bounceClick()
             .clip(RoundedCornerShape(16.dp))
             .clickable { goToBlog(blog.id) }
             .padding(8.dp)
@@ -185,6 +187,7 @@ fun BlogListItem(
                 modifier = Modifier
                     .padding(8.dp)
                     .size(40.dp)
+                    .bounceClick()
                     .clip(shape = CircleShape)
                     .background(color = Color.White)
                     .clickable { markAsFavorite(!blog.isFavorite, blog) }

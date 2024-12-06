@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.Loading
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import com.nfq.nfqsummit.ui.theme.boxShadow
 
@@ -155,6 +156,7 @@ private fun SignInButton(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .bounceClick()
             .height(58.dp)
             .boxShadow(
                 color = Color(0xFF1E1C2E).copy(alpha = 0.08f),
@@ -203,6 +205,7 @@ private fun UploadQRCodeButton(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .bounceClick()
             .height(58.dp)
             .clip(shape)
             .border(
@@ -227,8 +230,10 @@ private fun UploadQRCodeButton(
 private fun ContinueAsGuestButton(onEvent: (SignInEvent) -> Unit) {
     TextButton(
         onClick = { onEvent(SignInEvent.ContinueAsGuest) },
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .bounceClick()
+            .fillMaxWidth()
     ) {
         Text(
             text = "Continue As\nUnregistered guest",

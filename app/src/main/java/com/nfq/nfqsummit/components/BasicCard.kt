@@ -33,6 +33,7 @@ fun BasicCard(
 ) {
     Box(
         modifier = modifier
+            .bounceClick()
             .boxShadow(
                 color = shadowColor.copy(alpha = 0.08f),
                 blurRadius = blurRadius,

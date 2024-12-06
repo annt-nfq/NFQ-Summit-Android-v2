@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.SegmentedControl
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.coroutines.launch
@@ -117,16 +118,17 @@ fun ExploreItem(
 ) {
     Box(
         contentAlignment = Alignment.BottomStart,
+        modifier = Modifier
+            .bounceClick()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable {
+                goToDestination(exploreItem.destination)
+            }
     ) {
         Image(
             painter = painterResource(id = exploreItem.drawable),
             contentDescription = "Event Image",
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .clickable {
-                    goToDestination(exploreItem.destination)
-                },
+            modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.FillWidth
         )
         Column(

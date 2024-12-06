@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.Loading
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.mocks.mockSavedEvents
 import com.nfq.nfqsummit.mocks.mockUpcomingEvents
 import com.nfq.nfqsummit.model.SavedEventUIModel
@@ -157,6 +158,7 @@ private fun LazyListScope.showQRCodeSection(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .bounceClick()
                     .height(height = 117.dp)
                     .boxShadow(
                         color = Color(0xFF1E1C2E).copy(alpha = 0.08f),
@@ -221,7 +223,6 @@ fun LazyListScope.upcomingEventsSection(
                 pageSpacing = 16.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                println(upcomingEvents[it].toString())
                 UpcomingEventCard(
                     uiModel = upcomingEvents[it],
                     goToDetails = goToDetails,
@@ -250,6 +251,7 @@ fun SectionHeader(
         Spacer(modifier = Modifier.weight(1f))
         Box(
             modifier = Modifier
+                .bounceClick()
                 .clip(RoundedCornerShape(8.dp))
                 .clickable { onSeeAll() }
                 .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))

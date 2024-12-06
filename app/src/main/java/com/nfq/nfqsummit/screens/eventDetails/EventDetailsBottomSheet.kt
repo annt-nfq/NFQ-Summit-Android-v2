@@ -49,6 +49,7 @@ import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
 import com.nfq.nfqsummit.components.HtmlText
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.openMapView
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.BookmarkItem
@@ -197,6 +198,7 @@ private fun EventDetailsUI(
                             modifier = Modifier
                                 .padding(start = 8.dp)
                                 .size(116.dp, 30.dp)
+                                .bounceClick()
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable {
                                     onViewLocation(

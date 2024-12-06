@@ -63,6 +63,7 @@ fun BasicEvent(
         modifier = modifier
             .padding(vertical = 4.dp)
             .fillMaxSize()
+            .bounceClick()
             .padding(
                 bottom = if (positionedEvent.splitType == SplitType.End) 0.dp else 2.dp
             )

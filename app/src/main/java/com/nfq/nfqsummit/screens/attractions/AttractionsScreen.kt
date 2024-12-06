@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.nfq.data.domain.model.Attraction
 import com.nfq.nfqsummit.components.BasicTopAppBar
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.mocks.mockAttraction
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -93,6 +94,7 @@ fun AttractionListItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .bounceClick()
             .clip(RoundedCornerShape(16.dp))
             .background(NFQOrange)
             .clickable { goToAttraction(attraction.id) }
