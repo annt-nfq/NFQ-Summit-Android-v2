@@ -2,7 +2,6 @@
 
 package com.nfq.nfqsummit.screens.attractions.attractionBlogs
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,14 +20,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.ThumbUp
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,13 +35,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.BrushPainter
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,7 +46,7 @@ import coil.compose.AsyncImage
 import com.nfq.data.domain.model.Attraction
 import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.Response
-import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.BasicTopAppBar
 import com.nfq.nfqsummit.mocks.mockAttraction
 import com.nfq.nfqsummit.mocks.mockBlog
 import com.nfq.nfqsummit.mocks.mockFavoriteAndRecommendedBlog
@@ -69,9 +60,6 @@ fun AttractionBlogsScreen(
     goToBlog: (blogId: Int) -> Unit,
     viewModel: AttractionBlogsViewModel = hiltViewModel()
 ) {
-    val window = (LocalView.current.context as Activity).window
-    window.statusBarColor = Color.Transparent.toArgb()
-
     val blogsState by viewModel.blogs.collectAsState()
     val attractionState by viewModel.attraction.collectAsState()
 
@@ -100,21 +88,9 @@ fun AttractionBlogsUI(
 ) {
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = attraction?.title ?: "Attraction",
-                        style = MaterialTheme.typography.headlineLarge
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = goBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
+            BasicTopAppBar(
+                title = attraction?.title ?: "Attraction",
+                navigationUp = goBack
             )
         }
     ) { paddingValues ->
@@ -133,7 +109,11 @@ fun AttractionBlogsUI(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(blogsState.data!!) { blog ->
+                    items(
+                        items = blogsState.data!!,
+                        key = { it.id },
+                        contentType = { "BlogListItem" }
+                    ) { blog ->
                         BlogListItem(
                             blog = blog,
                             goToBlog = goToBlog,
@@ -155,9 +135,9 @@ fun BlogListItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                goToBlog(blog.id)
-            }
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { goToBlog(blog.id) }
+            .padding(8.dp)
     ) {
         Text(
             text = blog.title,
@@ -203,15 +183,11 @@ fun BlogListItem(
             )
             Box(
                 modifier = Modifier
-                    .clickable {
-                        markAsFavorite(!blog.isFavorite, blog)
-                    }
                     .padding(8.dp)
                     .size(40.dp)
-                    .background(
-                        color = Color.White,
-                        shape = CircleShape
-                    )
+                    .clip(shape = CircleShape)
+                    .background(color = Color.White)
+                    .clickable { markAsFavorite(!blog.isFavorite, blog) }
                     .align(Alignment.TopEnd)
                     .padding(4.dp)
             ) {
