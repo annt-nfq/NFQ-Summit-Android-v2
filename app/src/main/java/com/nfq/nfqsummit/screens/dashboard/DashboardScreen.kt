@@ -100,7 +100,6 @@ fun DashboardScreen(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        gesturesEnabled = false,
         drawerContent = {
             ModalDrawerSheet(
                 drawerState = drawerState,
