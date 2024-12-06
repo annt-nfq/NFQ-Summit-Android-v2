@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.1"
+core = "3.5.1"
 kotlin = "1.9.23"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -41,6 +42,8 @@ room = "2.6.1"
 sqlcipher = "4.5.3"
 androidxDataStore = "1.1.1"
 androidxDataStorePref = "1.1.1"
+zxingAndroidEmbedded = "4.3.0"
+timber = "5.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -112,6 +115,12 @@ sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "
 # Datastore
 androidx-dataStore-core = { group = "androidx.datastore", name = "datastore", version.ref = "androidxDataStore" }
 androidx-dataStore-pref = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidxDataStorePref" }
+
+# QRCode Decoder
+zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "core" }
+
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

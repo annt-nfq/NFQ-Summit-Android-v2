@@ -1,5 +1,8 @@
 package com.nfq.nfqsummit.screens.signIn
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +52,7 @@ import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import com.nfq.nfqsummit.ui.theme.boxShadow
+import com.nfq.nfqsummit.utils.handleQRCodeUri
 
 @Composable
 fun SignInScreen(
@@ -57,12 +62,33 @@ fun SignInScreen(
     val loading by viewModel.loading.collectAsState()
     if (loading) Loading()
 
+    val context = LocalContext.current
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            handleQRCodeUri(
+                context = context,
+                uri = it,
+                onSuccess = viewModel::signIn
+            )
+        }
+    }
+
     SignInUI(
         onEvent = { event ->
             when (event) {
-                is SignInEvent.SignIn -> viewModel.signIn(event.attendeeCode)
-                is SignInEvent.UploadMyQRCode -> {}
-                SignInEvent.ContinueAsGuest -> continueAsGuest()
+                is SignInEvent.SignIn -> {
+                    viewModel.signIn(event.attendeeCode)
+                }
+
+                is SignInEvent.UploadMyQRCode -> {
+                    imagePickerLauncher.launch("image/*")
+                }
+
+                SignInEvent.ContinueAsGuest -> {
+                    continueAsGuest()
+                }
             }
         }
     )
@@ -137,7 +163,7 @@ private fun SignInUI(
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
-                    UploadQRCodeButton()
+                    UploadQRCodeButton(onEvent = onEvent)
                     Spacer(modifier = Modifier.weight(1f))
                     ContinueAsGuestButton(onEvent)
                     Spacer(modifier = Modifier.height(56.dp))

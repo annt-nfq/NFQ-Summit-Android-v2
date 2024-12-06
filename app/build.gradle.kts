@@ -133,7 +133,12 @@ val jacocoTestReport = tasks.register<JacocoReport>("jacocoTestReport") {
         )
     }
 
-    sourceDirectories.setFrom(files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin"))
+    sourceDirectories.setFrom(
+        files(
+            "${project.projectDir}/src/main/java",
+            "${project.projectDir}/src/main/kotlin"
+        )
+    )
     classDirectories.setFrom(files(kotlinTree, javaTree))
     executionData.setFrom(fileTree(project.buildDir) {
         include("jacoco/testDebugUnitTest.exec")
@@ -198,6 +203,11 @@ dependencies {
     testImplementation(libs.androidx.arch.core.testing)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.ui.test.junit4)
+
+    implementation(libs.zxing.android.embedded)
+    implementation(libs.zxing.core)
+
+    implementation(libs.timber)
 
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.androidx.junit)
