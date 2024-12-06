@@ -116,7 +116,7 @@ fun BlogGridItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp),
-            contentScale = ContentScale.FillHeight,
+            contentScale = ContentScale.FillWidth,
             alignment = Alignment.BottomCenter
         )
     }
