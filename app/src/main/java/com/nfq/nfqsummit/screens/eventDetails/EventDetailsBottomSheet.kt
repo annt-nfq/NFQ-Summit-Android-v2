@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.EventDetailsModel
-import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
 import com.nfq.nfqsummit.components.HtmlText
