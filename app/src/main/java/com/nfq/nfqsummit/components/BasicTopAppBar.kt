@@ -3,6 +3,7 @@
 package com.nfq.nfqsummit.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,7 +20,7 @@ fun BasicTopAppBar(
     title: String = "",
     navigationUp: () -> Unit = {},
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
             Text(
                 text = title,
@@ -29,34 +30,14 @@ fun BasicTopAppBar(
         },
         navigationIcon = {
             IconButton(
-                onClick = {}
+                onClick = navigationUp
             ) {
                 Image(
                     painter = painterResource(R.drawable.ic_arrow_back),
-                    contentDescription = null
+                    contentDescription = "Back",
                 )
             }
-        }
-    )
-}
-
-@Composable
-fun BasicTopAppBar(
-    title: @Composable () -> Unit,
-    navigationUp: () -> Unit = {},
-) {
-    TopAppBar(
-        title = title,
-        navigationIcon = {
-            IconButton(
-                onClick = {}
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_arrow_back),
-                    contentDescription = null
-                )
-            }
-        }
+        },
     )
 }
 
