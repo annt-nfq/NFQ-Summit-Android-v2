@@ -80,9 +80,10 @@ dependencies {
     implementation(libs.androidx.dataStore.core)
     implementation(libs.androidx.dataStore.pref)
 
+    testImplementation(libs.mockk)
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation (libs.kotlinx.coroutines.test)
+    testImplementation (libs.turbine)
 }
 
 sqldelight {
