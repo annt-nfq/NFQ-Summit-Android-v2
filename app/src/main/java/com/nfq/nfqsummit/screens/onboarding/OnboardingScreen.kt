@@ -179,7 +179,8 @@ fun OnboardingPage1() {
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = Color.White
                 ),
-                textAlign = TextAlign.End
+                textAlign = TextAlign.End,
+                modifier = Modifier.navigationBarsPadding()
             )
         }
     }
@@ -223,7 +224,8 @@ fun OnboardingPage2() {
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = Color.White
                 ),
-                textAlign = TextAlign.End
+                textAlign = TextAlign.End,
+                modifier = Modifier.navigationBarsPadding()
             )
         }
     }
@@ -267,7 +269,8 @@ fun OnboardingPage3() {
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = Color.White
                 ),
-                textAlign = TextAlign.End
+                textAlign = TextAlign.End,
+                modifier = Modifier.navigationBarsPadding()
             )
         }
     }
