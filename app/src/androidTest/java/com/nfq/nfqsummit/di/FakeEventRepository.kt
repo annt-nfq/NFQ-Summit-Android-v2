@@ -18,19 +18,22 @@ class FakeEventRepository @Inject constructor(): EventRepository {
                         id = "1",
                         name = "Event 1",
                         start = LocalDateTime.of(2024, 1, 6, 10, 0),
-                        end = LocalDateTime.of(2024, 1, 6, 11, 0)
+                        end = LocalDateTime.of(2024, 1, 6, 11, 0),
+                        tag = "\uD83D\uDCBC Summit"
                     ),
                     SummitEvent(
                         id = "2",
                         name = "Event 2",
                         start = LocalDateTime.of(2024, 1, 6, 11, 0),
-                        end = LocalDateTime.of(2024, 1, 6, 12, 0)
+                        end = LocalDateTime.of(2024, 1, 6, 12, 0),
+                        tag = "\uD83D\uDCBC Summit"
                     ),
                     SummitEvent(
                         id = "3",
                         name = "Event 3",
                         start = LocalDateTime.of(2024, 1, 6, 12, 0),
-                        end = LocalDateTime.of(2024, 1, 6, 13, 0)
+                        end = LocalDateTime.of(2024, 1, 6, 13, 0),
+                        tag = "\uD83D\uDCBC Summit"
                     )
                 )
             )
@@ -38,26 +41,29 @@ class FakeEventRepository @Inject constructor(): EventRepository {
     override val savedEvents: Flow<List<SummitEvent>>
         get() = flow { emit(listOf()) }
 
-    override suspend fun fetchAllEvents(forceReload: Boolean): Response<List<SummitEvent>> {
-        return Response.Success(
+    override suspend fun fetchAllEvents(forceReload: Boolean): Result<List<SummitEvent>> {
+        return Result.success(
             listOf(
                 SummitEvent(
                     id = "1",
                     name = "Event 1",
                     start = LocalDateTime.of(2024, 1, 6, 10, 0),
-                    end = LocalDateTime.of(2024, 1, 6, 11, 0)
+                    end = LocalDateTime.of(2024, 1, 6, 11, 0),
+                    tag = "\uD83D\uDCBC Summit"
                 ),
                 SummitEvent(
                     id = "2",
                     name = "Event 2",
                     start = LocalDateTime.of(2024, 1, 6, 11, 0),
-                    end = LocalDateTime.of(2024, 1, 6, 12, 0)
+                    end = LocalDateTime.of(2024, 1, 6, 12, 0),
+                    tag = "\uD83D\uDCBC Summit"
                 ),
                 SummitEvent(
                     id = "3",
                     name = "Event 3",
                     start = LocalDateTime.of(2024, 1, 6, 12, 0),
-                    end = LocalDateTime.of(2024, 1, 6, 13, 0)
+                    end = LocalDateTime.of(2024, 1, 6, 13, 0),
+                    tag = "\uD83D\uDCBC Summit"
                 )
             )
         )

@@ -2,8 +2,10 @@ package com.nfq.data.mapper
 
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
+import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.remote.model.response.AttendeeResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
+import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTimeInMillis
 
 fun List<EventActivityResponse>.toEventEntities(): List<EventEntity> {
@@ -39,7 +41,7 @@ fun EventActivityResponse.toEventEntity(): EventEntity {
     )
 }
 
-fun AttendeeResponse.toUserEntity() : UserEntity{
+fun AttendeeResponse.toUserEntity(): UserEntity {
     return UserEntity(
         id = id.toString(),
         firstName = firstName.orEmpty(),
@@ -48,5 +50,22 @@ fun AttendeeResponse.toUserEntity() : UserEntity{
         qrCodeUrl = qrCodeUrl.orEmpty(),
         attendeeCode = attendeeCode.orEmpty(),
         tk = tk.orEmpty()
+    )
+}
+
+fun EventEntity.toEventDetailsModel(): EventDetailsModel {
+    val startTime = this
+        .timeStart
+        .toFormattedDateTimeString(targetPattern = "EEE, MMM d • HH:mm")
+    return EventDetailsModel(
+        id = id,
+        startTime = startTime,
+        name = name,
+        description = description,
+        locationName = location,
+        latitude = latitude,
+        longitude = longitude,
+        isFavorite = isFavorite,
+        coverPhotoUrl = images.find { image -> image.isNotBlank() }.orEmpty()
     )
 }

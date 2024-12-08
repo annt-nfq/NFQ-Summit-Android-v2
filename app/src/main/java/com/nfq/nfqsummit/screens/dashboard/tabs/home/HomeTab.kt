@@ -84,12 +84,12 @@ fun HomeTab(
         )
     }
 
-    if (showEventDetailsBottomSheet) {
+    /*if (showEventDetailsBottomSheet) {
         EventDetailsBottomSheet(
             eventId = eventId,
             onDismissRequest = { showEventDetailsBottomSheet = false }
         )
-    }
+    }*/
 
 
     HomeTabUI(

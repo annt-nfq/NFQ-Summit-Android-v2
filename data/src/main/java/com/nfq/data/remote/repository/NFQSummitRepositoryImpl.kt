@@ -8,6 +8,7 @@ import com.nfq.data.database.entity.UserEntity
 import com.nfq.data.datastore.PreferencesDataSource
 import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.domain.repository.NFQSummitRepository
+import com.nfq.data.mapper.toEventDetailsModel
 import com.nfq.data.mapper.toEventEntities
 import com.nfq.data.mapper.toUserEntity
 import com.nfq.data.network.exception.DataException
@@ -72,22 +73,8 @@ class NFQSummitRepositoryImpl @Inject constructor(
         return try {
             val details = eventDao
                 .getEventById(id)
-                .let {
-                    val startTime = it
-                        .timeStart
-                        .toFormattedDateTimeString(targetPattern = "EEE, MMM d • HH:mm")
-                    EventDetailsModel(
-                        id = it.id,
-                        startTime = startTime,
-                        name = it.name,
-                        description = it.description,
-                        locationName = it.location,
-                        latitude = it.latitude,
-                        longitude = it.longitude,
-                        isFavorite = it.isFavorite,
-                        coverPhotoUrl = it.images.find { image -> image.isNotBlank() }.orEmpty()
-                    )
-                }
+                .toEventDetailsModel()
+
             Either.Right(details)
         } catch (e: Exception) {
             Either.Left(DataException.Api(e.message ?: e.localizedMessage ?: "Unknown error"))
