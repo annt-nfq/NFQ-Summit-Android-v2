@@ -288,7 +288,7 @@ fun DrawerContent(
                             Text(
                                 text = it.title, style = MaterialTheme.typography.bodyMedium.copy(
                                     fontWeight = if (selected) FontWeight.Bold else FontWeight.W400,
-                                    color = if (selected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground,
+                                    color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground,
                                 ),
                                 modifier = Modifier.align(Alignment.CenterStart)
                             )
