@@ -51,7 +51,13 @@ fun AppNavHost(
         composable(AppDestination.Splash.route) {
             SplashScreen()
         }
-        composable(AppDestination.Onboarding.route) {
+        composable(
+            route = AppDestination.Onboarding.route,
+            enterTransition = MainTransition.enterTransition,
+            exitTransition = MainTransition.exitTransition,
+            popEnterTransition = MainTransition.enterTransition,
+            popExitTransition = MainTransition.exitTransition
+        ) {
             OnboardingScreen(
                 navigateToHome = {
                     navController.navigate(AppDestination.Dashboard.route) {
