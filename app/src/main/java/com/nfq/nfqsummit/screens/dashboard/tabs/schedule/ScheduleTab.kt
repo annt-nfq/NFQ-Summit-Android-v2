@@ -62,6 +62,7 @@ import com.nfq.nfqsummit.mocks.mockEventDay2H2
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.coroutines.launch
+import org.checkerframework.checker.units.qual.m
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.TextStyle
@@ -211,15 +212,7 @@ fun SummitSchedules(
 ) {
 
     if (dailyEvents.isEmpty()) {
-        Text(
-            text = "No events for today",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center,
-            modifier = modifier
-                .padding(16.dp)
-                .fillMaxSize()
-        )
+        EmptyEvent(modifier)
         return
     }
 
@@ -342,6 +335,26 @@ fun ScheduleDays(
         }
     }
 
+}
+
+@Composable
+private fun EmptyEvent(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "No events for today",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxSize()
+        )
+    }
 }
 
 @Composable
