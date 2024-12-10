@@ -20,10 +20,6 @@ import com.nfq.nfqsummit.screens.attractions.attractionBlogs.AttractionBlogsScre
 import com.nfq.nfqsummit.screens.blog.BlogScreen
 import com.nfq.nfqsummit.screens.bookingNumber.BookingNumberScreen
 import com.nfq.nfqsummit.screens.dashboard.DashboardScreen
-import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
-import com.nfq.nfqsummit.screens.dashboard.tabs.home.HomeTab
-import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
-import com.nfq.nfqsummit.screens.dashboard.tabs.techRocks.TechRocksTab
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsScreen
 import com.nfq.nfqsummit.screens.onboarding.OnboardingScreen
 import com.nfq.nfqsummit.screens.payment.PaymentScreen
@@ -71,7 +67,13 @@ fun AppNavHost(
                 }
             )
         }
-        composable(AppDestination.SignIn.route) {
+        composable(
+            route = AppDestination.SignIn.route,
+            enterTransition = MainTransition.enterTransition,
+            exitTransition = MainTransition.exitTransition,
+            popEnterTransition = MainTransition.enterTransition,
+            popExitTransition = MainTransition.exitTransition
+        ) {
             SignInScreen(
                 continueAsGuest = {
                     navController.navigate(AppDestination.Dashboard.route) {
@@ -105,8 +107,10 @@ fun AppNavHost(
                 goToDestination = {
                     navController.navigate(it)
                 },
-                goToDetails = {
-                    navController.navigate("${AppDestination.Blogs.route}/$it")
+                goToSignIn = {
+                    navController.navigate(AppDestination.SignIn.route) {
+                        popUpTo(AppDestination.Dashboard.route) { inclusive = true }
+                    }
                 },
                 goToAttractions = {
                     navController.navigate(AppDestination.Attractions.route)
@@ -188,39 +192,6 @@ fun AppNavHost(
             val eventId =
                 it.arguments?.getString(AppDestination.EventDetails.eventIdArg)
             EventDetailsScreen(eventId = eventId, goBack = { navController.navigateUp() })
-        }
-    }
-}
-
-@Composable
-fun DashboardNavHost(
-    goToEventDetails: (eventId: String) -> Unit,
-    goToDestination: (destination: String) -> Unit,
-    goToBlog: (blogId: Int) -> Unit,
-    goToAttractions: () -> Unit,
-    navController: NavHostController,
-    modifier: Modifier = Modifier
-) {
-    NavHost(navController = navController, startDestination = AppDestination.Home.route) {
-        composable(AppDestination.Home.route) {
-            HomeTab(
-                goToAttractions = goToAttractions
-            )
-        }
-        composable(AppDestination.Schedule.route) {
-            ScheduleTab(
-                goToEventDetails = goToEventDetails
-            )
-        }
-        composable(AppDestination.TechRocks.route) {
-            TechRocksTab(
-                goToEventDetails = goToEventDetails
-            )
-        }
-        composable(AppDestination.Explore.route) {
-            ExploreTab(
-                goToDestination = goToDestination
-            )
         }
     }
 }

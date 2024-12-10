@@ -66,6 +66,7 @@ import com.nfq.nfqsummit.ui.theme.boxShadow
 fun HomeTab(
     viewModel: HomeViewModel = hiltViewModel(),
     goToAttractions: () -> Unit,
+    goToSignIn: () -> Unit,
     seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
 ) {
@@ -96,6 +97,7 @@ fun HomeTab(
     HomeTabUI(
         uiState = uiState,
         goToAttractions = goToAttractions,
+        goToSignIn = goToSignIn,
         markAsFavorite = viewModel::markAsFavorite,
         seeAllSavedEvents = seeAllSavedEvents,
         seeAllEvents = seeAllEvents,
@@ -113,6 +115,7 @@ fun HomeTab(
 private fun HomeTabUI(
     uiState: HomeUIState,
     goToDetails: (String) -> Unit,
+    goToSignIn: () -> Unit,
     goToAttractions: () -> Unit,
     seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
@@ -126,11 +129,16 @@ private fun HomeTabUI(
             contentPadding = PaddingValues(bottom = 24.dp),
             modifier = Modifier.navigationBarsPadding()
         ) {
-            if (uiState.user != null) {
-                showQRCodeSection(
-                    onShowQRCode = onShowQRCode
-                )
-            }
+
+            showQRCodeSection(
+                onShowQRCode = {
+                    if (uiState.user == null) {
+                        goToSignIn()
+                    } else {
+                        onShowQRCode()
+                    }
+                }
+            )
 
             upcomingEventsSection(
                 upcomingEvents = uiState.upcomingEvents,
@@ -346,6 +354,7 @@ fun HomeTabUIPreview() {
         HomeTabUI(
             goToDetails = {},
             goToAttractions = {},
+            goToSignIn = {},
             markAsFavorite = { _, _ -> },
             uiState = HomeUIState(
                 upcomingEvents = mockUpcomingEvents,
@@ -363,6 +372,7 @@ fun HomeTabUIDarkPreview() {
         HomeTabUI(
             goToDetails = {},
             goToAttractions = {},
+            goToSignIn = {},
             markAsFavorite = { _, _ -> },
             uiState = HomeUIState(
                 upcomingEvents = mockUpcomingEvents,

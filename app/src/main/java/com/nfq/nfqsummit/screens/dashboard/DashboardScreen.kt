@@ -70,7 +70,7 @@ import kotlinx.coroutines.launch
 fun DashboardScreen(
     goToEventDetails: (eventId: String) -> Unit,
     goToDestination: (destination: String) -> Unit,
-    goToDetails: (eventId: Int) -> Unit,
+    goToSignIn: () -> Unit,
     goToAttractions: (country: String) -> Unit,
 ) {
 
@@ -171,7 +171,8 @@ fun DashboardScreen(
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
+                        goToSignIn = goToSignIn
                     )
                 }
                 composable(AppDestination.Schedule.route) {
@@ -394,7 +395,7 @@ fun DashboardScreenPreview() {
         DashboardScreen(
             goToEventDetails = {},
             goToDestination = {},
-            goToDetails = {},
+            goToSignIn = {},
             goToAttractions = {})
     }
 }
