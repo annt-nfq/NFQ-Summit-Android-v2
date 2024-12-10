@@ -58,7 +58,7 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 fun AttractionBlogsScreen(
     attractionId: Int,
     goBack: () -> Unit,
-    goToBlog: (blogId: Int) -> Unit,
+    goToBlog: (blogId: String) -> Unit,
     viewModel: AttractionBlogsViewModel = hiltViewModel()
 ) {
     val blogsState by viewModel.blogs.collectAsState()
@@ -84,7 +84,7 @@ fun AttractionBlogsUI(
     attraction: Attraction?,
     blogsState: Response<List<Blog>>,
     goBack: () -> Unit,
-    goToBlog: (blogId: Int) -> Unit,
+    goToBlog: (blogId: String) -> Unit,
     markAsFavorite: (favorite: Boolean, blog: Blog) -> Unit
 ) {
     Scaffold(
@@ -130,7 +130,7 @@ fun AttractionBlogsUI(
 @Composable
 fun BlogListItem(
     blog: Blog,
-    goToBlog: (blogId: Int) -> Unit,
+    goToBlog: (blogId: String) -> Unit,
     markAsFavorite: (favorite: Boolean, blog: Blog) -> Unit
 ) {
     Column(

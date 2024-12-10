@@ -1,12 +1,19 @@
 package com.nfq.data.mapper
 
+import com.nfq.data.database.entity.AttractionEntity
+import com.nfq.data.database.entity.BlogEntity
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
+import com.nfq.data.domain.model.Attraction
+import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.remote.model.response.AttendeeResponse
+import com.nfq.data.remote.model.response.AttractionResponse
+import com.nfq.data.remote.model.response.BlogResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTimeInMillis
+import kotlinx.serialization.json.JsonNull.content
 
 fun List<EventActivityResponse>.toEventEntities(): List<EventEntity> {
     return this.map { it.toEventEntity() }
@@ -67,5 +74,55 @@ fun EventEntity.toEventDetailsModel(): EventDetailsModel {
         longitude = longitude,
         isFavorite = isFavorite,
         coverPhotoUrl = images.find { image -> image.isNotBlank() }.orEmpty()
+    )
+}
+
+fun AttractionResponse.toAttractionEntity(): AttractionEntity {
+    return AttractionEntity(
+        id = id,
+        country = country,
+        iconUrl = iconUrl,
+        parentBlog = parentBlog,
+        title = title
+    )
+}
+
+fun List<AttractionEntity>.toAttractions(): List<Attraction> {
+    return this.map { it.toAttraction() }
+}
+
+fun AttractionEntity.toAttraction(): Attraction {
+    return Attraction(
+        id = id,
+        title = title,
+        icon = iconUrl,
+        country = country
+    )
+}
+
+fun BlogResponse.toBlogEntity(attractionId: String, isFavorite: Boolean): BlogEntity {
+    return BlogEntity(
+        id = id,
+        attractionId = attractionId,
+        contentUrl = contentUrl,
+        title = title,
+        description = description,
+        iconUrl = iconUrl,
+        parentBlog = parentBlog,
+        isFavorite = isFavorite
+    )
+}
+
+fun BlogEntity.toBlog(): Blog {
+    return Blog(
+        id = id,
+        attractionId = attractionId,
+        contentUrl = contentUrl,
+        title = title,
+        description = description,
+        iconUrl = iconUrl,
+        largeImageUrl = "",
+        isRecommended = false,
+        isFavorite = isFavorite
     )
 }

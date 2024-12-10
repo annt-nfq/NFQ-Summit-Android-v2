@@ -47,6 +47,7 @@ sealed class AppDestination(var route: String) {
 
     data object Attractions: AppDestination(route = "attractions") {
         const val attractionIdArg = "attractionId"
+        const val countryArg = "country"
         val routeWithArgs = "$route/{$attractionIdArg}"
         val arguments = listOf(
             navArgument(attractionIdArg) { type = NavType.IntType }

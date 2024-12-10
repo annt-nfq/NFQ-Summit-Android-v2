@@ -38,7 +38,7 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 @Composable
 fun TransportationScreen(
     goBack: () -> Unit,
-    goToBlog: (blogId: Int) -> Unit,
+    goToBlog: (blogId: String) -> Unit,
     viewModel: TransportationViewModel = hiltViewModel()
 ) {
 
@@ -56,7 +56,7 @@ fun TransportationScreen(
 @Composable
 fun TransportationScreenUI(
     goBack: () -> Unit,
-    goToBlog: (blogId: Int) -> Unit,
+    goToBlog: (blogId: String) -> Unit,
     blogs: List<Blog>?
 ) {
     Scaffold(
@@ -87,7 +87,7 @@ fun TransportationScreenUI(
 @Composable
 fun BlogGridItem(
     blog: Blog,
-    goToBlog: (blogId: Int) -> Unit
+    goToBlog: (blogId: String) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.SpaceBetween,

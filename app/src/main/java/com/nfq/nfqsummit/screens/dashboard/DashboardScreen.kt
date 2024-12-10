@@ -71,7 +71,7 @@ fun DashboardScreen(
     goToEventDetails: (eventId: String) -> Unit,
     goToDestination: (destination: AppDestination) -> Unit,
     goToDetails: (eventId: Int) -> Unit,
-    goToAttractions: () -> Unit,
+    goToAttractions: (country: String) -> Unit,
 ) {
 
     val navController = rememberNavController()
@@ -157,7 +157,7 @@ fun DashboardScreen(
             ) {
                 composable(AppDestination.Home.route) {
                     HomeTab(
-                        goToAttractions = goToAttractions,
+                        goToAttractions = { goToAttractions("") },
                         seeAllSavedEvents = {
                             navController.navigate(AppDestination.SavedEvents.route) {
                                 popUpTo(AppDestination.Home.route) { saveState = true }

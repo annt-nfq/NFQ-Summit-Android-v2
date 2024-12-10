@@ -47,7 +47,7 @@ class AttractionBlogsViewModel @Inject constructor(
     val blogs = attraction
         .filterNotNull()
         .flatMapLatest { attraction ->
-            blogRepository.getBlogsByAttractionId(attraction.id)
+            blogRepository.getBlogsByAttractionId(attraction.id.toInt())
         }
         .stateIn(
             scope = viewModelScope,

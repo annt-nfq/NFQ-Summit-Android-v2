@@ -28,6 +28,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.nfq.data.domain.model.CountryEnum
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.SegmentedControl
 import com.nfq.nfqsummit.components.bounceClick
@@ -41,6 +43,7 @@ fun ExploreTab(
 ) {
     val pagerState = rememberPagerState { 2 }
     val scope = rememberCoroutineScope()
+    val viewModel: ExploreViewModel = hiltViewModel()
 
     val exploreTHBItems = listOf(
         ExploreItem(
@@ -113,7 +116,13 @@ fun ExploreTab(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(
-                    items = if (pagerState.currentPage == 0) exploreTHBItems else exploreVDItems,
+                    items = if (pagerState.currentPage == 0) {
+                        viewModel.configCountry(CountryEnum.THAILAND)
+                        exploreTHBItems
+                    } else {
+                        viewModel.configCountry(CountryEnum.VIETNAM)
+                        exploreVDItems
+                    },
                     key = { it.title },
                     contentType = { "ExploreItem" }
                 ) { exploreItem ->

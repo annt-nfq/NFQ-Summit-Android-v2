@@ -1,37 +1,41 @@
 package com.nfq.nfqsummit.screens.attractions
 
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nfq.data.domain.model.Attraction
-import com.nfq.data.domain.model.Response
+import com.nfq.data.domain.model.CountryEnum
 import com.nfq.data.domain.repository.AttractionRepository
+import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AttractionsViewModel @Inject constructor(
     private val attractionRepository: AttractionRepository
-): ViewModel() {
+) : ViewModel() {
 
-    var attractions by mutableStateOf<List<Attraction>?>(emptyList())
-        private set
+    var attractions = attractionRepository
+        .attractions
+        .stateIn(
+            scope = viewModelScope,
+            initialValue = emptyList(),
+            started = SharingStarted.WhileSubscribed(5000)
+        )
 
-    fun getAttractions() {
-        viewModelScope.launch {
-            when(val response = attractionRepository.getAllAttractions(forceReload = false)) {
-                is Response.Success -> {
-                    attractions = response.data
+    init {
+
+        getAttractions()
+    }
+
+    private fun getAttractions() {
+        viewModelScope.launch(Dispatchers.IO) {
+            attractionRepository.getAttractions()
+                .onLeft {
+                    UserMessageManager.showMessage(it)
                 }
-                is Response.Loading -> {
-                }
-                is Response.Failure -> {
-                }
-            }
         }
     }
 }

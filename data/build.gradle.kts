@@ -77,13 +77,17 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.sqlcipher)
 
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-firestore")
+
     implementation(libs.androidx.dataStore.core)
     implementation(libs.androidx.dataStore.pref)
 
     testImplementation(libs.mockk)
     testImplementation(libs.junit)
-    testImplementation (libs.kotlinx.coroutines.test)
-    testImplementation (libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
 }
 
 sqldelight {

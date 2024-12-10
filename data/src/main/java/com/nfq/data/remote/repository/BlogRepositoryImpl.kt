@@ -118,6 +118,6 @@ class BlogRepositoryImpl @Inject constructor(
     }
 
     override suspend fun markBlogAsFavorite(blog: Blog, favorite: Boolean) {
-        blogLocal.markBlogAsFavorite(blog.id, favorite)
+        blogLocal.markBlogAsFavorite(blog.id.toInt(), favorite)
     }
 }

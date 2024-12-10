@@ -11,48 +11,48 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 val mockBlog = Blog(
-    id = 1,
+    id =" 1",
     title = "Title 1",
     description = "Description 1",
     iconUrl = "",
     contentUrl = "https://example.com",
-    attractionId = 1,
+    attractionId = "1",
     largeImageUrl = "",
     isFavorite = false,
     isRecommended = false
 )
 
 val mockFavoriteAndRecommendedBlog = Blog(
-    id = 2,
+    id = "2",
     title = "Title 2",
     description = "Description 2",
     iconUrl = "",
     contentUrl = "contentUrl",
-    attractionId = 1,
+    attractionId = "1",
     largeImageUrl = "",
     isFavorite = true,
     isRecommended = true
 )
 
 val mockFavoriteBlog = Blog(
-    id = 3,
+    id = "3",
     title = "Title 3",
     description = "Description 3",
     iconUrl = "",
     contentUrl = "contentUrl",
-    attractionId = 1,
+    attractionId = "1",
     largeImageUrl = "",
     isFavorite = true,
     isRecommended = false
 )
 
 val mockRecommendedBlog = Blog(
-    id = 4,
+    id = "4",
     title = "Title 4",
     description = "Description 4",
     iconUrl = "",
     contentUrl = "contentUrl",
-    attractionId = 1,
+    attractionId = "1",
     largeImageUrl = "",
     isFavorite = false,
     isRecommended = true
@@ -112,7 +112,7 @@ val mockSpeakerEvent2 = SummitEvent(
 )
 
 val mockAttraction = Attraction(
-    id = 1,
+    id = "1",
     title = "Attraction Title",
     icon = ""
 )

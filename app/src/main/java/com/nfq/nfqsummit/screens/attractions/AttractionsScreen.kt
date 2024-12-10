@@ -19,6 +19,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,16 +41,12 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 @Composable
 fun AttractionsScreen(
     goBack: () -> Unit,
-    goToAttraction: (attractionId: Int) -> Unit,
+    goToAttraction: (attractionId: String) -> Unit,
     viewModel: AttractionsViewModel = hiltViewModel(),
 ) {
-
-    LaunchedEffect(viewModel) {
-        viewModel.getAttractions()
-    }
-
+    val attractions by viewModel.attractions.collectAsState()
     AttractionsUI(
-        attractions = viewModel.attractions ?: emptyList(),
+        attractions = attractions,
         goBack = goBack,
         goToAttraction = goToAttraction
     )
@@ -57,7 +55,7 @@ fun AttractionsScreen(
 @Composable
 fun AttractionsUI(
     attractions: List<Attraction>, goBack: () -> Unit,
-    goToAttraction: (attractionId: Int) -> Unit = {}
+    goToAttraction: (attractionId: String) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -87,7 +85,7 @@ fun AttractionsUI(
 @Composable
 fun AttractionListItem(
     attraction: Attraction,
-    goToAttraction: (attractionId: Int) -> Unit = {}
+    goToAttraction: (attractionId: String) -> Unit = {}
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,

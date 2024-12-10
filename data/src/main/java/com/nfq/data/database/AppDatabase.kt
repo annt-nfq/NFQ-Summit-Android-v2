@@ -6,15 +6,19 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.nfq.data.BuildConfig
+import com.nfq.data.database.dao.AttractionDao
+import com.nfq.data.database.dao.BlogDao
 import com.nfq.data.database.dao.EventDao
 import com.nfq.data.database.dao.UserDao
+import com.nfq.data.database.entity.AttractionEntity
+import com.nfq.data.database.entity.BlogEntity
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
 @Database(
-    entities = [EventEntity::class, UserEntity::class],
+    entities = [EventEntity::class, UserEntity::class, BlogEntity::class, AttractionEntity::class],
     version = 1,
     exportSchema = true
 )
@@ -22,6 +26,8 @@ import net.sqlcipher.database.SupportFactory
 abstract class AppDatabase : RoomDatabase() {
     abstract fun eventDao(): EventDao
     abstract fun userDao(): UserDao
+    abstract fun attractionDao(): AttractionDao
+    abstract fun blogDao(): BlogDao
 
     companion object {
         fun buildDatabase(context: Context): AppDatabase {
