@@ -12,6 +12,9 @@ interface BlogDao {
     @Query("SELECT * FROM blog_entity WHERE attractionId = :attractionId")
     fun getBlogsByAttractionId(attractionId: String): Flow<List<BlogEntity>>
 
+    @Query("SELECT * FROM blog_entity WHERE id = :blogId")
+    fun getBlogDeatils(blogId: String): Flow<BlogEntity>
+
     @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
     suspend fun insertBlogs(blogs: List<BlogEntity>)
 

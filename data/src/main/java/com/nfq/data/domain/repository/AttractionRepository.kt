@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface AttractionRepository {
     val attractions: Flow<List<Attraction>>
     fun getBlogsByAttractionId(attractionId: String): Flow<List<Blog>>
+    fun getBlogDeatils(blogId: String): Flow<Blog>
 
     suspend fun updateFavouriteBlog(blogId: String, isFavorite: Boolean)
     suspend fun configCountry(countryEnum: CountryEnum)

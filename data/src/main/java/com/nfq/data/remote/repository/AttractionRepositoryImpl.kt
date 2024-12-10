@@ -46,6 +46,12 @@ class AttractionRepositoryImpl @Inject constructor(
             .map { it.toBlogs() }
     }
 
+    override fun getBlogDeatils(blogId: String): Flow<Blog> {
+        return blogDao
+            .getBlogDeatils(blogId)
+            .map { it.toBlog() }
+    }
+
     override suspend fun updateFavouriteBlog(blogId: String, isFavorite: Boolean) {
         blogDao.updateFavouriteBlog(blogId = blogId, isFavorite = isFavorite)
     }
@@ -65,7 +71,8 @@ class AttractionRepositoryImpl @Inject constructor(
                     val remoteBlogs = attractionResponse.blogs.map { blogResponse ->
                         blogResponse.toBlogEntity(
                             attractionId = attractionResponse.id,
-                            isFavorite = cachedBlogs?.any { it.id == blogResponse.id && it.isFavorite } ?: false
+                            isFavorite = cachedBlogs?.any { it.id == blogResponse.id && it.isFavorite }
+                                ?: false
                         )
                     }
                     blogs.addAll(remoteBlogs)

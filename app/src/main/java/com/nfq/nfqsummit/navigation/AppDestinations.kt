@@ -34,7 +34,7 @@ sealed class AppDestination(var route: String) {
         const val blogIdArg = "blogId"
         val routeWithArgs = "$route/{$blogIdArg}"
         val arguments = listOf(
-            navArgument(blogIdArg) { type = NavType.IntType }
+            navArgument(blogIdArg) { type = NavType.StringType }
         )
         val deeplinks = listOf(
             navDeepLink {

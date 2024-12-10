@@ -156,8 +156,8 @@ fun AppNavHost(
                 attractionId = attractionId!!,
                 attractionTitle = attractionTitle.orEmpty(),
                 goBack = { navController.navigateUp() },
-                goToBlog = {
-                    navController.navigate("${AppDestination.Blogs.route}/$it")
+                goToBlog = { blogId ->
+                    navController.navigate("${AppDestination.Blogs.route}/$blogId")
                 }
             )
         }
@@ -167,9 +167,9 @@ fun AppNavHost(
             arguments = AppDestination.Blogs.arguments,
             deepLinks = AppDestination.Blogs.deeplinks
         ) {
-            val blogId = it.arguments?.getInt(AppDestination.Blogs.blogIdArg)
+            val blogId = it.arguments?.getString(AppDestination.Blogs.blogIdArg)
             BlogScreen(
-                blogId = blogId ?: 0,
+                blogId = blogId!!,
                 goBack = { navController.navigateUp() }
             )
         }
