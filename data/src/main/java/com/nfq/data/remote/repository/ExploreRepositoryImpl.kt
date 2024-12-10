@@ -2,8 +2,8 @@ package com.nfq.data.remote.repository
 
 import arrow.core.Either
 import com.nfq.data.database.dao.AttractionDao
-import com.nfq.data.database.dao.BlogDao
-import com.nfq.data.database.entity.BlogEntity
+import com.nfq.data.database.dao.AttractionBlogDao
+import com.nfq.data.database.entity.AttractionBlogEntity
 import com.nfq.data.domain.model.Attraction
 import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.CountryEnum
@@ -14,7 +14,7 @@ import com.nfq.data.local.AttractionLocal
 import com.nfq.data.mapper.toAttractionEntity
 import com.nfq.data.mapper.toAttractions
 import com.nfq.data.mapper.toBlog
-import com.nfq.data.mapper.toBlogEntity
+import com.nfq.data.mapper.toAttractionBlogEntity
 import com.nfq.data.mapper.toBlogs
 import com.nfq.data.network.exception.DataException
 import com.nfq.data.remote.AttractionRemote
@@ -28,7 +28,7 @@ import javax.inject.Inject
 class ExploreRepositoryImpl @Inject constructor(
     private val attractionRemote: AttractionRemote,
     private val attractionLocal: AttractionLocal,
-    private val blogDao: BlogDao,
+    private val attractionBlogDao: AttractionBlogDao,
     private val attractionDao: AttractionDao
 ) : ExploreRepository {
     private val _countryEnumFlow = MutableStateFlow(CountryEnum.THAILAND)
@@ -41,19 +41,19 @@ class ExploreRepositoryImpl @Inject constructor(
         }
 
     override fun getBlogsByAttractionId(attractionId: String): Flow<List<Blog>> {
-        return blogDao
+        return attractionBlogDao
             .getBlogsByAttractionId(attractionId)
             .map { it.toBlogs() }
     }
 
     override fun getBlogDeatils(blogId: String): Flow<Blog> {
-        return blogDao
+        return attractionBlogDao
             .getBlogDeatils(blogId)
             .map { it.toBlog() }
     }
 
     override suspend fun updateFavouriteBlog(blogId: String, isFavorite: Boolean) {
-        blogDao.updateFavouriteBlog(blogId = blogId, isFavorite = isFavorite)
+        attractionBlogDao.updateFavouriteBlog(blogId = blogId, isFavorite = isFavorite)
     }
 
 
@@ -64,12 +64,12 @@ class ExploreRepositoryImpl @Inject constructor(
     override suspend fun getAttractions(): Either<DataException, Unit> {
         return try {
             attractionRemote.fetchAttractions().map { attractionResponses ->
-                val blogs = mutableListOf<BlogEntity>()
+                val blogs = mutableListOf<AttractionBlogEntity>()
                 val attractions = attractionResponses.map { attractionResponse ->
                     val cachedBlogs =
-                        blogDao.getBlogsByAttractionId(attractionResponse.id).firstOrNull()
+                        attractionBlogDao.getBlogsByAttractionId(attractionResponse.id).firstOrNull()
                     val remoteBlogs = attractionResponse.blogs.map { blogResponse ->
-                        blogResponse.toBlogEntity(
+                        blogResponse.toAttractionBlogEntity(
                             attractionId = attractionResponse.id,
                             isFavorite = cachedBlogs?.any { it.id == blogResponse.id && it.isFavorite }
                                 ?: false
@@ -79,7 +79,7 @@ class ExploreRepositoryImpl @Inject constructor(
                     attractionResponse.toAttractionEntity()
                 }
                 attractionDao.insertAttractions(attractions)
-                blogDao.insertBlogs(blogs)
+                attractionBlogDao.insertBlogs(blogs)
             }
             Either.Right(Unit)
         } catch (e: Exception) {

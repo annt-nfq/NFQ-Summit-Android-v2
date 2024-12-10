@@ -3,7 +3,7 @@ package com.nfq.data.database.di
 import android.content.Context
 import com.nfq.data.database.AppDatabase
 import com.nfq.data.database.dao.AttractionDao
-import com.nfq.data.database.dao.BlogDao
+import com.nfq.data.database.dao.AttractionBlogDao
 import com.nfq.data.database.dao.EventDao
 import com.nfq.data.database.dao.UserDao
 import dagger.Module
@@ -51,7 +51,7 @@ abstract class DatabaseModule {
 
         @Provides
         @Singleton
-        fun provideBlogDao(appDatabase: AppDatabase): BlogDao{
+        fun provideBlogDao(appDatabase: AppDatabase): AttractionBlogDao{
             return appDatabase.blogDao()
         }
     }

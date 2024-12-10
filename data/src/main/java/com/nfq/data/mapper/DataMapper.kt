@@ -1,7 +1,7 @@
 package com.nfq.data.mapper
 
 import com.nfq.data.database.entity.AttractionEntity
-import com.nfq.data.database.entity.BlogEntity
+import com.nfq.data.database.entity.AttractionBlogEntity
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
 import com.nfq.data.domain.model.Attraction
@@ -13,7 +13,6 @@ import com.nfq.data.remote.model.response.BlogResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTimeInMillis
-import kotlinx.serialization.json.JsonNull.content
 
 fun List<EventActivityResponse>.toEventEntities(): List<EventEntity> {
     return this.map { it.toEventEntity() }
@@ -100,23 +99,22 @@ fun AttractionEntity.toAttraction(): Attraction {
     )
 }
 
-fun BlogResponse.toBlogEntity(attractionId: String, isFavorite: Boolean): BlogEntity {
-    return BlogEntity(
+fun BlogResponse.toAttractionBlogEntity(attractionId: String, isFavorite: Boolean): AttractionBlogEntity {
+    return AttractionBlogEntity(
         id = id,
         attractionId = attractionId,
         contentUrl = contentUrl,
         title = title,
         description = description,
         iconUrl = iconUrl,
-        parentBlog = parentBlog,
         isFavorite = isFavorite
     )
 }
 
-fun List<BlogEntity>.toBlogs(): List<Blog> {
+fun List<AttractionBlogEntity>.toBlogs(): List<Blog> {
     return this.map { it.toBlog() }
 }
-fun BlogEntity.toBlog(): Blog {
+fun AttractionBlogEntity.toBlog(): Blog {
     return Blog(
         id = id,
         attractionId = attractionId,
