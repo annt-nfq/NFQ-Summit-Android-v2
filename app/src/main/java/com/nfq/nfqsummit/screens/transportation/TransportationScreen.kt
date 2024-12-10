@@ -105,6 +105,7 @@ fun BlogGridItem(
                 color = Color.White,
                 fontWeight = FontWeight(600)
             ),
+            minLines = 2,
             textAlign = TextAlign.Center
         )
         AsyncImage(
