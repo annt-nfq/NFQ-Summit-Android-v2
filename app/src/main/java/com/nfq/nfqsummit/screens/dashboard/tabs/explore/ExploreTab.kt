@@ -26,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -126,7 +127,8 @@ fun ExploreItem(
             contentDescription = "Event Image",
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(343f / 116f),
+                .aspectRatio(343f / 116f)
+                .background(Color(0xFFE6E6E6)),
             contentScale = ContentScale.FillWidth
         )
         Column(
