@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -48,7 +49,7 @@ fun ExploreTab(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(pagerState.currentPage){
+    LaunchedEffect(pagerState.currentPage) {
         if (pagerState.currentPage == 0) {
             viewModel.configCountry(CountryEnum.THAILAND)
         } else {
@@ -123,7 +124,9 @@ fun ExploreItem(
         Image(
             painter = networkImagePainter(exploreItem.imageUrl),
             contentDescription = "Event Image",
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(343f / 116f),
             contentScale = ContentScale.FillWidth
         )
         Column(
