@@ -3,7 +3,7 @@ package com.nfq.data.remote.model.response
 
 data class AttractionResponse(
     val id: String,
-    val blogs: List<BlogResponse>,
+    val blogs: List<AttractionBlogResponse>,
     val country: String,
     val iconUrl: String,
     val parentBlog: String,

@@ -7,7 +7,7 @@ import com.google.firebase.firestore.toObject
 import com.nfq.data.network.exception.DataException
 import com.nfq.data.remote.model.AttractionRemoteModel
 import com.nfq.data.remote.model.response.AttractionResponse
-import com.nfq.data.remote.model.response.BlogResponse
+import com.nfq.data.remote.model.response.AttractionBlogResponse
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
@@ -30,14 +30,13 @@ class AttractionRemoteImpl @Inject constructor(
                         id = document.id,
                         blogs = (document.get("blogs") as? List<*>)?.mapNotNull { blog ->
                             (blog as? Map<*, *>)?.let { blogMap ->
-                                BlogResponse(
+                                AttractionBlogResponse(
                                     id = blogMap["id"]?.toString().orEmpty(),
                                     attractionId = document.id,
                                     contentUrl = blogMap["content_url"]?.toString().orEmpty(),
                                     title = blogMap["title"]?.toString().orEmpty(),
                                     description = blogMap["description"]?.toString().orEmpty(),
-                                    iconUrl = blogMap["icon_url"]?.toString().orEmpty(),
-                                    parentBlog = blogMap["parentBlog"]?.toString().orEmpty()
+                                    iconUrl = blogMap["icon_url"]?.toString().orEmpty()
                                 )
                             }
                         }.orEmpty(),

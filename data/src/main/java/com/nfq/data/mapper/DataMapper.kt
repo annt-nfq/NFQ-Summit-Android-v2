@@ -9,7 +9,7 @@ import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.remote.model.response.AttendeeResponse
 import com.nfq.data.remote.model.response.AttractionResponse
-import com.nfq.data.remote.model.response.BlogResponse
+import com.nfq.data.remote.model.response.AttractionBlogResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTimeInMillis
@@ -99,7 +99,7 @@ fun AttractionEntity.toAttraction(): Attraction {
     )
 }
 
-fun BlogResponse.toAttractionBlogEntity(attractionId: String, isFavorite: Boolean): AttractionBlogEntity {
+fun AttractionBlogResponse.toAttractionBlogEntity(attractionId: String, isFavorite: Boolean): AttractionBlogEntity {
     return AttractionBlogEntity(
         id = id,
         attractionId = attractionId,
