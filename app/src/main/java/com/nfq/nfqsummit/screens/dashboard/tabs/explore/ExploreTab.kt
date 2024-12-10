@@ -46,51 +46,6 @@ fun ExploreTab(
     val scope = rememberCoroutineScope()
     val viewModel: ExploreViewModel = hiltViewModel()
 
-    /*val exploreTHBItems = listOf(
-        ExploreItem(
-            drawable = R.drawable.explore_transportation,
-            title = "Transportation \uD83D\uDE90",
-            destination = AppDestination.Transportations
-        ),
-        ExploreItem(
-            drawable = R.drawable.explore_payment,
-            title = "Payment \uD83D\uDCB8",
-            destination = AppDestination.Payment
-        ),
-        ExploreItem(
-            drawable = R.drawable.explore_attraction,
-            title = "Attraction ⭐",
-            destination = AppDestination.Attractions
-        ),
-        ExploreItem(
-            drawable = R.drawable.explore_survival_kit,
-            title = "Survival Kit \uD83D\uDEE0\uFE0F",
-            destination = AppDestination.Survival
-        )
-    )
-    val exploreVDItems = listOf(
-        ExploreItem(
-            drawable = R.drawable.explore_transportation_vd,
-            title = "Transportation \uD83D\uDE90",
-            destination = AppDestination.Transportations
-        ),
-        ExploreItem(
-            drawable = R.drawable.explore_payment,
-            title = "Payment \uD83D\uDCB8",
-            destination = AppDestination.Payment
-        ),
-        ExploreItem(
-            drawable = R.drawable.explore_attraction_vd,
-            title = "Attraction ⭐",
-            destination = AppDestination.Attractions
-        ),
-        ExploreItem(
-            drawable = R.drawable.explore_survival_kit,
-            title = "Survival Kit \uD83D\uDEE0\uFE0F",
-            destination = AppDestination.Survival
-        )
-    )*/
-
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(pagerState.currentPage){

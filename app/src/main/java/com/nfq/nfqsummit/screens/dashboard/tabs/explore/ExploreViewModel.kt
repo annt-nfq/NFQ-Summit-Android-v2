@@ -42,9 +42,20 @@ class ExploreViewModel @Inject constructor(
                 if (countryEnum == CountryEnum.THAILAND) "${AppDestination.Transportations.route}/${id}"
                 else "${AppDestination.Blogs.route}/${id}"
             }
-            "Payment" in title -> AppDestination.Payment.route
-            "Attraction" in title -> AppDestination.Attractions.route
-            "Survival Kit" in title -> AppDestination.Survival.route
+
+            "Payment" in title -> {
+                "${AppDestination.Blogs.route}/${id}"
+            }
+
+            "Attraction" in title -> {
+                AppDestination.Attractions.route
+            }
+
+            "Survival Kit" in title -> {
+                if (countryEnum == CountryEnum.THAILAND) AppDestination.Survival.route
+                else "${AppDestination.Blogs.route}/${id}"
+            }
+
             else -> throw IllegalArgumentException("Unknown destination")
         }
     )
