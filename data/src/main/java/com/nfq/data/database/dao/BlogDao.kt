@@ -15,6 +15,13 @@ interface BlogDao {
     @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
     suspend fun insertBlogs(blogs: List<BlogEntity>)
 
+    @Query("UPDATE blog_entity SET is_favorite =:isFavorite WHERE id=:blogId")
+    suspend fun updateFavouriteBlog(
+        blogId: String,
+        isFavorite: Boolean
+    )
+
+
     @Query("DELETE FROM blog_entity")
     suspend fun deleteAllBlogs()
 }

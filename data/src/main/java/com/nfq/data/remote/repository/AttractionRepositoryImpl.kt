@@ -5,6 +5,7 @@ import com.nfq.data.database.dao.AttractionDao
 import com.nfq.data.database.dao.BlogDao
 import com.nfq.data.database.entity.BlogEntity
 import com.nfq.data.domain.model.Attraction
+import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.CountryEnum
 import com.nfq.data.domain.model.Response
 import com.nfq.data.domain.model.toAttraction
@@ -12,7 +13,9 @@ import com.nfq.data.domain.repository.AttractionRepository
 import com.nfq.data.local.AttractionLocal
 import com.nfq.data.mapper.toAttractionEntity
 import com.nfq.data.mapper.toAttractions
+import com.nfq.data.mapper.toBlog
 import com.nfq.data.mapper.toBlogEntity
+import com.nfq.data.mapper.toBlogs
 import com.nfq.data.network.exception.DataException
 import com.nfq.data.remote.AttractionRemote
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +40,17 @@ class AttractionRepositoryImpl @Inject constructor(
             attractions.filter { it.country == country }.toAttractions()
         }
 
+    override fun getBlogsByAttractionId(attractionId: String): Flow<List<Blog>> {
+        return blogDao
+            .getBlogsByAttractionId(attractionId)
+            .map { it.toBlogs() }
+    }
+
+    override suspend fun updateFavouriteBlog(blogId: String, isFavorite: Boolean) {
+        blogDao.updateFavouriteBlog(blogId = blogId, isFavorite = isFavorite)
+    }
+
+
     override suspend fun configCountry(countryEnum: CountryEnum) {
         _countryEnumFlow.value = countryEnum
     }
@@ -51,7 +65,7 @@ class AttractionRepositoryImpl @Inject constructor(
                     val remoteBlogs = attractionResponse.blogs.map { blogResponse ->
                         blogResponse.toBlogEntity(
                             attractionId = attractionResponse.id,
-                            isFavorite = cachedBlogs?.any { it.id == blogResponse.id } == true
+                            isFavorite = cachedBlogs?.any { it.id == blogResponse.id && it.isFavorite } ?: false
                         )
                     }
                     blogs.addAll(remoteBlogs)

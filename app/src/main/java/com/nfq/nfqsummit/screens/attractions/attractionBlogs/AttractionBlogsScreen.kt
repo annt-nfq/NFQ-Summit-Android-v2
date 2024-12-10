@@ -29,7 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,12 +42,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.nfq.data.domain.model.Attraction
 import com.nfq.data.domain.model.Blog
-import com.nfq.data.domain.model.Response
 import com.nfq.nfqsummit.components.BasicTopAppBar
 import com.nfq.nfqsummit.components.bounceClick
-import com.nfq.nfqsummit.mocks.mockAttraction
 import com.nfq.nfqsummit.mocks.mockBlog
 import com.nfq.nfqsummit.mocks.mockFavoriteAndRecommendedBlog
 import com.nfq.nfqsummit.ui.theme.NFQOrange
@@ -56,21 +52,17 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
 @Composable
 fun AttractionBlogsScreen(
-    attractionId: Int,
+    attractionTitle: String,
+    attractionId: String,
     goBack: () -> Unit,
     goToBlog: (blogId: String) -> Unit,
     viewModel: AttractionBlogsViewModel = hiltViewModel()
 ) {
-    val blogsState by viewModel.blogs.collectAsState()
-    val attractionState by viewModel.attraction.collectAsState()
-
-    LaunchedEffect(viewModel) {
-        viewModel.getAttraction(attractionId)
-    }
+    val blogs by viewModel.blogs.collectAsState()
 
     AttractionBlogsUI(
-        attraction = attractionState,
-        blogsState = blogsState,
+        attractionTitle = attractionTitle,
+        blogs = blogs,
         goBack = goBack,
         goToBlog = goToBlog,
         markAsFavorite = { favorite, blog ->
@@ -81,8 +73,8 @@ fun AttractionBlogsScreen(
 
 @Composable
 fun AttractionBlogsUI(
-    attraction: Attraction?,
-    blogsState: Response<List<Blog>>,
+    attractionTitle: String,
+    blogs: List<Blog>,
     goBack: () -> Unit,
     goToBlog: (blogId: String) -> Unit,
     markAsFavorite: (favorite: Boolean, blog: Blog) -> Unit
@@ -90,38 +82,26 @@ fun AttractionBlogsUI(
     Scaffold(
         topBar = {
             BasicTopAppBar(
-                title = attraction?.title ?: "Attraction",
+                title = attractionTitle,
                 navigationUp = goBack
             )
         }
     ) { paddingValues ->
-        when (blogsState) {
-            is Response.Loading -> {
-                Text("Loading")
-            }
-
-            is Response.Failure -> {
-                Text(blogsState.e.message ?: "Error")
-            }
-
-            is Response.Success -> {
-                LazyColumn(
-                    modifier = Modifier.padding(paddingValues),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(
-                        items = blogsState.data!!,
-                        key = { it.id },
-                        contentType = { "BlogListItem" }
-                    ) { blog ->
-                        BlogListItem(
-                            blog = blog,
-                            goToBlog = goToBlog,
-                            markAsFavorite = markAsFavorite
-                        )
-                    }
-                }
+        LazyColumn(
+            modifier = Modifier.padding(paddingValues),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(
+                items = blogs,
+                key = { it.id },
+                contentType = { "BlogListItem" }
+            ) { blog ->
+                BlogListItem(
+                    blog = blog,
+                    goToBlog = goToBlog,
+                    markAsFavorite = markAsFavorite
+                )
             }
         }
     }
@@ -225,12 +205,10 @@ fun BlogListItem(
 fun AttractionBlogsUIPreview() {
     NFQSnapshotTestThemeForPreview {
         AttractionBlogsUI(
-            attraction = mockAttraction,
-            blogsState = Response.Success(
-                listOf(
-                    mockBlog,
-                    mockFavoriteAndRecommendedBlog
-                )
+            attractionTitle = "Attraction Title",
+            blogs = listOf(
+                mockBlog,
+                mockFavoriteAndRecommendedBlog
             ),
             goBack = {},
             goToBlog = {},
@@ -244,12 +222,10 @@ fun AttractionBlogsUIPreview() {
 fun AttractionBlogsUIDarkPreview() {
     NFQSnapshotTestThemeForPreview(darkTheme = true) {
         AttractionBlogsUI(
-            attraction = mockAttraction,
-            blogsState = Response.Success(
-                listOf(
-                    mockBlog,
-                    mockFavoriteAndRecommendedBlog
-                )
+            attractionTitle = "Attraction Title",
+            blogs = listOf(
+                mockBlog,
+                mockFavoriteAndRecommendedBlog
             ),
             goBack = {},
             goToBlog = {},

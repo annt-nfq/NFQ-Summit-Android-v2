@@ -2,7 +2,6 @@ package com.nfq.nfqsummit.screens.attractions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nfq.data.domain.model.CountryEnum
 import com.nfq.data.domain.repository.AttractionRepository
 import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel

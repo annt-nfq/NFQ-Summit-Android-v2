@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -41,7 +40,7 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 @Composable
 fun AttractionsScreen(
     goBack: () -> Unit,
-    goToAttraction: (attractionId: String) -> Unit,
+    goToAttraction: (attractionId: String, attractionTitle: String) -> Unit,
     viewModel: AttractionsViewModel = hiltViewModel(),
 ) {
     val attractions by viewModel.attractions.collectAsState()
@@ -55,7 +54,7 @@ fun AttractionsScreen(
 @Composable
 fun AttractionsUI(
     attractions: List<Attraction>, goBack: () -> Unit,
-    goToAttraction: (attractionId: String) -> Unit = {}
+    goToAttraction: (attractionId: String, attractionTitle: String) -> Unit = { _, _ -> }
 ) {
     Scaffold(
         topBar = {
@@ -85,7 +84,7 @@ fun AttractionsUI(
 @Composable
 fun AttractionListItem(
     attraction: Attraction,
-    goToAttraction: (attractionId: String) -> Unit = {}
+    goToAttraction: (attractionId: String, attractionTitle: String) -> Unit = { _, _ -> }
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -95,7 +94,7 @@ fun AttractionListItem(
             .bounceClick()
             .clip(RoundedCornerShape(16.dp))
             .background(NFQOrange)
-            .clickable { goToAttraction(attraction.id) }
+            .clickable { goToAttraction(attraction.id, attraction.title) }
 
     ) {
         Spacer(modifier = Modifier.width(24.dp))

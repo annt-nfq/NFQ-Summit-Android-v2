@@ -8,19 +8,19 @@ sealed class AppDestination(var route: String) {
 
     data object Onboarding : AppDestination(route = "onboarding")
 
-    data object BookingNumber: AppDestination(route = "booking")
+    data object BookingNumber : AppDestination(route = "booking")
 
     data object Dashboard : AppDestination(route = "dashboard")
 
-    data object Home: AppDestination(route = "home")
+    data object Home : AppDestination(route = "home")
 
-    data object Schedule: AppDestination(route = "schedule")
+    data object Schedule : AppDestination(route = "schedule")
 
-    data object TechRocks: AppDestination(route = "techRocks")
+    data object TechRocks : AppDestination(route = "techRocks")
 
-    data object Explore: AppDestination(route = "explore")
+    data object Explore : AppDestination(route = "explore")
 
-    data object SavedEvents: AppDestination(route = "savedEvents")
+    data object SavedEvents : AppDestination(route = "savedEvents")
 
     data object Splash : AppDestination(route = "splash")
 
@@ -45,16 +45,17 @@ sealed class AppDestination(var route: String) {
 
     data object Transportations : AppDestination(route = "transportations")
 
-    data object Attractions: AppDestination(route = "attractions") {
+    data object Attractions : AppDestination(route = "attractions") {
         const val attractionIdArg = "attractionId"
-        const val countryArg = "country"
-        val routeWithArgs = "$route/{$attractionIdArg}"
+        const val attractionTitleArg = "attractionTitle"
+        val routeWithArgs = "$route/{$attractionIdArg}/{$attractionTitleArg}"
         val arguments = listOf(
-            navArgument(attractionIdArg) { type = NavType.IntType }
+            navArgument(attractionIdArg) { type = NavType.StringType },
+            navArgument(attractionTitleArg) { type = NavType.StringType }
         )
         val deeplinks = listOf(
             navDeepLink {
-                uriPattern = "nfqsummit://$route/{$attractionIdArg}"
+                uriPattern = "nfqsummit://$route/{$attractionIdArg}/{$attractionTitleArg}"
             }
         )
     }

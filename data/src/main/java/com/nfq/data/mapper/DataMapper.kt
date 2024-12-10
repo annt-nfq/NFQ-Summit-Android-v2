@@ -113,6 +113,9 @@ fun BlogResponse.toBlogEntity(attractionId: String, isFavorite: Boolean): BlogEn
     )
 }
 
+fun List<BlogEntity>.toBlogs(): List<Blog> {
+    return this.map { it.toBlog() }
+}
 fun BlogEntity.toBlog(): Blog {
     return Blog(
         id = id,

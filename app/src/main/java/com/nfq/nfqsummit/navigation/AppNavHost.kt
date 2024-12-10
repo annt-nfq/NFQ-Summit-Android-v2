@@ -138,8 +138,8 @@ fun AppNavHost(
         composable(AppDestination.Attractions.route) {
             AttractionsScreen(
                 goBack = { navController.navigateUp() },
-                goToAttraction = {
-                    navController.navigate("${AppDestination.Attractions.route}/${it}")
+                goToAttraction = { attractionId, attractionTitle ->
+                    navController.navigate("${AppDestination.Attractions.route}/${attractionId}/${attractionTitle}")
                 }
             )
         }
@@ -149,9 +149,12 @@ fun AppNavHost(
             arguments = AppDestination.Attractions.arguments,
             deepLinks = AppDestination.Attractions.deeplinks
         ) {
-            val attractionId = it.arguments?.getInt(AppDestination.Attractions.attractionIdArg)
+            val attractionId = it.arguments?.getString(AppDestination.Attractions.attractionIdArg)
+            val attractionTitle =
+                it.arguments?.getString(AppDestination.Attractions.attractionTitleArg)
             AttractionBlogsScreen(
-                attractionId = attractionId ?: 0,
+                attractionId = attractionId!!,
+                attractionTitle = attractionTitle.orEmpty(),
                 goBack = { navController.navigateUp() },
                 goToBlog = {
                     navController.navigate("${AppDestination.Blogs.route}/$it")
