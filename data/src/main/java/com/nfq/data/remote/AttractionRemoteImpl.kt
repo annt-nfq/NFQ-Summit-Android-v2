@@ -8,6 +8,7 @@ import com.nfq.data.network.exception.DataException
 import com.nfq.data.remote.model.AttractionRemoteModel
 import com.nfq.data.remote.model.response.AttractionResponse
 import com.nfq.data.remote.model.response.AttractionBlogResponse
+import com.nfq.data.remote.model.response.BlogResponse
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
@@ -48,6 +49,29 @@ class AttractionRemoteImpl @Inject constructor(
                 }
 
             Either.Right(attractions)
+        } catch (e: Exception) {
+            Either.Left(DataException.Api(e.message ?: "An error occurred"))
+        }
+    }
+
+    override suspend fun fetchBlogs(): Either<DataException, List<BlogResponse>> {
+        return try {
+            val querySnapshot = db.collection("blogs")
+                .get()
+                .await()
+            val blogs = querySnapshot
+                .documents
+                .mapNotNull { document ->
+                    BlogResponse(
+                        id = document.id,
+                        contentUrl = document.getString("content_url").orEmpty(),
+                        country = document.getString("country").orEmpty(),
+                        iconUrl = document.getString("icon_url").orEmpty(),
+                        parentBlog = document.getString("parent_blog").orEmpty(),
+                        title = document.getString("title").orEmpty()
+                    )
+                }
+            Either.Right(blogs)
         } catch (e: Exception) {
             Either.Left(DataException.Api(e.message ?: "An error occurred"))
         }

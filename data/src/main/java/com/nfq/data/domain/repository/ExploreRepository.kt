@@ -11,11 +11,14 @@ import kotlinx.coroutines.flow.Flow
 interface ExploreRepository {
     val attractions: Flow<List<Attraction>>
     fun getBlogsByAttractionId(attractionId: String): Flow<List<Blog>>
-    fun getBlogDeatils(blogId: String): Flow<Blog>
+    fun getBlogDetails(blogId: String): Flow<Blog>
+    fun getTransportationBlogs(parentBlogId: String): Flow<List<Blog>>
+    fun exploreBlogs(countryEnum: CountryEnum): Flow<List<Blog>>
 
     suspend fun updateFavouriteBlog(blogId: String, isFavorite: Boolean)
     suspend fun configCountry(countryEnum: CountryEnum)
-    suspend fun getAttractions(): Either<DataException, Unit>
+    suspend fun fetchAttractions(): Either<DataException, Unit>
+    suspend fun fetchBlogs(): Either<DataException, Unit>
     suspend fun getAllAttractions(forceReload: Boolean = false): Response<List<Attraction>>
 
     suspend fun getAttractionById(attractionId: Int): Response<Attraction>

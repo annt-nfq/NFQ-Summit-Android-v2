@@ -16,7 +16,7 @@ class BlogViewModel @Inject constructor(
 ) : ViewModel() {
     private val blogId = savedStateHandle.get<String>("blogId")!!
     var blog = exploreRepository
-        .getBlogDeatils(blogId = blogId)
+        .getBlogDetails(blogId = blogId)
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),

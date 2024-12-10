@@ -3,6 +3,8 @@ package com.nfq.nfqsummit.navigation
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.nfq.nfqsummit.navigation.AppDestination.Blogs.blogIdArg
+import com.nfq.nfqsummit.navigation.AppDestination.Transportations.parentBlogId
 
 sealed class AppDestination(var route: String) {
 
@@ -34,7 +36,7 @@ sealed class AppDestination(var route: String) {
         const val blogIdArg = "blogId"
         val routeWithArgs = "$route/{$blogIdArg}"
         val arguments = listOf(
-            navArgument(blogIdArg) { type = NavType.StringType }
+            navArgument(blogIdArg) { type = NavType.StringType },
         )
         val deeplinks = listOf(
             navDeepLink {
@@ -43,7 +45,18 @@ sealed class AppDestination(var route: String) {
         )
     }
 
-    data object Transportations : AppDestination(route = "transportations")
+    data object Transportations : AppDestination(route = "transportations"){
+        const val parentBlogId = "parentBlogId"
+        val routeWithArgs = "$route/{$parentBlogId}"
+        val arguments = listOf(
+            navArgument(parentBlogId) { type = NavType.StringType }
+        )
+        val deeplinks = listOf(
+            navDeepLink {
+                uriPattern = "nfqsummit://$route/{$parentBlogId}"
+            }
+        )
+    }
 
     data object Attractions : AppDestination(route = "attractions") {
         const val attractionIdArg = "attractionId"

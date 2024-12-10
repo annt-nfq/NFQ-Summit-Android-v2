@@ -69,7 +69,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DashboardScreen(
     goToEventDetails: (eventId: String) -> Unit,
-    goToDestination: (destination: AppDestination) -> Unit,
+    goToDestination: (destination: String) -> Unit,
     goToDetails: (eventId: Int) -> Unit,
     goToAttractions: (country: String) -> Unit,
 ) {

@@ -103,7 +103,7 @@ fun AppNavHost(
                     )
                 },
                 goToDestination = {
-                    navController.navigate(it.route)
+                    navController.navigate(it)
                 },
                 goToDetails = {
                     navController.navigate("${AppDestination.Blogs.route}/$it")
@@ -120,11 +120,17 @@ fun AppNavHost(
             )
         }
 
-        composable(AppDestination.Transportations.route) {
+        composable(
+            route = AppDestination.Transportations.routeWithArgs,
+            arguments = AppDestination.Transportations.arguments,
+            deepLinks = AppDestination.Transportations.deeplinks
+        ) {
+            val parentBlogId = it.arguments?.getString(AppDestination.Transportations.parentBlogId)
             TransportationScreen(
+                parentBlogId = parentBlogId!!,
                 goBack = { navController.navigateUp() },
-                goToBlog = {
-                    navController.navigate("${AppDestination.Blogs.route}/$it")
+                goToBlog = { blogId ->
+                    navController.navigate("${AppDestination.Blogs.route}/$blogId")
                 }
             )
         }
@@ -189,7 +195,7 @@ fun AppNavHost(
 @Composable
 fun DashboardNavHost(
     goToEventDetails: (eventId: String) -> Unit,
-    goToDestination: (destination: AppDestination) -> Unit,
+    goToDestination: (destination: String) -> Unit,
     goToBlog: (blogId: Int) -> Unit,
     goToAttractions: () -> Unit,
     navController: NavHostController,

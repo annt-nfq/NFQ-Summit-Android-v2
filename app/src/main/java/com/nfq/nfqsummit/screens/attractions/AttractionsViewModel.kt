@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AttractionsViewModel @Inject constructor(
-    private val exploreRepository: ExploreRepository
+    exploreRepository: ExploreRepository
 ) : ViewModel() {
 
     var attractions = exploreRepository
@@ -23,18 +23,4 @@ class AttractionsViewModel @Inject constructor(
             initialValue = emptyList(),
             started = SharingStarted.WhileSubscribed(5000)
         )
-
-    init {
-
-        getAttractions()
-    }
-
-    private fun getAttractions() {
-        viewModelScope.launch(Dispatchers.IO) {
-            exploreRepository.getAttractions()
-                .onLeft {
-                    UserMessageManager.showMessage(it)
-                }
-        }
-    }
 }

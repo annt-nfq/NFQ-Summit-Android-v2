@@ -2,6 +2,7 @@ package com.nfq.data.mapper
 
 import com.nfq.data.database.entity.AttractionEntity
 import com.nfq.data.database.entity.AttractionBlogEntity
+import com.nfq.data.database.entity.BlogEntity
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
 import com.nfq.data.domain.model.Attraction
@@ -10,6 +11,7 @@ import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.remote.model.response.AttendeeResponse
 import com.nfq.data.remote.model.response.AttractionResponse
 import com.nfq.data.remote.model.response.AttractionBlogResponse
+import com.nfq.data.remote.model.response.BlogResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTimeInMillis
@@ -99,21 +101,28 @@ fun AttractionEntity.toAttraction(): Attraction {
     )
 }
 
-fun AttractionBlogResponse.toAttractionBlogEntity(attractionId: String, isFavorite: Boolean): AttractionBlogEntity {
-    return AttractionBlogEntity(
+fun AttractionBlogResponse.toBlogEntity(
+    attractionId: String,
+    isFavorite: Boolean
+): BlogEntity {
+    return BlogEntity(
         id = id,
         attractionId = attractionId,
         contentUrl = contentUrl,
         title = title,
         description = description,
         iconUrl = iconUrl,
-        isFavorite = isFavorite
+        isFavorite = isFavorite,
+        parentBlog = "",
+        country = ""
     )
 }
 
-fun List<AttractionBlogEntity>.toBlogs(): List<Blog> {
+
+fun List<AttractionBlogEntity>.toAttractionBlogs(): List<Blog> {
     return this.map { it.toBlog() }
 }
+
 fun AttractionBlogEntity.toBlog(): Blog {
     return Blog(
         id = id,
@@ -125,5 +134,37 @@ fun AttractionBlogEntity.toBlog(): Blog {
         largeImageUrl = "",
         isRecommended = false,
         isFavorite = isFavorite
+    )
+}
+
+fun BlogResponse.toBlogEntity(): BlogEntity {
+    return BlogEntity(
+        id = id,
+        contentUrl = contentUrl,
+        country = country,
+        iconUrl = iconUrl,
+        parentBlog = parentBlog,
+        title = title,
+        isFavorite = false,
+        description = "",
+        attractionId = ""
+    )
+}
+
+fun List<BlogEntity>.toBlogs(): List<Blog> {
+    return this.map { it.toBlog() }
+}
+
+fun BlogEntity.toBlog(): Blog {
+    return Blog(
+        id = id,
+        attractionId = "",
+        contentUrl = contentUrl,
+        title = title,
+        description = "",
+        iconUrl = iconUrl,
+        largeImageUrl = "",
+        isRecommended = false,
+        isFavorite = false
     )
 }

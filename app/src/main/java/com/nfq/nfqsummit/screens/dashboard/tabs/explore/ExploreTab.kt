@@ -1,6 +1,5 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.explore
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,33 +18,35 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.CountryEnum
-import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.SegmentedControl
 import com.nfq.nfqsummit.components.bounceClick
+import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.coroutines.launch
 
 @Composable
 fun ExploreTab(
-    goToDestination: (destination: AppDestination) -> Unit = {}
+    goToDestination: (destination: String) -> Unit = {}
 ) {
     val pagerState = rememberPagerState { 2 }
     val scope = rememberCoroutineScope()
     val viewModel: ExploreViewModel = hiltViewModel()
 
-    val exploreTHBItems = listOf(
+    /*val exploreTHBItems = listOf(
         ExploreItem(
             drawable = R.drawable.explore_transportation,
             title = "Transportation \uD83D\uDE90",
@@ -88,7 +89,17 @@ fun ExploreTab(
             title = "Survival Kit \uD83D\uDEE0\uFE0F",
             destination = AppDestination.Survival
         )
-    )
+    )*/
+
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(pagerState.currentPage){
+        if (pagerState.currentPage == 0) {
+            viewModel.configCountry(CountryEnum.THAILAND)
+        } else {
+            viewModel.configCountry(CountryEnum.VIETNAM)
+        }
+    }
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
@@ -117,11 +128,9 @@ fun ExploreTab(
             ) {
                 items(
                     items = if (pagerState.currentPage == 0) {
-                        viewModel.configCountry(CountryEnum.THAILAND)
-                        exploreTHBItems
+                        uiState.exploreThailand
                     } else {
-                        viewModel.configCountry(CountryEnum.VIETNAM)
-                        exploreVDItems
+                        uiState.exploreVietnam
                     },
                     key = { it.title },
                     contentType = { "ExploreItem" }
@@ -137,15 +146,15 @@ fun ExploreTab(
 }
 
 data class ExploreItem(
-    @DrawableRes val drawable: Int,
+    val imageUrl: String,
     val title: String,
-    val destination: AppDestination
+    val destination: String
 )
 
 @Composable
 fun ExploreItem(
     exploreItem: ExploreItem,
-    goToDestination: (destination: AppDestination) -> Unit
+    goToDestination: (destination: String) -> Unit
 ) {
     Box(
         contentAlignment = Alignment.BottomStart,
@@ -157,7 +166,7 @@ fun ExploreItem(
             }
     ) {
         Image(
-            painter = painterResource(id = exploreItem.drawable),
+            painter = networkImagePainter(exploreItem.imageUrl),
             contentDescription = "Event Image",
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.FillWidth
@@ -209,9 +218,9 @@ private fun ExploreItemPreview() {
     NFQSnapshotTestThemeForPreview {
         ExploreItem(
             exploreItem = ExploreItem(
-                drawable = R.drawable.explore_transportation,
+                imageUrl = "",
                 title = "Transportation \uD83D\uDE90",
-                destination = AppDestination.Attractions
+                destination = AppDestination.Attractions.route
             ),
             goToDestination = {}
         )
