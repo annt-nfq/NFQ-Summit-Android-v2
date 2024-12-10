@@ -2,7 +2,7 @@ package com.nfq.nfqsummit.screens.attractions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nfq.data.domain.repository.AttractionRepository
+import com.nfq.data.domain.repository.ExploreRepository
 import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -13,10 +13,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AttractionsViewModel @Inject constructor(
-    private val attractionRepository: AttractionRepository
+    private val exploreRepository: ExploreRepository
 ) : ViewModel() {
 
-    var attractions = attractionRepository
+    var attractions = exploreRepository
         .attractions
         .stateIn(
             scope = viewModelScope,
@@ -31,7 +31,7 @@ class AttractionsViewModel @Inject constructor(
 
     private fun getAttractions() {
         viewModelScope.launch(Dispatchers.IO) {
-            attractionRepository.getAttractions()
+            exploreRepository.getAttractions()
                 .onLeft {
                     UserMessageManager.showMessage(it)
                 }

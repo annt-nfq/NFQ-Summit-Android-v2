@@ -1,6 +1,6 @@
 package com.nfq.nfqsummit.di
 
-import com.nfq.data.domain.repository.AttractionRepository
+import com.nfq.data.domain.repository.ExploreRepository
 import com.nfq.data.domain.repository.BlogRepository
 import com.nfq.data.domain.repository.EventRepository
 import com.nfq.data.domain.repository.TranslationRepository
@@ -30,9 +30,9 @@ abstract class FakeRepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindAttractionRepository(
-        fakeAttractionRepository: FakeAttractionRepository
-    ): AttractionRepository
+    abstract fun bindFakeExploreRepository(
+        fakeAttractionRepository: FakeExploreRepository
+    ): ExploreRepository
 
     @Binds
     @Singleton

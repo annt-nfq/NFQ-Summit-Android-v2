@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.model.Blog
-import com.nfq.data.domain.repository.AttractionRepository
+import com.nfq.data.domain.repository.ExploreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -13,12 +13,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AttractionBlogsViewModel @Inject constructor(
-    private val attractRepository: AttractionRepository,
+    private val exploreRepository: ExploreRepository,
     saveStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val attractionId = saveStateHandle.get<String>("attractionId")!!
 
-    val blogs = attractRepository
+    val blogs = exploreRepository
         .getBlogsByAttractionId(attractionId = attractionId)
         .stateIn(
             scope = viewModelScope,
@@ -28,7 +28,7 @@ class AttractionBlogsViewModel @Inject constructor(
 
     fun markBlogAsFavorite(favorite: Boolean, blog: Blog) {
         viewModelScope.launch {
-            attractRepository.updateFavouriteBlog(blogId = blog.id, isFavorite = favorite)
+            exploreRepository.updateFavouriteBlog(blogId = blog.id, isFavorite = favorite)
         }
     }
 }

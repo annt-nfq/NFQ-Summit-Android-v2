@@ -9,7 +9,7 @@ import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.CountryEnum
 import com.nfq.data.domain.model.Response
 import com.nfq.data.domain.model.toAttraction
-import com.nfq.data.domain.repository.AttractionRepository
+import com.nfq.data.domain.repository.ExploreRepository
 import com.nfq.data.local.AttractionLocal
 import com.nfq.data.mapper.toAttractionEntity
 import com.nfq.data.mapper.toAttractions
@@ -25,12 +25,12 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class AttractionRepositoryImpl @Inject constructor(
+class ExploreRepositoryImpl @Inject constructor(
     private val attractionRemote: AttractionRemote,
     private val attractionLocal: AttractionLocal,
     private val blogDao: BlogDao,
     private val attractionDao: AttractionDao
-) : AttractionRepository {
+) : ExploreRepository {
     private val _countryEnumFlow = MutableStateFlow(CountryEnum.THAILAND)
     override val attractions: Flow<List<Attraction>>
         get() = combine(

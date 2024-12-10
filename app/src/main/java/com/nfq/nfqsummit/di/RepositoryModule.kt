@@ -1,11 +1,11 @@
 package com.nfq.nfqsummit.di
 
-import com.nfq.data.domain.repository.AttractionRepository
+import com.nfq.data.domain.repository.ExploreRepository
 import com.nfq.data.domain.repository.BlogRepository
 import com.nfq.data.domain.repository.EventRepository
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.data.domain.repository.TranslationRepository
-import com.nfq.data.remote.repository.AttractionRepositoryImpl
+import com.nfq.data.remote.repository.ExploreRepositoryImpl
 import com.nfq.data.remote.repository.BlogRepositoryImpl
 import com.nfq.data.remote.repository.EventRepositoryImpl
 import com.nfq.data.remote.repository.NFQSummitRepositoryImpl
@@ -34,8 +34,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAttractionRepository(
-        attractionRepositoryImpl: AttractionRepositoryImpl
-    ): AttractionRepository
+        attractionRepositoryImpl: ExploreRepositoryImpl
+    ): ExploreRepository
 
     @Binds
     @Singleton

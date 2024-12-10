@@ -8,7 +8,7 @@ import com.nfq.data.domain.model.Response
 import com.nfq.data.network.exception.DataException
 import kotlinx.coroutines.flow.Flow
 
-interface AttractionRepository {
+interface ExploreRepository {
     val attractions: Flow<List<Attraction>>
     fun getBlogsByAttractionId(attractionId: String): Flow<List<Blog>>
     fun getBlogDeatils(blogId: String): Flow<Blog>
