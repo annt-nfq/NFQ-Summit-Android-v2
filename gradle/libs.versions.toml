@@ -1,6 +1,7 @@
 [versions]
 agp = "8.5.1"
 core = "3.5.1"
+firebaseBom = "33.7.0"
 kotlin = "1.9.23"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -33,7 +34,6 @@ robolectric = "4.11.1"
 hamcrest = "1.3"
 jacoco = "0.8.10"
 compose-markdown = "0.5.2"
-firebase-bom = "33.1.2"
 androidx-splashscreen = "1.0.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerializationJson = "1.0.0"
@@ -100,9 +100,12 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 hamcrest-core = { group = "org.hamcrest", name = "hamcrest-core", version.ref = "hamcrest" }
 compose-markdown = { group = "com.github.jeziellago", name = "compose-markdown", version.ref = "compose-markdown" }
-firebase-bom = {group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom"}
+
+#Firebase
+firebase-bom = {group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom"}
 firebase-analytics = {group = "com.google.firebase", name = "firebase-analytics-ktx"}
 firebase-crashlytics = {group = "com.google.firebase", name = "firebase-crashlytics-ktx"}
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-kotlin-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerializationJson" }

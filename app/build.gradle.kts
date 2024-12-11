@@ -22,8 +22,8 @@ android {
         applicationId = "com.nfq.nfqsummit"
         minSdk = 26
         targetSdk = 34
-        versionCode = 101000
-        versionName = "1.1.0"
+        versionCode = 101001
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "com.nfq.nfqsummit.HiltTestRunner"
         vectorDrawables {
