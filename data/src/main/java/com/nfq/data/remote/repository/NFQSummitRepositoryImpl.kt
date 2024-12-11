@@ -10,6 +10,7 @@ import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.data.mapper.toEventDetailsModel
 import com.nfq.data.mapper.toEventEntities
+import com.nfq.data.mapper.toEventEntity
 import com.nfq.data.mapper.toUserEntity
 import com.nfq.data.network.exception.DataException
 import com.nfq.data.remote.datasource.NFQSummitDataSource
@@ -56,16 +57,17 @@ class NFQSummitRepositoryImpl @Inject constructor(
             .map { latestEvents ->
                 val favoriteEvents = eventDao.getFavoriteEvents().firstOrNull().orEmpty()
                 val updatedEvents = updateEventsWithFavorites(latestEvents, favoriteEvents)
-                eventDao.insertEvents(updatedEvents.toEventEntities())
+                eventDao.deleteAllEvents()
+                eventDao.insertEvents(updatedEvents)
             }
     }
 
     private fun updateEventsWithFavorites(
         latestEvents: List<EventActivityResponse>,
         favoriteEvents: List<EventEntity>
-    ): List<EventActivityResponse> {
+    ): List<EventEntity> {
         return latestEvents.map { event ->
-            event.copy(isFavorite = favoriteEvents.any { favoriteEvent -> favoriteEvent.id == event.id.toString() })
+            event.copy(isFavorite = favoriteEvents.any { favoriteEvent -> favoriteEvent.id == event.id.toString() }).toEventEntity()
         }
     }
 
