@@ -62,7 +62,6 @@ import com.nfq.nfqsummit.mocks.mockEventDay2H2
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.coroutines.launch
-import org.checkerframework.checker.units.qual.m
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.TextStyle

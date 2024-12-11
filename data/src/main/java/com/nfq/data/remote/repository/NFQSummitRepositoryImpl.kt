@@ -9,13 +9,11 @@ import com.nfq.data.datastore.PreferencesDataSource
 import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.data.mapper.toEventDetailsModel
-import com.nfq.data.mapper.toEventEntities
 import com.nfq.data.mapper.toEventEntity
 import com.nfq.data.mapper.toUserEntity
 import com.nfq.data.network.exception.DataException
 import com.nfq.data.remote.datasource.NFQSummitDataSource
 import com.nfq.data.remote.model.response.EventActivityResponse
-import com.nfq.data.toFormattedDateTimeString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map

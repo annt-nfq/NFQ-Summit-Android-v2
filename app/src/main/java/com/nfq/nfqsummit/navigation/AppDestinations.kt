@@ -3,8 +3,6 @@ package com.nfq.nfqsummit.navigation
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.nfq.nfqsummit.navigation.AppDestination.Blogs.blogIdArg
-import com.nfq.nfqsummit.navigation.AppDestination.Transportations.parentBlogId
 
 sealed class AppDestination(var route: String) {
 
