@@ -38,6 +38,7 @@ import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
+import java.time.LocalDateTime
 
 @Composable
 fun UpcomingEventCard(
@@ -65,7 +66,9 @@ fun UpcomingEventCard(
                         .aspectRatio(221f / 131f)
                 )
                 BookmarkItem(
-                    modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp),
                     isFavorite = uiModel.isFavorite,
                     id = uiModel.id,
                     markAsFavorite = markAsFavorite,
@@ -144,6 +147,7 @@ private fun UpcomingEventPreview() {
                     imageUrl = "",
                     isFavorite = false,
                     startAndEndTime = "10:00 - 12:00",
+                    startDateTime = LocalDateTime.now(),
                     tag = "\uD83D\uDCBC Summit"
                 ),
                 goToDetails = { },

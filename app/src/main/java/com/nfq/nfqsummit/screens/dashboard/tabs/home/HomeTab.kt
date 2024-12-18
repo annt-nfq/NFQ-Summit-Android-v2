@@ -1,5 +1,12 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
+import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
@@ -38,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -46,7 +54,10 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.components.bounceClick
@@ -57,6 +68,7 @@ import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.SavedEventCard
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.UpcomingEventCard
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
+import com.nfq.nfqsummit.screens.eventDetails.setUpScheduler
 import com.nfq.nfqsummit.screens.qrCode.QRCodeBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -70,11 +82,19 @@ fun HomeTab(
     seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     var showEventDetailsBottomSheet by remember { mutableStateOf(false) }
     var eventId by remember { mutableStateOf("") }
     var showQRCodeBottomSheet by remember { mutableStateOf(false) }
 
+    val permission =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS
+        else Manifest.permission.ACCESS_NOTIFICATION_POLICY
+    val notificationPermissionState = rememberPermissionState(permission = permission)
+
+    var showAlarmRequest by remember { mutableStateOf(false) }
+    var showNotificationRequest by remember { mutableStateOf(false) }
     if (uiState.isLoading) {
         Loading()
     }
@@ -93,12 +113,66 @@ fun HomeTab(
         )
     }
 
+    if (showNotificationRequest) {
+        BasicAlertDialog(
+            title = "Allow notification permission",
+            body = "This app requires notification permission to show you reminders of your saved events",
+            dismissButtonText = "Deny",
+            dismissButton = { showNotificationRequest = false },
+            confirmButtonText = "Allow",
+            confirmButton = {
+                showNotificationRequest = false
+                context.startActivity(
+                    Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:${context.packageName}")
+                    ).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                )
+            }
+        )
+    }
+
+    if (showAlarmRequest) {
+        BasicAlertDialog(
+            title = "Allow alarm permission",
+            body = "This app requires alarm permission to show you reminders of your saved events",
+            dismissButtonText = "Deny",
+            dismissButton = { showAlarmRequest = false },
+            confirmButtonText = "Allow",
+            confirmButton = {
+                showAlarmRequest = false
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    context.startActivity(
+                        Intent(
+                            Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                            Uri.parse("package:${context.packageName}")
+                        )
+                    )
+                }
+            }
+        )
+    }
+
 
     HomeTabUI(
         uiState = uiState,
         goToAttractions = goToAttractions,
         goToSignIn = goToSignIn,
-        markAsFavorite = viewModel::markAsFavorite,
+        markAsFavorite = { isFavorite, event ->
+            setUpScheduler(
+                context = context,
+                isFavorite = isFavorite,
+                startDateTime = event.startDateTime,
+                eventName = event.name,
+                eventId = event.id,
+                notificationPermissionState = notificationPermissionState,
+                showAlarmRequest = { showAlarmRequest = it },
+                showNotificationRequest = { showNotificationRequest = it },
+                markEventAsFavorite = viewModel::markAsFavorite
+            )
+        },
         seeAllSavedEvents = seeAllSavedEvents,
         seeAllEvents = seeAllEvents,
         goToDetails = {
@@ -120,7 +194,7 @@ private fun HomeTabUI(
     seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
     onShowQRCode: () -> Unit,
-    markAsFavorite: (favorite: Boolean, eventId: String) -> Unit
+    markAsFavorite: (favorite: Boolean, event: UpcomingEventUIModel) -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize()
@@ -220,7 +294,7 @@ fun LazyListScope.upcomingEventsSection(
     upcomingEvents: List<UpcomingEventUIModel>,
     goToDetails: (String) -> Unit,
     seeAllEvents: () -> Unit = {},
-    markAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit
+    markAsFavorite: (isFavorite: Boolean, event: UpcomingEventUIModel) -> Unit
 ) {
     item {
         if (upcomingEvents.isEmpty()) return@item
@@ -234,10 +308,13 @@ fun LazyListScope.upcomingEventsSection(
                 pageSpacing = 16.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                val uiModel = upcomingEvents[it]
                 UpcomingEventCard(
-                    uiModel = upcomingEvents[it],
+                    uiModel = uiModel,
                     goToDetails = goToDetails,
-                    markAsFavorite = markAsFavorite,
+                    markAsFavorite = { isFavorite, _ ->
+                        markAsFavorite(isFavorite, uiModel)
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

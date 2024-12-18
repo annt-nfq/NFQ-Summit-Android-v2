@@ -140,6 +140,7 @@ val mockUpcomingEvents = listOf(
         imageUrl = "",
         isFavorite = false,
         startAndEndTime = "10:00 - 12:00",
+        startDateTime = LocalDateTime.now(),
         tag = "\uD83D\uDCBC Summit"
     ),
     UpcomingEventUIModel(
@@ -149,6 +150,7 @@ val mockUpcomingEvents = listOf(
         imageUrl = "",
         isFavorite = false,
         startAndEndTime = "12:00 - 13:00",
+        startDateTime = LocalDateTime.now(),
         tag = "\uD83D\uDCBC Summit"
     )
 )

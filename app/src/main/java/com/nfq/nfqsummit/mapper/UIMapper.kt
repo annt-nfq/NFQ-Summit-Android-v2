@@ -36,6 +36,7 @@ private fun EventEntity.toUpcomingEventUIModel(): UpcomingEventUIModel {
         startAndEndTime = "${timeStart.toFormattedDateTimeString(targetPattern = "HH:mm")} - ${
             timeEnd.toFormattedDateTimeString(targetPattern = "HH:mm")
         }",
+        startDateTime = timeStart.toLocalDateTime(),
         isFavorite = isFavorite,
         tag = "\uD83D\uDCBC Summit"
     )

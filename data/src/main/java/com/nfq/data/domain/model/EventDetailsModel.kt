@@ -1,7 +1,10 @@
 package com.nfq.data.domain.model
 
+import java.time.LocalDateTime
+
 data class EventDetailsModel(
     val id: String,
+    val startDateTime: LocalDateTime,
     val startTime: String,
     val name: String,
     val description: String,

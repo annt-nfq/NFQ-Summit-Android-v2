@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.navigation.AppNavHost
+import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -38,6 +39,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
     private val viewModel: MainViewModel by viewModels()
     private var screenState: ScreenState by mutableStateOf(ScreenState.SplashScreen)
+    private var showEventDetailsBottomSheet: Boolean by mutableStateOf(false)
+    private var eventId: String by mutableStateOf("")
     private val statusBarStyle = SystemBarStyle.auto(
         android.graphics.Color.TRANSPARENT,
         android.graphics.Color.TRANSPARENT,
@@ -47,6 +50,7 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         enableEdgeToEdge(statusBarStyle = statusBarStyle)
         super.onCreate(savedInstanceState)
+        checkNotificationExtras()
 
         splashScreen.setKeepOnScreenCondition { false }
 
@@ -76,6 +80,7 @@ class MainActivity : ComponentActivity() {
             darkThemeMutableState = when (screenState) {
                 is ScreenState.OnBoardingScreen,
                 is ScreenState.SplashScreen -> true
+
                 else -> false
             }
 
@@ -84,7 +89,12 @@ class MainActivity : ComponentActivity() {
             NFQSnapshotTestTheme(
                 darkTheme = darkTheme
             ) {
-                // A surface container using the 'background' color from the theme
+                if (showEventDetailsBottomSheet) {
+                    EventDetailsBottomSheet(
+                        eventId = eventId,
+                        onDismissRequest = { showEventDetailsBottomSheet = false }
+                    )
+                }
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -95,18 +105,8 @@ class MainActivity : ComponentActivity() {
                     HandleUserMessage(viewModel)
                 }
             }
-//            checkNotificationExtras()
-        }
-    }
 
-    private fun checkNotificationExtras() {
-        intent.extras?.let {
-            val eventId = intent?.getStringExtra("eventId")
-            eventId?.let {
-                navigateToEventDetails(it)
-            }
         }
-        intent = null
     }
 
     @Composable
@@ -135,15 +135,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun checkNotificationExtras(){
+        intent.extras?.let {
+            val eventId = it.getString("eventId")
+            eventId?.let {
+                this.eventId = eventId
+                showEventDetailsBottomSheet = true
+            }
+        }
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         val eventId = intent.getStringExtra("eventId")
         eventId?.let {
-            navigateToEventDetails(it)
+            this.eventId = it
+            showEventDetailsBottomSheet = true
         }
     }
-
-    private fun navigateToEventDetails(eventId: String) = navController.navigate(
-        "${AppDestination.EventDetails.route}/$eventId"
-    )
 }

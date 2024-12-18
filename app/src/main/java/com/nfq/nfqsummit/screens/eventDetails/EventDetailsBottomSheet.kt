@@ -1,7 +1,14 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 
 package com.nfq.nfqsummit.screens.eventDetails
 
+import android.Manifest
+import android.app.AlarmManager
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,8 +52,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
 import com.nfq.nfqsummit.components.HtmlText
 import com.nfq.nfqsummit.components.bounceClick
@@ -74,6 +88,55 @@ fun EventDetailsBottomSheet(
         viewModel.getEvent(eventId)
     }
 
+    val permission =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS
+        else Manifest.permission.ACCESS_NOTIFICATION_POLICY
+    val notificationPermissionState = rememberPermissionState(permission = permission)
+
+    var showAlarmRequest by remember { mutableStateOf(false) }
+    var showNotificationRequest by remember { mutableStateOf(false) }
+
+    if (showNotificationRequest) {
+        BasicAlertDialog(
+            title = "Allow notification permission",
+            body = "This app requires notification permission to show you reminders of your saved events",
+            dismissButtonText = "Deny",
+            dismissButton = { showNotificationRequest = false },
+            confirmButtonText = "Allow",
+            confirmButton = {
+                showNotificationRequest = false
+                context.startActivity(
+                    Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:${context.packageName}")
+                    ).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                )
+            }
+        )
+    }
+
+    if (showAlarmRequest) {
+        BasicAlertDialog(
+            title = "Allow alarm permission",
+            body = "This app requires alarm permission to show you reminders of your saved events",
+            dismissButtonText = "Deny",
+            dismissButton = { showAlarmRequest = false },
+            confirmButtonText = "Allow",
+            confirmButton = {
+                showAlarmRequest = false
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    context.startActivity(
+                        Intent(
+                            Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                            Uri.parse("package:${context.packageName}")
+                        )
+                    )
+                }
+            }
+        )
+    }
 
     BasicModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -81,8 +144,18 @@ fun EventDetailsBottomSheet(
             viewModel.event?.let { event ->
                 EventDetailsUI(
                     event = event,
-                    markAsFavorite = { isFavorite, eventId ->
-                        viewModel.markEventAsFavorite(isFavorite, eventId)
+                    markAsFavorite = { isFavorite, _ ->
+                        setUpScheduler(
+                            context = context,
+                            isFavorite = isFavorite,
+                            startDateTime = event.startDateTime,
+                            eventName = event.name,
+                            eventId = event.id,
+                            notificationPermissionState = notificationPermissionState,
+                            showAlarmRequest = { showAlarmRequest = it },
+                            showNotificationRequest = { showNotificationRequest = it },
+                            markEventAsFavorite = viewModel::markEventAsFavorite
+                        )
                     },
                     onViewLocation = { latitude, longitude, locationName ->
                         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
@@ -101,11 +174,54 @@ fun EventDetailsBottomSheet(
     )
 }
 
+fun setUpScheduler(
+    context: Context,
+    isFavorite: Boolean,
+    startDateTime: LocalDateTime,
+    eventName: String,
+    eventId: String,
+    notificationPermissionState: PermissionState,
+    showAlarmRequest: (Boolean) -> Unit,
+    showNotificationRequest: (Boolean) -> Unit,
+    markEventAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit
+) {
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+    if (Build.VERSION.SDK_INT > 30 && !alarmManager.canScheduleExactAlarms()) {
+        showAlarmRequest(true)
+        return
+    }
+
+    if (!notificationPermissionState.status.isGranted) {
+        if (notificationPermissionState.status.shouldShowRationale) {
+            showNotificationRequest(true)
+        } else {
+            notificationPermissionState.launchPermissionRequest()
+        }
+        return
+    }
+
+    if (isFavorite) {
+        markEventAsFavorite(true, eventId)
+        createNotificationChannel(context)
+        scheduleNotification(
+            context,
+            startDateTime.minusMinutes(15),
+            eventName,
+            "This event is starting in 15 minutes",
+            eventId
+        )
+    } else {
+        markEventAsFavorite(false, eventId)
+        cancelNotification(context, eventId)
+    }
+}
+
 
 @Composable
 private fun EventDetailsUI(
     event: EventDetailsModel,
-    markAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit = { _, _ -> },
+    markAsFavorite: (isFavorite: Boolean, event: String) -> Unit = { _, _ -> },
     onViewLocation: (latitude: Double?, longitude: Double?, locationName: String) -> Unit,
 ) {
     Box(
@@ -175,7 +291,7 @@ private fun EventDetailsUI(
                                 .padding(top = 8.dp)
                         )
                         Text(
-                            text = event.locationName ?: "-",
+                            text = event.locationName,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Medium,
                             fontSize = 10.sp,
@@ -203,7 +319,7 @@ private fun EventDetailsUI(
                                     onViewLocation(
                                         event.latitude,
                                         event.longitude,
-                                        event.locationName.orEmpty()
+                                        event.locationName
                                     )
                                 }
                                 .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
@@ -262,6 +378,7 @@ private fun EventDetailsPreview() {
                 coverPhotoUrl = "",
                 locationName = "Saigon, Vietnam Office ",
                 isFavorite = false,
+                startDateTime = LocalDateTime.now(),
                 startTime = LocalDateTime.now().format(
                     DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")
                 )

@@ -14,6 +14,7 @@ import com.nfq.data.remote.model.response.AttractionBlogResponse
 import com.nfq.data.remote.model.response.BlogResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
 import com.nfq.data.toFormattedDateTimeString
+import com.nfq.data.toLocalDateTime
 import com.nfq.data.toLocalDateTimeInMillis
 
 fun List<EventActivityResponse>.toEventEntities(): List<EventEntity> {
@@ -67,6 +68,7 @@ fun EventEntity.toEventDetailsModel(): EventDetailsModel {
         .toFormattedDateTimeString(targetPattern = "EEE, MMM d • HH:mm")
     return EventDetailsModel(
         id = id,
+        startDateTime = timeStart.toLocalDateTime(),
         startTime = startTime,
         name = name,
         description = description,
