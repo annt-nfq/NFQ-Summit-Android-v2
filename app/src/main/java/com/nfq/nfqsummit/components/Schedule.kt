@@ -1,12 +1,10 @@
 package com.nfq.nfqsummit.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,13 +18,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.model.PositionedEvent
+import kotlinx.collections.immutable.PersistentList
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
 @Composable
 fun Schedule(
-    events: List<SummitEvent>,
+    events: PersistentList<SummitEvent>,
     currentTime: LocalTime,
     modifier: Modifier = Modifier,
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit,
@@ -41,7 +40,7 @@ fun Schedule(
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes.toFloat() / 60f
     var sidebarWidth by remember { mutableStateOf(0) }
-    var headerHeight by remember { mutableStateOf(0) }
+    val headerHeight by remember { mutableStateOf(0) }
     BoxWithConstraints(modifier = modifier) {
 
         val dayWidth: Dp = with(LocalDensity.current) {

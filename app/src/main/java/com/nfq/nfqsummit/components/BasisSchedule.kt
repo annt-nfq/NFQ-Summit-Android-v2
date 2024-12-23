@@ -22,10 +22,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.google.common.collect.ImmutableList
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.model.PositionedEvent
 import com.nfq.nfqsummit.model.SplitType
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
@@ -208,7 +211,7 @@ fun CurrentTimeIndicator(
 fun BasicSchedulePreview() {
     NFQSnapshotTestThemeForPreview {
         BasicSchedule(
-            events = listOf(
+            events = persistentListOf(
                 SummitEvent(
                     id = "1",
                     name = "Event 1",
@@ -237,7 +240,7 @@ fun BasicSchedulePreview() {
 
 @Composable
 fun BasicSchedule(
-    events: List<SummitEvent>,
+    events: PersistentList<SummitEvent>,
     modifier: Modifier = Modifier,
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
         BasicEvent(

@@ -7,6 +7,7 @@ coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.5.1"
+kotlinxCollectionsImmutable = "0.3.8"
 lifecycleRuntimeKtx = "2.8.4"
 activityCompose = "1.9.1"
 composeBom = "2024.11.00"
@@ -67,6 +68,7 @@ androidx-compose-foundation = { group = "androidx.compose.foundation", name = "f
 
 androidx-arch-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "androidx-arch" }
 androidx-splash = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-splashscreen" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigation" }
 kotlinx-coroutines-android = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines"}

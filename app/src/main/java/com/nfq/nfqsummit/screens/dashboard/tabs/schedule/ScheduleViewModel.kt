@@ -49,20 +49,15 @@ class ScheduleViewModel @Inject constructor(
             // Pair each date with its corresponding non-conference events
             val dayEventPairs = distinctDates.map { date ->
                 date to events.filter { event ->
-                    event.start.toLocalDate() == date && !event.isConference
+                    event.start.toLocalDate() == date && event.start.hour < event.end.hour
                 }.sortedBy { it.start }
             }
 
-            // Extract events for the selected date
-            val dailyEvents = dayEventPairs
-                .filter { (date, _) -> date.isSame(selectedDate) }
-                .flatMap { (_, events) -> events }
 
             ScheduleUIState(
                 events = events,
                 selectedDate = selectedDate!!,
-                dayEventPairs = dayEventPairs,
-                dailyEvents = dailyEvents
+                dayEventPairs = dayEventPairs
             )
         } else {
             ScheduleUIState()
@@ -96,5 +91,4 @@ data class ScheduleUIState(
     val selectedDate: LocalDate = LocalDate.now(),
     val currentTime: LocalTime = LocalTime.now(),
     val dayEventPairs: List<Pair<LocalDate, List<SummitEvent>>> = emptyList(),
-    val dailyEvents: List<SummitEvent> = emptyList()
 )

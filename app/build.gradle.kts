@@ -209,6 +209,8 @@ dependencies {
 
     implementation(libs.timber)
 
+    implementation(libs.kotlinx.collections.immutable)
+
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -61,6 +61,7 @@ import com.nfq.nfqsummit.mocks.mockEventDay2H1
 import com.nfq.nfqsummit.mocks.mockEventDay2H2
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
@@ -115,7 +116,8 @@ fun ScheduleTabUI(
         }
     ) { innerPadding ->
         SummitSchedules(
-            dailyEvents = uiState.dailyEvents,
+            selectedDate = uiState.selectedDate,
+            dayEventPairs = uiState.dayEventPairs,
             currentTime = uiState.currentTime,
             onEventClick = { onEventClick(it) },
             modifier = Modifier.padding(innerPadding)
@@ -204,11 +206,18 @@ private fun ScheduleHeader(
 @Composable
 fun SummitSchedules(
     modifier: Modifier = Modifier,
-    dailyEvents: List<SummitEvent>,
+    selectedDate: LocalDate,
+    dayEventPairs: List<Pair<LocalDate, List<SummitEvent>>>,
     currentTime: LocalTime,
     verticalScroll: ScrollState = rememberScrollState(),
     onEventClick: (SummitEvent) -> Unit
 ) {
+    // Extract events for the selected date
+    val dailyEvents = remember(selectedDate) {
+        dayEventPairs
+            .filter { (date, _) -> date.isSame(selectedDate) }
+            .flatMap { (_, events) -> events }
+    }
 
     if (dailyEvents.isEmpty()) {
         EmptyEvent(modifier)
@@ -226,7 +235,7 @@ fun SummitSchedules(
     ) {
 
         Schedule(
-            events = dailyEvents.sortedBy { it.name },
+            events = dailyEvents.sortedBy { it.name }.toPersistentList(),
             currentTime = currentTime,
             modifier = Modifier
                 .fillMaxWidth(),
@@ -403,23 +412,10 @@ val dayEventPair = listOf(
     LocalDate.of(2024, 1, 2) to listOf(
         mockEventDay2H1,
         mockEventDay2H2,
-    ),
-    LocalDate.of(2024, 1, 3) to listOf(
-        mockEventDay2H1,
-        mockEventDay2H2,
-    ),
-    LocalDate.of(2024, 1, 4) to listOf(
-        mockEventDay2H1,
-        mockEventDay2H2,
-    ),
-    LocalDate.of(2024, 1, 5) to listOf(
-        mockEventDay2H1,
-        mockEventDay2H2,
     )
 )
 
 val uiState = ScheduleUIState(
-    dailyEvents = dayEventPair.flatMap { it.second },
     dayEventPairs = dayEventPair,
     currentTime = LocalTime.of(11, 0),
     selectedDate = LocalDate.of(2024, 1, 1),

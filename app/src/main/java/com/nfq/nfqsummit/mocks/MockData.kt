@@ -61,8 +61,8 @@ val mockRecommendedBlog = Blog(
 val mockEventDay1 = SummitEvent(
     id = "1",
     name = "Event 1",
-    start = LocalDateTime.of(2024, 1, 6, 10, 0),
-    end = LocalDateTime.of(2024, 1, 6, 11, 0),
+    start = LocalDateTime.of(2024, 1, 1, 10, 0),
+    end = LocalDateTime.of(2024, 1, 1, 11, 0),
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     0.0, 0.0,
     "",
