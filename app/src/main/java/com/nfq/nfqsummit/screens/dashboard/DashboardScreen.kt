@@ -204,7 +204,7 @@ fun DashBoardHeader(
             .statusBarsPadding()
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            .padding(top = 24.dp)
+            .padding(top = 8.dp)
             .padding(bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -252,7 +252,7 @@ fun DrawerContent(
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                 modifier = Modifier
                     .padding(start = 34.dp)
-                    .padding(top = 36.dp)
+                    .padding(top = 20.dp)
                     .width(80.dp)
             )
             Spacer(modifier = Modifier.height(20.dp))
