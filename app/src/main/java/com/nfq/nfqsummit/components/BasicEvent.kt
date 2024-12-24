@@ -189,7 +189,7 @@ fun BasicEvent(
                         modifier = Modifier
                             .fillMaxWidth(),
                         textAlign = TextAlign.Start,
-                        maxLines = 2,
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
