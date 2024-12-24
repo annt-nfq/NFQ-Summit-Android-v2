@@ -14,6 +14,8 @@ val LabelGrey = Color(0x80231F20)
 val NFQOrange = Color(0xFFFF6B00)
 val MainNeutral = Color(0xFFF2EEE7)
 val MainGreen = Color(0xFF3AB34A)
+val Grey = Color(0xFF919199)
+val LightGrey = Color(0xFFCECED9)
 
 val PrimaryLight = NFQOrange
 val OnPrimaryLight = Color(0xFFFFFFFF)

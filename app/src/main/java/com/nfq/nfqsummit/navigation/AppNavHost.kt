@@ -54,18 +54,7 @@ fun AppNavHost(
             popEnterTransition = MainTransition.enterTransition,
             popExitTransition = MainTransition.exitTransition
         ) {
-            OnboardingScreen(
-                navigateToHome = {
-                    navController.navigate(AppDestination.Dashboard.route) {
-                        popUpTo(AppDestination.Onboarding.route) { inclusive = true }
-                    }
-                },
-                navigateToBooking = {
-                    navController.navigate(AppDestination.BookingNumber.route) {
-                        popUpTo(AppDestination.Onboarding.route) { inclusive = true }
-                    }
-                }
-            )
+            OnboardingScreen()
         }
         composable(
             route = AppDestination.SignIn.route,

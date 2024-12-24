@@ -13,6 +13,9 @@ val notoSansFamily = FontFamily(
     Font(R.font.notosans_medium, FontWeight.Medium),
     Font(R.font.notosans_bold, FontWeight.Bold),
 )
+val ubuntuFamily = FontFamily(
+    Font(R.font.ubuntu_bold, FontWeight.Bold),
+)
 val Typography = Typography(
     bodySmall = TextStyle(
         fontFamily = notoSansFamily,

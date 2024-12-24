@@ -74,10 +74,7 @@ fun NFQSnapshotTestTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        darkTheme -> DarkColorPalette
-        else -> LightColorPalette
-    }
+    val colorScheme = LightColorPalette
 
     val view = LocalView.current
     if (!view.isInEditMode) {

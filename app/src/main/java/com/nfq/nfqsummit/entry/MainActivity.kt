@@ -85,7 +85,6 @@ class MainActivity : ComponentActivity() {
             var darkThemeMutableState by remember { mutableStateOf(false) }
 
             darkThemeMutableState = when (screenState) {
-                is ScreenState.OnBoardingScreen,
                 is ScreenState.SplashScreen -> true
 
                 else -> false
