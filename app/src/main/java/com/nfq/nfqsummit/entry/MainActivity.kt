@@ -30,6 +30,7 @@ import com.nfq.nfqsummit.navigation.AppNavHost
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -38,6 +39,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
     private val viewModel: MainViewModel by viewModels()
+    private var keepSplashScreen = true
     private var screenState: ScreenState by mutableStateOf(ScreenState.SplashScreen)
     private var showEventDetailsBottomSheet: Boolean by mutableStateOf(false)
     private var eventId: String by mutableStateOf("")
@@ -48,11 +50,16 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-        enableEdgeToEdge(statusBarStyle = statusBarStyle)
         super.onCreate(savedInstanceState)
-        checkNotificationExtras()
 
-        splashScreen.setKeepOnScreenCondition { false }
+        checkNotificationExtras()
+        enableEdgeToEdge(statusBarStyle = statusBarStyle)
+        splashScreen.setKeepOnScreenCondition { keepSplashScreen }
+
+        lifecycleScope.launch {
+            delay(2000)
+            keepSplashScreen = false
+        }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
