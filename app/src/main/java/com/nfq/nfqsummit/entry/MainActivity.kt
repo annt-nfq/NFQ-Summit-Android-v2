@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
 
         lifecycleScope.launch {
-            delay(2000)
+            delay(800)
             keepSplashScreen = false
         }
 
