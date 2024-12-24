@@ -14,7 +14,7 @@ interface NFQSummitRepository {
     val isCompletedOnboarding: Flow<Boolean>
     suspend fun authenticateWithAttendeeCode(attendeeCode: String): Either<DataException, Unit>
     suspend fun logout(): Either<DataException, Unit>
-    suspend fun fetchEventActivities(): Either<DataException, Unit>
+    suspend fun fetchEventActivities(forceUpdate: Boolean = false): Either<DataException, Unit>
     suspend fun getEventActivityByID(id: String): Either<DataException, EventDetailsModel>
     suspend fun updateFavorite(eventId: String, isFavorite: Boolean): Either<DataException, Unit>
     suspend fun updateOnboardingStatus(isCompletedOnboarding: Boolean)

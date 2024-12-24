@@ -45,14 +45,14 @@ class HomeViewModel @Inject constructor(
     )
 
     init {
-        fetchUpcomingEvents()
+        fetchEventActivities()
     }
 
-    private fun fetchUpcomingEvents() {
+    private fun fetchEventActivities() {
         viewModelScope.launch(Dispatchers.IO) {
             updateLoadingStateIfNeeded()
             repository
-                .fetchEventActivities()
+                .fetchEventActivities(forceUpdate = true)
                 .onLeft { e ->
                     loadingFlow.value = false
                     UserMessageManager.showMessage(e)

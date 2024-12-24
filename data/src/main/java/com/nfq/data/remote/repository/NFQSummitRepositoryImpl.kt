@@ -49,13 +49,13 @@ class NFQSummitRepositoryImpl @Inject constructor(
             .map { userDao.deleteUser() }
     }
 
-    override suspend fun fetchEventActivities(): Either<DataException, Unit> {
+    override suspend fun fetchEventActivities(forceUpdate: Boolean): Either<DataException, Unit> {
         return dataSource
             .getEventActivities()
             .map { latestEvents ->
                 val favoriteEvents = eventDao.getFavoriteEvents().firstOrNull().orEmpty()
                 val updatedEvents = updateEventsWithFavorites(latestEvents, favoriteEvents)
-                eventDao.deleteAllEvents()
+                if (forceUpdate) eventDao.deleteAllEvents()
                 eventDao.insertEvents(updatedEvents)
             }
     }
@@ -65,7 +65,9 @@ class NFQSummitRepositoryImpl @Inject constructor(
         favoriteEvents: List<EventEntity>
     ): List<EventEntity> {
         return latestEvents.map { event ->
-            event.copy(isFavorite = favoriteEvents.any { favoriteEvent -> favoriteEvent.id == event.id.toString() }).toEventEntity()
+            event
+                .copy(isFavorite = favoriteEvents.any { favoriteEvent -> favoriteEvent.id == event.id.toString() })
+                .toEventEntity()
         }
     }
 
