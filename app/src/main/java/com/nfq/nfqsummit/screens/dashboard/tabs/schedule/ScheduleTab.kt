@@ -54,6 +54,9 @@ import com.nfq.nfqsummit.components.Schedule
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.isSame
 import com.nfq.nfqsummit.mocks.mockEventDay1
+import com.nfq.nfqsummit.mocks.mockEventDay1H1
+import com.nfq.nfqsummit.mocks.mockEventDay1H12
+import com.nfq.nfqsummit.mocks.mockEventDay1H13
 import com.nfq.nfqsummit.mocks.mockEventDay2H1
 import com.nfq.nfqsummit.mocks.mockEventDay2H2
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
@@ -210,11 +213,11 @@ fun SummitSchedules(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(Color(0xFFF8F8FA))
             .verticalScroll(state = verticalScroll)
             .padding(start = 32.dp)
             .padding(top = 16.dp)
             .navigationBarsPadding()
-
     ) {
 
         if (dailyEvents.isEmpty()) {
@@ -395,7 +398,10 @@ fun ScheduleDaysUnselectedPreview() {
 
 val dayEventPair = persistentListOf(
     LocalDate.of(2024, 1, 1) to persistentListOf(
-        mockEventDay1
+        mockEventDay1,
+        mockEventDay1H1,
+        mockEventDay1H12,
+        mockEventDay1H13
     ),
     LocalDate.of(2024, 1, 2) to persistentListOf(
         mockEventDay2H1,
@@ -405,7 +411,8 @@ val dayEventPair = persistentListOf(
 
 val uiState = ScheduleUIState(
     dayEventPairs = dayEventPair,
-    currentTime = LocalTime.of(11, 0),
+    dailyEvents = dayEventPair[0].second,
+    currentTime = LocalTime.of(11, 40),
     selectedDate = LocalDate.of(2024, 1, 1),
 )
 

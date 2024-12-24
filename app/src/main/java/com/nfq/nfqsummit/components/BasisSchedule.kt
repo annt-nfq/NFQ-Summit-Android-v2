@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.google.common.collect.ImmutableList
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.model.PositionedEvent
 import com.nfq.nfqsummit.model.SplitType
@@ -266,9 +265,7 @@ fun BasicSchedule(
         content = {
             positionedEvents.forEach { positionedEvent ->
                 Box(
-                    modifier = Modifier
-                        .padding(end = 16.dp)
-                        .eventData(positionedEvent)
+                    modifier = Modifier.eventData(positionedEvent)
                 ) {
                     eventContent(positionedEvent)
                 }

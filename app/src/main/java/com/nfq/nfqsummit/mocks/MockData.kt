@@ -72,6 +72,48 @@ val mockEventDay1 = SummitEvent(
     speakerPosition = "Speaker Position",
     tag = "\uD83D\uDCBC Summit"
 )
+val mockEventDay1H1 = SummitEvent(
+    id = "1",
+    name = "Event 1",
+    start = LocalDateTime.of(2024, 1, 1, 11, 0),
+    end = LocalDateTime.of(2024, 1, 1, 11, 40),
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    0.0, 0.0,
+    "",
+    "Bangkok, Thailand",
+    iconUrl = "",
+    speakerName = "Speaker Name",
+    speakerPosition = "Speaker Position",
+    tag = "\uD83D\uDCBC Summit"
+)
+val mockEventDay1H12 = SummitEvent(
+    id = "1",
+    name = "Event 1",
+    start = LocalDateTime.of(2024, 1, 1, 10, 0),
+    end = LocalDateTime.of(2024, 1, 1, 10, 30),
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    0.0, 0.0,
+    "",
+    "Bangkok, Thailand",
+    iconUrl = "",
+    speakerName = "Speaker Name",
+    speakerPosition = "Speaker Position",
+    tag = "\uD83D\uDCBC Summit"
+)
+val mockEventDay1H13 = SummitEvent(
+    id = "1",
+    name = "Event 1",
+    start = LocalDateTime.of(2024, 1, 1, 12, 0),
+    end = LocalDateTime.of(2024, 1, 1, 13, 0),
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    0.0, 0.0,
+    "",
+    "Bangkok, Thailand",
+    iconUrl = "",
+    speakerName = "Speaker Name",
+    speakerPosition = "Speaker Position",
+    tag = "\uD83D\uDCBC Summit"
+)
 
 val mockEventDay2H1 = SummitEvent(
     id = "2",

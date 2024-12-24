@@ -29,6 +29,7 @@ data class SummitEvent(
     val isConference: Boolean = false,
     val eventType: String? = null,
     val ordering: Int = 0,
+    val speakerProfileUrl: String? = null,
     val speakerName: String? = null,
     val speakerPosition: String? = null,
     val isFavorite: Boolean = false,
