@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.repository.NFQSummitRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,6 +36,7 @@ class DashboardViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(loading = true) }
+            delay(300)
             repository
                 .logout()
                 .onLeft {
