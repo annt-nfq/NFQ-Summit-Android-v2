@@ -1,6 +1,5 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.schedule
 
-import android.app.Activity
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ScrollState
@@ -42,8 +41,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,6 +58,8 @@ import com.nfq.nfqsummit.mocks.mockEventDay2H1
 import com.nfq.nfqsummit.mocks.mockEventDay2H2
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -70,12 +69,8 @@ import java.util.Locale
 
 @Composable
 fun ScheduleTab(
-    viewModel: ScheduleViewModel = hiltViewModel(),
-    goToEventDetails: (eventId: String) -> Unit
+    viewModel: ScheduleViewModel = hiltViewModel()
 ) {
-    val window = (LocalView.current.context as Activity).window
-    window.statusBarColor = Color.Transparent.toArgb()
-
     val uiState by viewModel.uiState.collectAsState()
     var showEventDetailsBottomSheet by remember { mutableStateOf(false) }
     var eventId by remember { mutableStateOf("") }
@@ -92,7 +87,7 @@ fun ScheduleTab(
         onEventClick = {
             eventId = it.id
             showEventDetailsBottomSheet = true
-        },
+        }
     )
 }
 
@@ -116,8 +111,7 @@ fun ScheduleTabUI(
         }
     ) { innerPadding ->
         SummitSchedules(
-            selectedDate = uiState.selectedDate,
-            dayEventPairs = uiState.dayEventPairs,
+            dailyEvents = uiState.dailyEvents,
             currentTime = uiState.currentTime,
             onEventClick = { onEventClick(it) },
             modifier = Modifier.padding(innerPadding)
@@ -127,7 +121,7 @@ fun ScheduleTabUI(
 
 @Composable
 private fun ScheduleHeader(
-    dayEventPairs: List<Pair<LocalDate, List<SummitEvent>>>,
+    dayEventPairs: PersistentList<Pair<LocalDate, PersistentList<SummitEvent>>>,
     selectedDate: LocalDate,
     verticalScroll: ScrollState = rememberScrollState(),
     onDayClick: (LocalDate) -> Unit,
@@ -177,6 +171,7 @@ private fun ScheduleHeader(
                     .padding(vertical = 24.dp)
             ) {
                 Spacer(modifier = Modifier.width(16.dp))
+
                 dayEventPairs.forEach { (date, events) ->
                     ScheduleDays(
                         date = date.dayOfMonth.toString(),
@@ -206,23 +201,11 @@ private fun ScheduleHeader(
 @Composable
 fun SummitSchedules(
     modifier: Modifier = Modifier,
-    selectedDate: LocalDate,
-    dayEventPairs: List<Pair<LocalDate, List<SummitEvent>>>,
+    dailyEvents: PersistentList<SummitEvent>,
     currentTime: LocalTime,
     verticalScroll: ScrollState = rememberScrollState(),
     onEventClick: (SummitEvent) -> Unit
 ) {
-    // Extract events for the selected date
-    val dailyEvents = remember(selectedDate) {
-        dayEventPairs
-            .filter { (date, _) -> date.isSame(selectedDate) }
-            .flatMap { (_, events) -> events }
-    }
-
-    if (dailyEvents.isEmpty()) {
-        EmptyEvent(modifier)
-        return
-    }
 
     Column(
         modifier = modifier
@@ -233,6 +216,11 @@ fun SummitSchedules(
             .navigationBarsPadding()
 
     ) {
+
+        if (dailyEvents.isEmpty()) {
+            EmptyEvent(modifier)
+            return
+        }
 
         Schedule(
             events = dailyEvents.sortedBy { it.name }.toPersistentList(),
@@ -405,11 +393,11 @@ fun ScheduleDaysUnselectedPreview() {
     }
 }
 
-val dayEventPair = listOf(
-    LocalDate.of(2024, 1, 1) to listOf(
+val dayEventPair = persistentListOf(
+    LocalDate.of(2024, 1, 1) to persistentListOf(
         mockEventDay1
     ),
-    LocalDate.of(2024, 1, 2) to listOf(
+    LocalDate.of(2024, 1, 2) to persistentListOf(
         mockEventDay2H1,
         mockEventDay2H2,
     )
