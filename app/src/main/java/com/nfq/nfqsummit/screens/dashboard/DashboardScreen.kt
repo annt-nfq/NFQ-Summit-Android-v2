@@ -87,12 +87,6 @@ fun DashboardScreen(
         BottomNavItem.Explore
     )
 
-    var showModalDrawerSheet by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        delay(500L)
-        showModalDrawerSheet = true
-    }
-
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
@@ -112,15 +106,15 @@ fun DashboardScreen(
                     onMenuClick = {
                         coroutineScope.launch {
                             drawerState.close()
-                        }
-                        navController.navigate(it) {
-                            navController.graph.startDestinationRoute?.let { screenRoute ->
-                                popUpTo(screenRoute) {
-                                    saveState = true
+                            navController.navigate(it) {
+                                navController.graph.startDestinationRoute?.let { screenRoute ->
+                                    popUpTo(screenRoute) {
+                                        saveState = true
+                                    }
                                 }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
                     },
                     onSignOutClick = {
@@ -153,7 +147,6 @@ fun DashboardScreen(
                 exitTransition = MainTransition.exitTransition,
                 popEnterTransition = MainTransition.enterTransition,
                 popExitTransition = MainTransition.exitTransition,
-                modifier = Modifier.weight(1f)
             ) {
                 composable(AppDestination.Home.route) {
                     HomeTab(
@@ -176,9 +169,7 @@ fun DashboardScreen(
                     )
                 }
                 composable(AppDestination.Schedule.route) {
-                    ScheduleTab(
-                        goToEventDetails = goToEventDetails
-                    )
+                    ScheduleTab()
                 }
                 composable(AppDestination.Explore.route) {
                     ExploreTab(
