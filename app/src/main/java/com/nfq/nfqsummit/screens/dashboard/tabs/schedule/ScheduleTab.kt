@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,6 +51,7 @@ import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicEvent
 import com.nfq.nfqsummit.components.Schedule
+import com.nfq.nfqsummit.components.SegmentedControl
 import com.nfq.nfqsummit.isSame
 import com.nfq.nfqsummit.mocks.mockEventDay1
 import com.nfq.nfqsummit.mocks.mockEventDay1H1
@@ -127,6 +130,7 @@ private fun ScheduleHeader(
     onDayClick: (LocalDate) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val pagerState = rememberPagerState { 2 }
     Surface {
         Column {
             Row(
@@ -157,8 +161,20 @@ private fun ScheduleHeader(
                     )
                     Spacer(modifier = Modifier.width(21.dp))
                 }
-                Spacer(modifier = Modifier.width(16.dp))
             }
+            SegmentedControl(
+                items = listOf(
+                    "Summit & K5 \uD83D\uDCBC",
+                    "Tech Rock \uD83E\uDD16 "
+                ),
+                selectedIndex = pagerState.currentPage,
+                onItemSelection = {
+                    coroutineScope.launch { pagerState.animateScrollToPage(it) }
+                },
+                modifier = Modifier
+                    .padding( 24.dp)
+                    .padding()
+            )
             HorizontalDivider(color = Color(0xFFCFCAE4), thickness = 1.dp)
         }
     }

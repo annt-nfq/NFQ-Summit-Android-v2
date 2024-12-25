@@ -166,7 +166,7 @@ val mockTranslationAudio = TranslationAudio(
 )
 
 val mockTranslation = Translation(
-    id = 1,
+    id = "1",
     title = "Title",
     audios = listOf(
         mockTranslationAudio,

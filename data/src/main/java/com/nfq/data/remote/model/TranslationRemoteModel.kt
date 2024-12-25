@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TranslationRemoteModel(
     @SerialName("id")
-    val id: Int,
+    val id: String,
     @SerialName("title")
     val title: String,
     val audios: List<AudioRemoteModel>

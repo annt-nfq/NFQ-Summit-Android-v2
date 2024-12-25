@@ -4,7 +4,7 @@ import com.nfq.data.remote.model.AudioRemoteModel
 import com.nfq.data.remote.model.TranslationRemoteModel
 
 data class Translation(
-    val id: Int,
+    val id: String,
     val title: String,
     val audios: List<TranslationAudio>
 )

@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -42,6 +44,7 @@ import com.nfq.data.domain.model.Translation
 import com.nfq.data.domain.model.TranslationAudio
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicTopAppBar
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.mocks.mockTranslation
 import com.nfq.nfqsummit.mocks.mockTranslationAudio
 import com.nfq.nfqsummit.ui.theme.NFQOrange
@@ -166,7 +169,9 @@ fun AudioListItem(
         )
         IconButton(
             modifier = Modifier
-                .background(color = NFQOrange, shape = CircleShape),
+                .bounceClick()
+                .clip(CircleShape),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = NFQOrange),
             onClick = {
                 playAudio(audio.audioUrl)
             }
@@ -217,7 +222,7 @@ fun TranslationListItemPreview() {
     NFQSnapshotTestThemeForPreview {
         TranslationListItem(
             translation = Translation(
-                id = 1,
+                id = "1",
                 title = "Title",
                 audios = listOf(
                     mockTranslationAudio,
