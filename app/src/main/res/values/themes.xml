@@ -15,9 +15,7 @@
 
     <style name="Theme.App.Starting" parent="Theme.MySplash">
         <item name="windowSplashScreenBackground" tools:targetApi="s">@color/nfq_orange</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
         <item name="postSplashScreenTheme">@style/Theme.NFQSummit</item>
-        <item name="android:windowSplashScreenBehavior" tools:targetApi="tiramisu">icon_preferred
-        </item>
     </style>
 </resources>
