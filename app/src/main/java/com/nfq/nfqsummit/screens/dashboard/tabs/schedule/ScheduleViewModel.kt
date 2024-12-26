@@ -1,6 +1,5 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.schedule
 
-import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

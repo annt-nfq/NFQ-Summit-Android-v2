@@ -4,7 +4,6 @@ package com.nfq.nfqsummit.screens.survival
 
 import android.content.Context
 import android.media.MediaPlayer
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
