@@ -44,9 +44,11 @@ fun EventActivityResponse.toEventEntity(): EventEntity {
         images = images.orEmpty(),
         order = order ?: 0,
         category = category,
+        genre = genre,
         eventDay = eventDay,
         qrCodeUrl = qrCodeUrl.orEmpty(),
-        isFavorite = isFavorite ?: false
+        isFavorite = isFavorite ?: false,
+        speaker = speaker
     )
 }
 

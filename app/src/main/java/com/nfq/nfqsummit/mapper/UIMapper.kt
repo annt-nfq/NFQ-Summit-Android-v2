@@ -2,7 +2,9 @@ package com.nfq.nfqsummit.mapper
 
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
+import com.nfq.data.domain.model.CategoryEnum
 import com.nfq.data.domain.model.SummitEvent
+import com.nfq.data.remote.model.response.CategoryResponse
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTime
 import com.nfq.nfqsummit.model.SavedEventUIModel
@@ -28,6 +30,7 @@ fun List<EventEntity>.toUpcomingEventUIModels(): List<UpcomingEventUIModel> {
 }
 
 private fun EventEntity.toUpcomingEventUIModel(): UpcomingEventUIModel {
+    val categoryEnum = category.toCategoryEnum()
     return UpcomingEventUIModel(
         id = id,
         name = name,
@@ -38,7 +41,8 @@ private fun EventEntity.toUpcomingEventUIModel(): UpcomingEventUIModel {
         }",
         startDateTime = timeStart.toLocalDateTime(),
         isFavorite = isFavorite,
-        tag = "\uD83D\uDCBC Summit"
+        tag = categoryEnum.tag,
+        category = categoryEnum
     )
 }
 
@@ -48,6 +52,7 @@ fun List<EventEntity>.toSubmitEvents(): List<SummitEvent> {
 }
 
 private fun EventEntity.toSubmitEvent(): SummitEvent {
+    val categoryEnum = category.toCategoryEnum()
     return SummitEvent(
         id = id,
         name = name,
@@ -62,11 +67,22 @@ private fun EventEntity.toSubmitEvent(): SummitEvent {
         isConference = isMain,
         eventType = category?.name,
         ordering = order,
-        speakerName = gatherLocation,
+        speakerName = speaker?.name.orEmpty(),
+        speakerAvatar = speaker?.avatar.orEmpty(),
         speakerPosition = gatherTime,
         isFavorite = isFavorite,
-        tag = "\uD83D\uDCBC Summit"
+        tag = categoryEnum.tag,
+        category = categoryEnum
     )
+}
+
+private fun CategoryResponse?.toCategoryEnum(): CategoryEnum {
+    return when (this?.code) {
+        CategoryEnum.SUMMIT.code -> CategoryEnum.SUMMIT
+        CategoryEnum.K5.code -> CategoryEnum.K5
+        CategoryEnum.TECH_ROCK.code -> CategoryEnum.TECH_ROCK
+        else -> CategoryEnum.SUMMIT
+    }
 }
 
 fun UserEntity.toUserUIModel(): UserUIModel {

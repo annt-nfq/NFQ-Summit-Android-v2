@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -75,7 +74,7 @@ fun BasicEvent(
             .fillMaxSize()
             .bounceClick()
             .padding(
-                bottom = if (positionedEvent.splitType == SplitType.End) 0.dp else 2.dp
+                bottom = if (positionedEvent.splitType == SplitType.End) 0.dp else 1.dp
             )
             .coloredShadow(
                 MaterialTheme.colorScheme.secondary,
@@ -97,13 +96,14 @@ fun BasicEvent(
              3 -> Color(0xFF26C6DA) // Blue
              else -> Color(0xFFFFE1CC)      // Default color
          }*/
-        val color = Color(0xFFFFE1CC)
+        val contentColor = Color(event.category.contentColor)
+        val containerColor = Color(event.category.containerColor)
 
         Box(
             modifier = Modifier
                 .width(9.dp)
                 .fillMaxHeight()
-                .background(color)
+                .background(containerColor)
         )
 
         Column(
@@ -111,19 +111,21 @@ fun BasicEvent(
             modifier = Modifier
                 .padding(
                     start = 8.dp,
-                    end = if (eventSize == EventSize.Large) 8.dp else 0.dp
+                    end = if (eventSize == EventSize.Large) 16.dp else 0.dp
                 )
                 .padding(
-                    vertical = if (eventSize == EventSize.Large) 16.dp else 4.dp
+                    top = if (eventSize == EventSize.Large) 16.dp else 4.dp,
                 )
         ) {
             FlowRow(
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(bottom = 4.dp)
+                modifier = Modifier
             ) {
                 if (eventSize == EventSize.Large) {
                     TagItem(
                         tag = event.tag,
+                        containerColor = containerColor,
+                        contentColor = contentColor,
                         modifier = Modifier
                             .padding(end = 10.dp)
                             .padding(bottom = 12.dp)
@@ -144,50 +146,42 @@ fun BasicEvent(
                     overflow = TextOverflow.Visible
                 )
             }
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    modifier = Modifier.widthIn(
-                        min = 0.dp,
-                        max = 250.dp
-                    )
-                ) {
-                    Text(
-                        text = event.name,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = if (compact) 14.sp else 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = if (eventSize == EventSize.Small) 1 else titleMaxLines,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }
-            }
+
+            AutoResizedText(
+                text = event.name,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = if (eventSize == EventSize.Small) 14.sp else 19.sp,
+                ),
+                maxLines = when {
+                    eventSize == EventSize.Small -> 2
+                    else -> 3
+                },
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier.padding(top = if (eventSize == EventSize.Small) 0.dp else 4.dp)
+            )
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = if (eventSize == EventSize.Large) 16.dp else if (eventSize == EventSize.Medium) 4.dp else 1.dp)
             ) {
-                if (event.iconUrl != null && eventSize != EventSize.Small)
+                if (event.speakerAvatar.isNotBlank() && eventSize != EventSize.Small)
                     AsyncImage(
                         modifier = Modifier
                             .size(21.dp)
                             .clip(CircleShape)
                             .background(Color(0xFFE6E6E6)),
-                        model = event.iconUrl,
+                        model = event.speakerAvatar,
                         contentDescription = "speaker profile",
                         contentScale = ContentScale.Crop
                     )
-                if (event.speakerName != null)
+                if (event.speakerName.isNotBlank())
                     Text(
-                        text = event.speakerName ?: "",
+                        text = event.speakerName,
                         style = MaterialTheme.typography.bodySmall,
                         fontSize = 10.sp,
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Start,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -218,7 +212,7 @@ private fun BasicEventPreview(
                     name = "Event Name",
                     iconUrl = "https://www.example.com/image.jpg",
                     speakerName = "Speaker Name",
-                    speakerProfileUrl = "https://www.example.com/speaker.jpg",
+                    speakerAvatar = "https://www.example.com/speaker.jpg",
                     ordering = 4,
                     id = "1",
                     start = java.time.LocalDateTime.now(),
@@ -244,10 +238,10 @@ private fun BasicEventPreview() {
         BasicEvent(
             positionedEvent = PositionedEvent(
                 event = SummitEvent(
-                    name = "Event Name",
+                    name = "How to migrate from an Android codebase to KMMHow to migrate from an Android codebase to KMM",
                     iconUrl = "https://www.example.com/image.jpg",
                     speakerName = "Speaker Name",
-                    speakerProfileUrl = "https://www.example.com/speaker.jpg",
+                    speakerAvatar = "https://www.example.com/speaker.jpg",
                     ordering = 4,
                     id = "1",
                     start = java.time.LocalDateTime.now(),

@@ -2,12 +2,11 @@ package com.nfq.nfqsummit.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -30,8 +29,10 @@ fun Schedule(
     modifier: Modifier = Modifier,
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit,
     timeLabel: @Composable (time: LocalTime) -> Unit = { BasicSidebarLabel(time = it) },
-    minDate: LocalDate = events.minByOrNull(SummitEvent::start)?.start?.toLocalDate() ?: LocalDate.now(),
-    maxDate: LocalDate = events.maxByOrNull(SummitEvent::end)?.end?.toLocalDate() ?: LocalDate.now(),
+    minDate: LocalDate = events.minByOrNull(SummitEvent::start)?.start?.toLocalDate()
+        ?: LocalDate.now(),
+    maxDate: LocalDate = events.maxByOrNull(SummitEvent::end)?.end?.toLocalDate()
+        ?: LocalDate.now(),
     minTime: LocalTime = LocalTime.MIN,
     maxTime: LocalTime = LocalTime.MAX,
     daySize: ScheduleSize = ScheduleSize.FixedSize(500.dp),
@@ -39,8 +40,8 @@ fun Schedule(
 ) {
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes.toFloat() / 60f
-    var sidebarWidth by remember { mutableStateOf(0) }
-    val headerHeight by remember { mutableStateOf(0) }
+    var sidebarWidth by remember { mutableIntStateOf(150) }
+    val headerHeight by remember { mutableIntStateOf(0) }
     BoxWithConstraints(modifier = modifier) {
 
         val dayWidth: Dp = with(LocalDensity.current) {
@@ -60,47 +61,42 @@ fun Schedule(
                 )
             }
         }
-        Column(modifier = modifier) {
 
-            Box(
-                modifier = Modifier.fillMaxWidth()
-//                .weight(1f)
-            ) {
-                ScheduleSidebar(
-                    hourHeight = hourHeight,
-                    minTime = minTime,
-                    maxTime = maxTime,
-                    label = timeLabel,
-                    modifier = Modifier
-                        .onGloballyPositioned { sidebarWidth = it.size.width }
-                        .align(Alignment.TopStart)
-//                        .background(Color(0x66FF0000))
-                )
-                BasicSchedule(
-                    events = events,
-                    eventContent = eventContent,
-                    minDate = minDate,
-                    maxDate = maxDate,
-                    minTime = minTime,
-                    maxTime = maxTime,
-                    dayWidth = dayWidth,
-                    hourHeight = hourHeight,
-                    modifier = Modifier
-                        .padding(top = 10.dp)
-                        .align(Alignment.TopEnd)
-//                        .background(Color(0x6600FFAE))
-                )
-                CurrentTimeIndicator(
-                    currentTime = currentTime,
-                    minDate = minDate,
-                    maxDate = maxDate,
-                    minTime = minTime,
-                    maxTime = maxTime,
-                    dayWidth = fullWidth,
-                    hourHeight = hourHeight,
-                    modifier = Modifier
-                )
-            }
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            ScheduleSidebar(
+                hourHeight = hourHeight,
+                minTime = minTime,
+                maxTime = maxTime,
+                label = timeLabel,
+                modifier = Modifier
+                    .onGloballyPositioned { sidebarWidth = it.size.width }
+                    .align(Alignment.TopStart)
+            )
+            BasicSchedule(
+                events = events,
+                eventContent = eventContent,
+                minDate = minDate,
+                maxDate = maxDate,
+                minTime = minTime,
+                maxTime = maxTime,
+                dayWidth = dayWidth,
+                hourHeight = hourHeight,
+                modifier = Modifier
+                    .padding(top = 10.dp)
+                    .align(Alignment.TopEnd)
+            )
+            CurrentTimeIndicator(
+                currentTime = currentTime,
+                minDate = minDate,
+                maxDate = maxDate,
+                minTime = minTime,
+                maxTime = maxTime,
+                dayWidth = fullWidth,
+                hourHeight = hourHeight,
+                modifier = Modifier
+            )
         }
     }
 }

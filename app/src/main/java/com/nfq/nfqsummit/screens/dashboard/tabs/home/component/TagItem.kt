@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -16,12 +17,14 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 @Composable
 fun TagItem(
     modifier: Modifier = Modifier,
-    tag: String
+    tag: String,
+    contentColor: Color = MaterialTheme.colorScheme.primary,
+    containerColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
 ) {
     Box(
         modifier = modifier
             .background(
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                color = containerColor,
                 shape = RoundedCornerShape(8.dp),
             )
             .padding(horizontal = 12.dp, vertical = 4.dp)
@@ -29,7 +32,7 @@ fun TagItem(
         Text(
             text = tag,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.primary,
+            color = contentColor,
             fontWeight = FontWeight.Medium
         )
     }

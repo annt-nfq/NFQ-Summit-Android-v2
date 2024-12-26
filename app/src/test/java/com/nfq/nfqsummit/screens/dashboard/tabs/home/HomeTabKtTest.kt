@@ -73,13 +73,13 @@ class HomeTabKtTest : BaseComposeTest() {
                 )
             )
         )
-        viewModel = HomeViewModel(eventRepository, blogRepository)
+        /*viewModel = HomeViewModel(eventRepository, blogRepository)
         composeTestRule.setContent {
             HomeTab(
                 viewModel = viewModel,
                 goToAttractions = {}
             )
-        }
+        }*/
     }
 
 

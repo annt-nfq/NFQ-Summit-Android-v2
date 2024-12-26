@@ -26,19 +26,38 @@ data class EventActivityResponse(
     @SerialName("images") val images: List<String>?,
     @SerialName("order") val order: Int?,
     @SerialName("category") val category: CategoryResponse?,
+    @SerialName("genre") val genre: GenreResponse?,
     @SerialName("eventDay") val eventDay: EventDayResponse?,
     @SerialName("qrCodeUrl") val qrCodeUrl: String?,
-    @SerialName("isFavorite") val isFavorite: Boolean?
+    @SerialName("isFavorite") val isFavorite: Boolean?,
+    @SerialName("speaker") val speaker: SpeakerResponse?
 )
 
 @Serializable
 data class CategoryResponse(
     @SerialName("id") val id: Int,
-    @SerialName("name") val name: String
+    @SerialName("name") val name: String,
+    @SerialName("code") val code: String
 )
+
+@Serializable
+data class GenreResponse(
+    @SerialName("id") val id: Int,
+    @SerialName("name") val name: String,
+    @SerialName("code") val code: String
+)
+
+
 @Serializable
 data class EventDayResponse(
     @SerialName("id") val id: Int,
     @SerialName("name") val name: String,
     @SerialName("dateStart") val dateStart: String
+)
+
+@Serializable
+data class SpeakerResponse(
+    @SerialName("id") val id: Int,
+    @SerialName("name") val name: String,
+    @SerialName("avatar") val avatar: String
 )

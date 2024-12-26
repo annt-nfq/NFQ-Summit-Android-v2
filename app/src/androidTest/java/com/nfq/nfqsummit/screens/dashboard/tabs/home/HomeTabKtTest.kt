@@ -44,7 +44,8 @@ class HomeTabTest {
             composeTestRule.setContent {
                 HomeTab(
                     viewModel = mockViewModel,
-                    goToAttractions = {}
+                    goToAttractions = {},
+                    goToSignIn = {}
                 )
             }
         }
@@ -68,7 +69,8 @@ class HomeTabTest {
                 viewModel = mockViewModel,
                 goToAttractions = {},
                 seeAllEvents = {},
-                seeAllSavedEvents = {}
+                seeAllSavedEvents = {},
+                goToSignIn = {}
             )
         }
 
@@ -96,7 +98,8 @@ class HomeTabTest {
                 viewModel = mockViewModel,
                 goToAttractions = {},
                 seeAllEvents = {},
-                seeAllSavedEvents = {}
+                seeAllSavedEvents = {},
+                goToSignIn = {}
             )
         }
 
@@ -132,7 +135,8 @@ class HomeTabTest {
                 viewModel = mockViewModel,
                 goToAttractions = {},
                 seeAllEvents = {},
-                seeAllSavedEvents = {}
+                seeAllSavedEvents = {},
+                goToSignIn = {}
             )
         }
 
@@ -159,7 +163,8 @@ class HomeTabTest {
                 viewModel = mockViewModel,
                 goToAttractions = {},
                 seeAllEvents = {},
-                seeAllSavedEvents = {}
+                seeAllSavedEvents = {},
+                goToSignIn = {}
             )
         }
 
@@ -184,7 +189,8 @@ class HomeTabTest {
                 viewModel = mockViewModel,
                 goToAttractions = {},
                 seeAllEvents = {},
-                seeAllSavedEvents = {}
+                seeAllSavedEvents = {},
+                goToSignIn = {}
             )
         }
 

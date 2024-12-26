@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.nfq.data.remote.model.response.CategoryResponse
 import com.nfq.data.remote.model.response.EventDayResponse
+import com.nfq.data.remote.model.response.GenreResponse
+import com.nfq.data.remote.model.response.SpeakerResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -31,7 +33,9 @@ data class EventEntity(
     @ColumnInfo("images") val images: List<String>,
     @ColumnInfo("order") val order: Int,
     @ColumnInfo("category") val category: CategoryResponse?,
+    @ColumnInfo("genre") val genre: GenreResponse?,
     @ColumnInfo("eventDay") val eventDay: EventDayResponse?,
     @ColumnInfo("qrCodeUrl") val qrCodeUrl: String,
-    @ColumnInfo("isFavorite") val isFavorite: Boolean
+    @ColumnInfo("isFavorite") val isFavorite: Boolean,
+    @ColumnInfo("speaker") val speaker: SpeakerResponse?
 )

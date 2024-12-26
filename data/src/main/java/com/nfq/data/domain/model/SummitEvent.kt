@@ -29,12 +29,26 @@ data class SummitEvent(
     val isConference: Boolean = false,
     val eventType: String? = null,
     val ordering: Int = 0,
-    val speakerProfileUrl: String? = null,
-    val speakerName: String? = null,
+    val speakerAvatar: String = "",
+    val speakerName: String = "",
     val speakerPosition: String? = null,
     val isFavorite: Boolean = false,
-    val tag: String
+    val tag: String,
+    val category: CategoryEnum = CategoryEnum.SUMMIT
 )
+
+
+enum class CategoryEnum(
+    val code: String,
+    val containerColor: Int,
+    val contentColor: Int,
+    val tag: String
+) {
+    SUMMIT("summit", 0xFFFFE1CC.toInt(), 0xFFFF6B00.toInt(), "\uD83D\uDCBC Summit"),
+    K5("k5", 0xFFB4EAFF.toInt(), 0xFF02A5E6.toInt(), "\uD83C\uDDE9\uD83C\uDDEA K5"),
+    TECH_ROCK("tech_rock", 0xFFE5EDFF.toInt(), 0xFF42389D.toInt(), "\uD83E\uDD16 Tech Rock")
+}
+
 
 object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
     override val descriptor: SerialDescriptor =
@@ -68,6 +82,7 @@ fun SummitEventRemoteModel.toSummitEvent(): SummitEvent {
         eventType = eventType ?: "",
         ordering = ordering ?: 0,
         speakerName = speakerName ?: "",
+        speakerAvatar = "",
         speakerPosition = speakerPosition,
         isFavorite = isFavorite ?: false,
         tag = tag ?: "\uD83D\uDCBC Summit"

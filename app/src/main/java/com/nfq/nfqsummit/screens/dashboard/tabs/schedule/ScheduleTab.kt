@@ -4,7 +4,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -19,6 +18,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -51,6 +52,7 @@ import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicEvent
 import com.nfq.nfqsummit.components.Schedule
+import com.nfq.nfqsummit.components.ScheduleSize
 import com.nfq.nfqsummit.components.SegmentedControl
 import com.nfq.nfqsummit.isSame
 import com.nfq.nfqsummit.mocks.mockEventDay1
@@ -102,35 +104,57 @@ fun ScheduleTabUI(
 ) {
 
     val verticalScroll = rememberScrollState()
+    val pagerState = rememberPagerState { 2 }
 
     Scaffold(
         topBar = {
             ScheduleHeader(
-                dayEventPairs = uiState.dayEventPairs,
-                selectedDate = uiState.selectedDate,
+                uiState = uiState,
+                pagerState = pagerState,
                 verticalScroll = verticalScroll,
                 onDayClick = onDayClick
             )
         }
     ) { innerPadding ->
-        SummitSchedules(
-            dailyEvents = uiState.dailyEvents,
-            currentTime = uiState.currentTime,
-            onEventClick = { onEventClick(it) },
+        HorizontalPager(
+            state = pagerState,
             modifier = Modifier.padding(innerPadding)
-        )
+        ) { page ->
+            Surface(
+                color = Color(0xFFF8F8FA),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                when (page) {
+                    0 -> {
+                        SummitSchedules(
+                            dailyEvents = uiState.summitEvents,
+                            currentTime = uiState.currentTime,
+                            onEventClick = onEventClick
+                        )
+                    }
+
+                    else -> {
+                        SummitSchedules(
+                            dailyEvents = uiState.techRockEvents,
+                            currentTime = uiState.currentTime,
+                            hourSize = uiState.hourSize,
+                            onEventClick = onEventClick
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
 private fun ScheduleHeader(
-    dayEventPairs: PersistentList<Pair<LocalDate, PersistentList<SummitEvent>>>,
-    selectedDate: LocalDate,
+    uiState: ScheduleUIState,
+    pagerState: PagerState,
     verticalScroll: ScrollState = rememberScrollState(),
     onDayClick: (LocalDate) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState { 2 }
     Surface {
         Column {
             Row(
@@ -142,15 +166,18 @@ private fun ScheduleHeader(
             ) {
                 Spacer(modifier = Modifier.width(16.dp))
 
-                dayEventPairs.forEach { (date, events) ->
+                uiState.dayEventPairs.forEach { (date, events) ->
                     ScheduleDays(
                         date = date.dayOfMonth.toString(),
                         dayOfWeek = date.dayOfWeek.getDisplayName(
                             TextStyle.SHORT,
                             Locale.getDefault()
                         ),
-                        eventCount = events.size,
-                        selected = selectedDate.isSame(date),
+                        eventCount = Pair(
+                            events.toSummitEvents().size,
+                            events.toTechRockEvents().size
+                        ),
+                        selected = uiState.selectedDate.isSame(date),
                         onClick = {
                             onDayClick(date)
 
@@ -172,7 +199,8 @@ private fun ScheduleHeader(
                     coroutineScope.launch { pagerState.animateScrollToPage(it) }
                 },
                 modifier = Modifier
-                    .padding( 24.dp)
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 24.dp)
                     .padding()
             )
             HorizontalDivider(color = Color(0xFFCFCAE4), thickness = 1.dp)
@@ -185,28 +213,27 @@ fun SummitSchedules(
     modifier: Modifier = Modifier,
     dailyEvents: PersistentList<SummitEvent>,
     currentTime: LocalTime,
+    hourSize: ScheduleSize = ScheduleSize.FixedSize(130.dp),
     verticalScroll: ScrollState = rememberScrollState(),
     onEventClick: (SummitEvent) -> Unit
 ) {
-
+    if (dailyEvents.isEmpty()) {
+        EmptyEvent(modifier)
+        return
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F8FA))
             .verticalScroll(state = verticalScroll)
-            .padding(start = 32.dp)
+            .padding(start = 20.dp)
             .padding(top = 16.dp)
             .navigationBarsPadding()
     ) {
 
-        if (dailyEvents.isEmpty()) {
-            EmptyEvent(modifier)
-            return
-        }
-
         Schedule(
             events = dailyEvents.sortedBy { it.name }.toPersistentList(),
             currentTime = currentTime,
+            hourSize = hourSize,
             modifier = Modifier
                 .fillMaxWidth(),
             minTime = dailyEvents
@@ -226,7 +253,7 @@ fun SummitSchedules(
 fun ScheduleDays(
     date: String,
     dayOfWeek: String,
-    eventCount: Int,
+    eventCount: Pair<Int, Int>,
     selected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
@@ -293,18 +320,31 @@ fun ScheduleDays(
             modifier = Modifier
                 .padding(top = if (selected) 0.dp else 2.dp)
                 .height(12.dp)
-
         ) {
-            if (eventCount <= 3)
-                repeat(eventCount) {
-                    EventCountIndicator()
+            val totalEventCount = eventCount.first + eventCount.second
+            val primaryColor = MaterialTheme.colorScheme.primary
+            val secondaryColor = Color(0xFF42389D)
+
+            if (totalEventCount <= 3) {
+                repeat(eventCount.first) {
+                    EventCountIndicator(primaryColor)
                 }
-            else {
-                repeat(3) {
-                    EventCountIndicator()
+                repeat(eventCount.second) {
+                    EventCountIndicator(secondaryColor)
+                }
+            } else {
+                val primaryCount =
+                    if (eventCount.first < 3) eventCount.first else if (eventCount.second == 0) 3 else 2
+                val secondaryCount = if (eventCount.second != 0) 1 else 0
+
+                repeat(primaryCount) {
+                    EventCountIndicator(primaryColor)
+                }
+                repeat(secondaryCount) {
+                    EventCountIndicator(secondaryColor)
                 }
                 Text(
-                    text = "+${eventCount - 3}",
+                    text = "+${totalEventCount - 3}",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Normal,
                     fontSize = 10.sp
@@ -312,7 +352,6 @@ fun ScheduleDays(
             }
         }
     }
-
 }
 
 @Composable
@@ -324,24 +363,23 @@ private fun EmptyEvent(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "No events for today",
+            text = "No events",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center,
-            modifier = modifier
-                .padding(16.dp)
-                .fillMaxSize()
+            textAlign = TextAlign.Center
         )
     }
 }
 
 @Composable
-fun EventCountIndicator() {
+fun EventCountIndicator(
+    color: Color = MaterialTheme.colorScheme.primary
+) {
     Box(
         modifier = Modifier
             .padding(1.dp)
             .size(4.dp)
-            .background(MaterialTheme.colorScheme.primary, CircleShape)
+            .background(color, CircleShape)
     )
 }
 
@@ -356,7 +394,7 @@ fun ScheduleDaysSelectedPreview() {
                 selected = true,
                 date = "1",
                 dayOfWeek = "Mon",
-                eventCount = 3,
+                eventCount = Pair(2, 1),
             )
         }
 
@@ -370,7 +408,7 @@ fun ScheduleDaysUnselectedPreview() {
         ScheduleDays(
             date = "1",
             dayOfWeek = "Mon",
-            eventCount = 5,
+            eventCount = Pair(2, 1),
         )
     }
 }
@@ -379,6 +417,9 @@ val dayEventPair = persistentListOf(
     LocalDate.of(2024, 1, 1) to persistentListOf(
         mockEventDay1,
         mockEventDay1H1,
+        mockEventDay1H1,
+        mockEventDay1H12,
+        mockEventDay1H12,
         mockEventDay1H12,
         mockEventDay1H13
     ),
@@ -390,7 +431,7 @@ val dayEventPair = persistentListOf(
 
 val uiState = ScheduleUIState(
     dayEventPairs = dayEventPair,
-    dailyEvents = dayEventPair[0].second,
+    summitEvents = dayEventPair[0].second,
     currentTime = LocalTime.of(11, 40),
     selectedDate = LocalDate.of(2024, 1, 1),
 )

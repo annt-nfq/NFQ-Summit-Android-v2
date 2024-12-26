@@ -1,10 +1,13 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.schedule
 
 import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nfq.data.domain.model.CategoryEnum
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.domain.repository.NFQSummitRepository
+import com.nfq.nfqsummit.components.ScheduleSize
 import com.nfq.nfqsummit.isSame
 import com.nfq.nfqsummit.mapper.toSubmitEvents
 import com.nfq.nfqsummit.utils.UserMessageManager
@@ -21,6 +24,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,10 +69,23 @@ class ScheduleViewModel @Inject constructor(
             .flatMap { (_, events) -> events }
             .toPersistentList()
 
+        val summitEvents = dailyEvents.toSummitEvents()
+        val techRockEvents = dailyEvents.toTechRockEvents()
+
+        val hourSize =
+            if (techRockEvents.any { ChronoUnit.MINUTES.between(it.start, it.end) < 60 }) {
+                ScheduleSize.FixedSize(220.dp)
+            } else {
+                ScheduleSize.FixedSize(130.dp)
+            }
+
         ScheduleUIState(
             selectedDate = selectedDate!!,
             dailyEvents = dailyEvents,
-            dayEventPairs = dayEventPairs
+            dayEventPairs = dayEventPairs,
+            techRockEvents = techRockEvents,
+            summitEvents = summitEvents,
+            hourSize = hourSize
         )
 
     }.stateIn(
@@ -93,10 +110,22 @@ class ScheduleViewModel @Inject constructor(
     }
 }
 
+fun PersistentList<SummitEvent>.toTechRockEvents(): PersistentList<SummitEvent> {
+    return this.filter { it.category == CategoryEnum.TECH_ROCK }.toPersistentList()
+}
+
+fun PersistentList<SummitEvent>.toSummitEvents(): PersistentList<SummitEvent> {
+    return this.filter { it.category == CategoryEnum.SUMMIT || it.category == CategoryEnum.K5 }
+        .toPersistentList()
+}
+
 data class ScheduleUIState(
     val isLoading: Boolean = false,
     val selectedDate: LocalDate = LocalDate.now(),
     val currentTime: LocalTime = LocalTime.now(),
     val dailyEvents: PersistentList<SummitEvent> = persistentListOf(),
+    val summitEvents: PersistentList<SummitEvent> = persistentListOf(),
+    val techRockEvents: PersistentList<SummitEvent> = persistentListOf(),
+    val hourSize: ScheduleSize = ScheduleSize.FixedSize(130.dp),
     val dayEventPairs: PersistentList<Pair<LocalDate, PersistentList<SummitEvent>>> = persistentListOf(),
 )

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,14 +29,14 @@ class HomeViewModel @Inject constructor(
 
     val uiState = combine(
         repository.user,
-        repository.events,
+        repository.events.map { it.sortedBy { event -> event.timeStart }.take(3) },
         repository.savedEvents,
         loadingFlow
     ) { user, events, savedEvents, isLoading ->
         HomeUIState(
             isLoading = isLoading,
             user = user?.toUserUIModel(),
-            upcomingEvents = events.sortedBy { it.timeStart }.take(3).toUpcomingEventUIModels(),
+            upcomingEvents = events.toUpcomingEventUIModels(),
             savedEvents = savedEvents.toSavedEventUIModels()
         )
     }.stateIn(

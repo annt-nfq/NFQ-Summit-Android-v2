@@ -98,7 +98,7 @@ class FakeNFQSummitRepository : NFQSummitRepository {
         }
     }
 
-    override suspend fun fetchEventActivities(): Either<DataException, Unit> {
+    override suspend fun fetchEventActivities(forceUpdate: Boolean): Either<DataException, Unit> {
         return if (shouldFailFetchEvents) {
             Either.Left(DataException.Api("Fetch events failed"))
         } else {

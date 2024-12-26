@@ -179,6 +179,7 @@ object EventActivityResponseMock {
         adminNotes = "Ensure all participants have their badges",
         order = 1,
         category = null,
+        genre = null,
         eventDay = EventDayResponse(
             id = 1,
             name = "Day 1",
@@ -188,7 +189,8 @@ object EventActivityResponseMock {
         code = "TECH2024",
         title = "NFQ Tech Conference 2024",
         quantity = 200,
-        isMain = true
+        isMain = true,
+        speaker = null
     )
 
     private val event2 = EventActivityResponse(
@@ -212,6 +214,7 @@ object EventActivityResponseMock {
         adminNotes = "Dietary restrictions to be considered",
         order = 2,
         category = null,
+        genre = null,
         eventDay = EventDayResponse(
             id = 1,
             name = "Day 1",
@@ -221,7 +224,8 @@ object EventActivityResponseMock {
         code = "LUNCH2024",
         title = "Networking Lunch Session",
         quantity = 150,
-        isMain = false
+        isMain = false,
+        speaker = null
     )
 
     val favoriteEvents = listOf(
@@ -243,13 +247,15 @@ object EventActivityResponseMock {
             adminNotes = "",
             order = 0,
             category = null,
+            genre = null,
             eventDay = null,
             qrCodeUrl = "",
             code = "",
             title = "",
             quantity = 0,
             isMain = false,
-            timeEnd = 0L
+            timeEnd = 0L,
+            speaker = null
         )
     )
     val mockEventEntity = EventEntity(
@@ -270,13 +276,15 @@ object EventActivityResponseMock {
         adminNotes = "",
         order = 0,
         category = null,
+        genre = null,
         eventDay = null,
         qrCodeUrl = "",
         code = "",
         title = "",
         quantity = 0,
         isMain = false,
-        timeEnd = 0L
+        timeEnd = 0L,
+        speaker = null
     )
     val eventsList = listOf(event1, event2)
 }
