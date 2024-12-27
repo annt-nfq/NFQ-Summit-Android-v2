@@ -52,6 +52,11 @@ class NFQSummitRepositoryImpl @Inject constructor(
     override suspend fun fetchEventActivities(forceUpdate: Boolean): Either<DataException, Unit> {
         return dataSource
             .getEventActivities()
+            .onLeft {
+                if (it is DataException.Api && it.errorCode == 401) {
+                    userDao.deleteUser()
+                }
+            }
             .map { latestEvents ->
                 val favoriteEvents = eventDao.getFavoriteEvents().firstOrNull().orEmpty()
                 val updatedEvents = updateEventsWithFavorites(latestEvents, favoriteEvents)

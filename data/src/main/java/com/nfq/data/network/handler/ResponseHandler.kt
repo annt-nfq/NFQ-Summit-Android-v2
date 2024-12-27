@@ -49,13 +49,7 @@ suspend fun <T, R> handleCall(
                 }
             }
 
-            else -> Either.Left(
-                DataException.Api(
-                    title = ERROR_TITLE_GENERAL,
-                    message = ERROR_DATA_NOT_FOUNT,
-                    errorCode = -1
-                )
-            )
+            else -> errorResponseHandler(it)
         }
     }
 } catch (e: Exception) {
@@ -161,20 +155,12 @@ suspend fun <T, R> errorResponseHandler(
         null
     }
 
-    return when {
-        it.code() == 404 -> {
-            Either.Left(DataException.Api(message = errorMessage ?: ERROR_MESSAGE_GENERAL))
-        }
-
-        else -> {
-            Either.Left(
-                DataException.Api(
-                    message = errorMessage ?: ERROR_MESSAGE_GENERAL,
-                    title = ERROR_TITLE_GENERAL,
-                    errorCode = -1
-                )
-            )
-        }
-    }
+    return Either.Left(
+        DataException.Api(
+            message = errorMessage ?: ERROR_MESSAGE_GENERAL,
+            title = ERROR_TITLE_GENERAL,
+            errorCode = it.code()
+        )
+    )
 }
 
