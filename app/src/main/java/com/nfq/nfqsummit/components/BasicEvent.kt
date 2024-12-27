@@ -136,15 +136,15 @@ fun BasicEvent(
                 val timeFormatter = DateTimeFormatter.ofPattern("h:mm a")
                 val startTime = event.start.format(timeFormatter).lowercase().replace(":00", "")
                 val endTime = event.end.format(timeFormatter).lowercase().replace(":00", "")
-                Text(
+                AutoResizedText(
                     text = "$startTime - $endTime",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(top = 4.dp),
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    minFontSize = 10.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Visible
-                )
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 4.dp)                )
             }
 
             AutoResizedText(
