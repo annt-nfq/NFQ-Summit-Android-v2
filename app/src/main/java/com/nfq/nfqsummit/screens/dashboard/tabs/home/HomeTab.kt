@@ -275,7 +275,7 @@ private fun LazyListScope.showQRCodeSection(
                         Text(
                             text = "You'll need to show this at NFQ Summit registration \uD83D\uDCCB",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.secondary
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
                             )
                         )
                     }
