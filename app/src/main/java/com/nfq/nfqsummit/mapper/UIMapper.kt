@@ -16,12 +16,14 @@ fun List<EventEntity>.toSavedEventUIModels(): List<SavedEventUIModel> {
 }
 
 private fun EventEntity.toSavedEventUIModel(): SavedEventUIModel {
+    val categoryEnum = category.toCategoryEnum()
     return SavedEventUIModel(
         id = id,
         imageUrl = images.find { it.isNotBlank() }.orEmpty(),
         name = name,
         date = timeStart.toFormattedDateTimeString(targetPattern = "EEE, MMM d • HH:mm"),
-        tag = "\uD83D\uDCBC Summit"
+        tag = category.toCategoryEnum().tag,
+        category = categoryEnum
     )
 }
 
