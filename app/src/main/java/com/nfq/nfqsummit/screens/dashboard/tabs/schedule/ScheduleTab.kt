@@ -270,7 +270,7 @@ fun ScheduleDays(
     ) {
         BasicCard(
             shape = RoundedCornerShape(10.dp),
-            blurRadius = 20.dp,
+            blurRadius = 10.dp,
             shadowColor = MaterialTheme.colorScheme.secondary
         ) {
             Column(
