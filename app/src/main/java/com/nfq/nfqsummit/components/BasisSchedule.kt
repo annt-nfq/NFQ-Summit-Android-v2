@@ -178,7 +178,7 @@ fun CurrentTimeIndicator(
                 )
             }
         },
-        modifier = modifier.padding(start = 25.dp)
+        modifier = modifier.padding(start = 40.dp)
     ) { measureables, constraints ->
         val height = (hourHeight.toPx() * (numMinutes / 60f)).roundToInt()
         val width = dayWidth.roundToPx() * numDays
