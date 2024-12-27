@@ -5,6 +5,8 @@ import com.nfq.data.BuildConfig
 import com.nfq.data.database.dao.UserDao
 import com.nfq.data.network.utils.createOkHttpClient
 import com.nfq.data.network.utils.createRetrofitClient
+import com.nfq.data.network.utils.networkConnectivity.ConnectivityObserver
+import com.nfq.data.network.utils.networkConnectivity.NetworkConnectivityObserver
 import com.nfq.data.remote.datasource.NFQSummitDataSource
 import com.nfq.data.remote.datasource.NFQSummitDataSourceImpl
 import dagger.Binds
@@ -60,6 +62,14 @@ abstract class NetworkModule {
         @Singleton
         fun provideRetrofit(okHttpClient: OkHttpClient, networkJson: Json): Retrofit {
             return createRetrofitClient(BuildConfig.BASE_URL, okHttpClient, networkJson)
+        }
+
+        @Provides
+        @Singleton
+        fun provideNetworkConnectivityObserver(
+            @ApplicationContext context: Context
+        ): ConnectivityObserver {
+            return NetworkConnectivityObserver(context)
         }
     }
 
