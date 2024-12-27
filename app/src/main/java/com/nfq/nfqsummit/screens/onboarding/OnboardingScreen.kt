@@ -205,14 +205,14 @@ private fun OnboardingContent(
             ) { page ->
                 when (page) {
                     0 -> OnboardingPage(
-                        modifier = Modifier.fillMaxHeight(0.78f),
+                        modifier = Modifier.fillMaxHeight(0.75f),
                         imageRes = R.drawable.onboarding1,
                         title = "Explore Events",
                         description = "Discover every event and stay informed! Explore the NFQ Summit 2025 calendar to ensure you never miss any exciting sessions, workshops, or networking opportunities."
                     )
 
                     1 -> OnboardingPage(
-                        modifier = Modifier.fillMaxHeight(0.78f),
+                        modifier = Modifier.fillMaxHeight(0.75f),
                         imageRes = R.drawable.onboarding2,
                         title = "Experience Thailand & Vietnam",
                         description = "Explore these vibrant destinations with expert guides, uncovering landmarks, culture, and local flavors."
