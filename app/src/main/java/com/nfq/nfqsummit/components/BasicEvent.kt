@@ -144,7 +144,8 @@ fun BasicEvent(
                     minFontSize = 10.sp,
                     maxLines = 1,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(top = 4.dp)                )
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
 
             AutoResizedText(
@@ -153,9 +154,9 @@ fun BasicEvent(
                     fontWeight = FontWeight.Bold,
                     lineHeight = if (eventSize == EventSize.Small) 14.sp else 19.sp,
                 ),
-                maxLines = when {
-                    eventSize == EventSize.Small -> 2
-                    else -> 3
+                maxLines = when (eventSize) {
+                    EventSize.Small, EventSize.Medium -> 4
+                    else -> 5
                 },
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.padding(top = if (eventSize == EventSize.Small) 0.dp else 4.dp)
