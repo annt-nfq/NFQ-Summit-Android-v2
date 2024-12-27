@@ -27,27 +27,20 @@ fun AutoResizedText(
     maxFontSize: TextUnit = style.fontSize.takeIf { !it.isUnspecified } ?: 24.sp
 ) {
     var resizedTextStyle by remember { mutableStateOf(style.copy(fontSize = maxFontSize)) }
-    var shouldDraw by remember { mutableStateOf(false) }
     var lineCount by remember { mutableIntStateOf(0) }
 
     Text(
         text = text,
         color = color,
-        modifier = modifier.drawWithContent { if (shouldDraw) drawContent() },
+        modifier = modifier.drawWithContent { drawContent() },
         style = resizedTextStyle,
         onTextLayout = { result ->
             lineCount = result.lineCount
-            if (lineCount > maxLines) {
-                if (resizedTextStyle.fontSize > minFontSize) {
-                    resizedTextStyle = resizedTextStyle.copy(
-                        fontSize = (resizedTextStyle.fontSize * 0.95f).value
-                            .coerceIn(minFontSize.value, maxFontSize.value).sp
-                    )
-                } else {
-                    shouldDraw = true
-                }
-            } else {
-                shouldDraw = true
+            if (lineCount > maxLines && resizedTextStyle.fontSize > minFontSize) {
+                resizedTextStyle = resizedTextStyle.copy(
+                    fontSize = (resizedTextStyle.fontSize * 0.95f).value
+                        .coerceIn(minFontSize.value, maxFontSize.value).sp
+                )
             }
         }
     )
