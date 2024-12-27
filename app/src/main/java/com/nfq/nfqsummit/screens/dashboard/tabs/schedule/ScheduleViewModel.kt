@@ -43,30 +43,27 @@ class ScheduleViewModel @Inject constructor(
         val firstEventDate = events.firstOrNull()?.start?.toLocalDate() ?: today
         val lastEventDate = events.lastOrNull()?.end?.toLocalDate() ?: today
 
-        val selectedDate = when {
-            oldSelectedDate != null -> oldSelectedDate
+        val selectedDate = oldSelectedDate ?: when {
             today < firstEventDate -> firstEventDate
             today > lastEventDate -> lastEventDate
             else -> today
         }
-        // Generate a sorted list of unique event dates
+
         val distinctDates = events
             .mapNotNull { it.start.toLocalDate() }
             .distinct()
             .sorted()
 
-        // Pair each date with its corresponding non-conference events
         val dayEventPairs = distinctDates.map { date ->
             date to events.filter { event ->
                 event.start.toLocalDate() == date && event.start.hour < event.end.hour
             }.sortedBy { it.start }.toPersistentList()
         }.toPersistentList()
 
-        // Extract events for the selected date
         val dailyEvents = dayEventPairs
-            .filter { (date, _) -> date.isSame(selectedDate) }
-            .flatMap { (_, events) -> events }
-            .toPersistentList()
+            .firstOrNull { (date, _) -> date.isSame(selectedDate) }
+            ?.second
+            ?: persistentListOf()
 
         val summitEvents = dailyEvents.toSummitEvents()
         val techRockEvents = dailyEvents.toTechRockEvents()
@@ -79,7 +76,7 @@ class ScheduleViewModel @Inject constructor(
             }
 
         ScheduleUIState(
-            selectedDate = selectedDate!!,
+            selectedDate = selectedDate,
             dailyEvents = dailyEvents,
             dayEventPairs = dayEventPairs,
             techRockEvents = techRockEvents,
