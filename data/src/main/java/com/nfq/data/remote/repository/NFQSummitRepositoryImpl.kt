@@ -88,7 +88,7 @@ class NFQSummitRepositoryImpl @Inject constructor(
         isFavorite: Boolean
     ): Either<DataException, Unit> {
         return try {
-            eventDao.updateFavorite(eventId, isFavorite)
+            eventDao.updateFavorite(eventId, isFavorite, updatedAt = System.currentTimeMillis())
             Either.Right(Unit)
         } catch (e: Exception) {
             Either.Left(DataException.Api(e.message ?: e.localizedMessage ?: "Unknown error"))

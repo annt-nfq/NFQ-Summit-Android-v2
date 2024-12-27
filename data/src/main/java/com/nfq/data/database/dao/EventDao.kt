@@ -11,13 +11,14 @@ interface EventDao {
     @Query("SELECT * FROM event_entity ORDER BY timeStart ASC")
     fun getAllEvents(): Flow<List<EventEntity>>
 
-    @Query("SELECT * FROM event_entity WHERE isFavorite = 1 ORDER BY timeStart ASC")
+    @Query("SELECT * FROM event_entity WHERE isFavorite = 1 ORDER BY updatedAt DESC")
     fun getFavoriteEvents(): Flow<List<EventEntity>>
 
-    @Query("UPDATE event_entity SET isFavorite =:isFavorite WHERE id=:eventId")
+    @Query("UPDATE event_entity SET isFavorite =:isFavorite , updatedAt=:updatedAt WHERE id=:eventId")
     suspend fun updateFavorite(
         eventId: String,
-        isFavorite: Boolean
+        isFavorite: Boolean,
+        updatedAt: Long
     )
 
     @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)

@@ -48,7 +48,8 @@ fun EventActivityResponse.toEventEntity(): EventEntity {
         eventDay = eventDay,
         qrCodeUrl = qrCodeUrl.orEmpty(),
         isFavorite = isFavorite ?: false,
-        speaker = speaker
+        speaker = speaker,
+        updatedAt = 0L
     )
 }
 
