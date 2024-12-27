@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.Translation
 import com.nfq.data.domain.model.TranslationAudio
+import com.nfq.data.network.utils.networkConnectivity.ConnectivityObserver
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicTopAppBar
 import com.nfq.nfqsummit.components.bounceClick
@@ -54,17 +56,22 @@ fun SurvivalScreen(
     goBack: () -> Unit,
     viewModel: SurvivalViewModel = hiltViewModel()
 ) {
+
+    val networkStatus by viewModel.networkStatus.collectAsState()
     LaunchedEffect(viewModel) {
         viewModel.getTranslations()
     }
 
     SurvivalScreenUI(
         goBack = goBack,
+        status = networkStatus,
         translations = viewModel.translations
     )
 }
 
-class AudioPlayer(private val context: Context) {
+class AudioPlayer(
+    private val context: Context,
+) {
     private var mediaPlayer: MediaPlayer? = null
 
     fun play(url: String) {
@@ -74,6 +81,7 @@ class AudioPlayer(private val context: Context) {
             prepare()
             start()
         }
+
     }
 
     fun pause() {
@@ -90,6 +98,7 @@ class AudioPlayer(private val context: Context) {
 @Composable
 fun SurvivalScreenUI(
     goBack: () -> Unit,
+    status: ConnectivityObserver.Status = ConnectivityObserver.Status.Unavailable,
     translations: List<Translation>?
 ) {
     val context = LocalContext.current
@@ -115,7 +124,9 @@ fun SurvivalScreenUI(
                     TranslationListItem(
                         translation,
                         playAudio = {
-                            audioPlayer.play(it)
+                            if (status == ConnectivityObserver.Status.Available) {
+                                audioPlayer.play(it)
+                            }
                         }
                     )
                 }
