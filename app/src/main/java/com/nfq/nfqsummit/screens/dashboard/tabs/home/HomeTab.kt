@@ -68,6 +68,7 @@ import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.SavedEventCard
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.UpcomingEventCard
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
+import com.nfq.nfqsummit.screens.eventDetails.scheduleAlarm
 import com.nfq.nfqsummit.screens.eventDetails.setUpScheduler
 import com.nfq.nfqsummit.screens.qrCode.QRCodeBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQOrange
@@ -95,6 +96,7 @@ fun HomeTab(
 
     var showAlarmRequest by remember { mutableStateOf(false) }
     var showNotificationRequest by remember { mutableStateOf(false) }
+
     if (uiState.isLoading) {
         Loading()
     }
@@ -143,14 +145,7 @@ fun HomeTab(
             confirmButtonText = "Allow",
             confirmButton = {
                 showAlarmRequest = false
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    context.startActivity(
-                        Intent(
-                            Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                            Uri.parse("package:${context.packageName}")
-                        )
-                    )
-                }
+                scheduleAlarm(context)
             }
         )
     }

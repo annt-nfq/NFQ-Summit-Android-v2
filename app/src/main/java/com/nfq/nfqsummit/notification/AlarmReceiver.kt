@@ -36,6 +36,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .setContentTitle(title)
             .setContentText(body)
             .setSmallIcon(R.drawable.ic_stat_nfq)
+            .setAutoCancel(true)
 
         manager.notify(System.currentTimeMillis().toInt(), builder.build())
     }

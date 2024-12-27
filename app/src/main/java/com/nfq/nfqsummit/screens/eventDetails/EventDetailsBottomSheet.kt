@@ -4,6 +4,7 @@ package com.nfq.nfqsummit.screens.eventDetails
 
 import android.Manifest
 import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -64,6 +65,7 @@ import com.nfq.nfqsummit.components.BasicModalBottomSheet
 import com.nfq.nfqsummit.components.HtmlText
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.components.networkImagePainter
+import com.nfq.nfqsummit.notification.AlarmReceiver
 import com.nfq.nfqsummit.openMapView
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.BookmarkItem
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -126,14 +128,7 @@ fun EventDetailsBottomSheet(
             confirmButtonText = "Allow",
             confirmButton = {
                 showAlarmRequest = false
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    context.startActivity(
-                        Intent(
-                            Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                            Uri.parse("package:${context.packageName}")
-                        )
-                    )
-                }
+                scheduleAlarm(context)
             }
         )
     }
@@ -174,6 +169,34 @@ fun EventDetailsBottomSheet(
     )
 }
 
+fun scheduleAlarm(context: Context) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        context.startActivity(
+            Intent(
+                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                Uri.parse("package:${context.packageName}")
+            )
+        )
+    } else {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        // For Android 30 and below, you can use setExactAndAllowWhileIdle
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis(),
+                pendingIntent
+            )
+        }
+    }
+}
+
 fun setUpScheduler(
     context: Context,
     isFavorite: Boolean,
@@ -186,13 +209,20 @@ fun setUpScheduler(
     markEventAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit
 ) {
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    val hasAlarmPermission: Boolean = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+        // For Android 30 and below
+        true
+    } else {
+        // For Android 31+
+        alarmManager.canScheduleExactAlarms()
+    }
 
-    if (Build.VERSION.SDK_INT > 30 && !alarmManager.canScheduleExactAlarms()) {
+    if (!hasAlarmPermission) {
         showAlarmRequest(true)
         return
     }
 
-    if (!notificationPermissionState.status.isGranted) {
+    if (!notificationPermissionState.status.isGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         if (notificationPermissionState.status.shouldShowRationale) {
             showNotificationRequest(true)
         } else {
