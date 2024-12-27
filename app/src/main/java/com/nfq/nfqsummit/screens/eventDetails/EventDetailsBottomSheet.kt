@@ -286,7 +286,7 @@ private fun EventDetailsUI(
                     .shadow(
                         elevation = 10.dp,
                         shape = MaterialTheme.shapes.bottomSheetMedium,
-                        ambientColor = Color(0xFFC3C9D2)
+                        ambientColor = Color(0xFFC3C9D2).copy(alpha = 0.9f)
                     )
                     .padding(top = 12.dp)
                     .fillMaxWidth()
