@@ -10,6 +10,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -250,16 +251,21 @@ private fun PagerIndicator(
                 modifier = Modifier
                     .size(width, 10.dp)
                     .clip(CircleShape)
-                    .background(
-                        color = if (isSelected) MaterialTheme.colorScheme.primary else LightGrey
-                    )
                     .then(
-                        if (isSelected) Modifier.boxShadow(
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                            blurRadius = 4.dp,
-                            spreadRadius = 1.dp,
-                            offset = DpOffset(2.dp, 2.dp)
-                        ) else Modifier
+                        if (isSelected) {
+                            Modifier
+                                .background(MaterialTheme.colorScheme.primary)
+                                .boxShadow(
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                    blurRadius = 4.dp,
+                                    spreadRadius = 1.dp,
+                                    offset = DpOffset(2.dp, 2.dp)
+                                )
+                        } else Modifier.border(
+                            width = 1.dp,
+                            color = LightGrey,
+                            shape = CircleShape
+                        )
                     )
             )
         }
