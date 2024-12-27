@@ -5,9 +5,13 @@ import arrow.core.Either
 import com.nfq.data.network.exception.DataException
 import com.nfq.data.remote.model.BaseAttendeeResponse
 import com.nfq.data.remote.model.BaseResponse
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.net.UnknownHostException
 import kotlinx.serialization.SerializationException
+import org.json.JSONObject
 import retrofit2.Response
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 typealias ApiCall<T> = suspend () -> Response<T>
 
@@ -108,13 +112,7 @@ suspend fun <T, R> handleCall(
                 }
             }
 
-            else -> Either.Left(
-                DataException.Api(
-                    title = ERROR_TITLE_GENERAL,
-                    message = ERROR_DATA_NOT_FOUNT,
-                    errorCode = -1
-                )
-            )
+            else -> errorResponseHandler(it)
         }
     }
 } catch (e: Exception) {
@@ -137,6 +135,46 @@ suspend fun <T, R> handleCall(
                 errorCode = -1
             )
         )
+    }
+}
+
+suspend fun <T, R> errorResponseHandler(
+    it: Response<T>,
+): Either<DataException, R> {
+
+    val jsonObject: JSONObject? = try {
+        suspendCancellableCoroutine { cont ->
+            runCatching {
+                cont.resume(it.errorBody()?.string())
+            }.recover { throwable ->
+                cont.resumeWithException(throwable)
+            }
+        }?.let { JSONObject(it) }
+    } catch (e: Exception) {
+        null
+    }
+
+
+    val errorMessage = try {
+        jsonObject?.getString("message")
+    } catch (e: Exception) {
+        null
+    }
+
+    return when {
+        it.code() == 404 -> {
+            Either.Left(DataException.Api(message = errorMessage ?: ERROR_MESSAGE_GENERAL))
+        }
+
+        else -> {
+            Either.Left(
+                DataException.Api(
+                    message = errorMessage ?: ERROR_MESSAGE_GENERAL,
+                    title = ERROR_TITLE_GENERAL,
+                    errorCode = -1
+                )
+            )
+        }
     }
 }
 
