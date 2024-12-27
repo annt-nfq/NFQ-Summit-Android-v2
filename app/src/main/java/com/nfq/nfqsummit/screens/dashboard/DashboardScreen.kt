@@ -40,7 +40,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -78,7 +77,6 @@ import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
 import com.nfq.nfqsummit.screens.savedEvents.SavedEventTab
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
