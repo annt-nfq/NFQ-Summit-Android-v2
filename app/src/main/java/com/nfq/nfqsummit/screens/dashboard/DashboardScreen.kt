@@ -385,9 +385,8 @@ fun DrawerContent(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Turning this on will send a notification to your device as a reminder of the event time.",
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                         )
                     }
                 }
@@ -424,7 +423,7 @@ private fun SignOutButton(
             text = "Sign out",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.error,
+            color = Color(0xFFFF0000),
         )
     }
 }
