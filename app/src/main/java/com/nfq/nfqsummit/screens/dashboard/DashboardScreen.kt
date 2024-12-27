@@ -1,5 +1,14 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package com.nfq.nfqsummit.screens.dashboard
 
+import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,7 +63,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.navigation.MainTransition
@@ -229,7 +244,53 @@ fun DrawerContent(
     onSignOutClick: () -> Unit,
     isSelected: (BottomNavItem) -> Boolean,
 ) {
-    var switchCheckedState by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var showNotificationRequest by remember { mutableStateOf(false) }
+    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        Manifest.permission.POST_NOTIFICATIONS
+    } else {
+        Manifest.permission.ACCESS_NOTIFICATION_POLICY
+    }
+
+    val notificationPermissionState = rememberPermissionState(permission = permission)
+    var switchCheckedState by remember {
+        mutableStateOf(notificationPermissionState.status.isGranted || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+    }
+
+    if (showNotificationRequest) {
+        BasicAlertDialog(
+            title = "Allow notification permission",
+            body = "This app requires notification permission to show you reminders of your saved events",
+            dismissButtonText = "Deny",
+            dismissButton = { showNotificationRequest = false },
+            confirmButtonText = "Allow",
+            confirmButton = {
+                showNotificationRequest = false
+                context.startActivity(
+                    Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:${context.packageName}")
+                    ).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                )
+            }
+        )
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            switchCheckedState = true
+        } else {
+            if (notificationPermissionState.status.shouldShowRationale) {
+                showNotificationRequest = true
+            } else {
+                notificationPermissionState.launchPermissionRequest()
+            }
+        }
+    }
 
     Surface {
         Column(
@@ -300,7 +361,11 @@ fun DrawerContent(
                 ) {
                     Switch(
                         checked = switchCheckedState,
-                        onCheckedChange = { switchCheckedState = it },
+                        onCheckedChange = {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                launcher.launch(permission)
+                            }
+                        },
                         colors = SwitchDefaults.colors(
                             checkedTrackColor = MainGreen
                         ),
