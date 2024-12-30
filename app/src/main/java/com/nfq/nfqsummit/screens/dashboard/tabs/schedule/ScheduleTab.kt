@@ -225,7 +225,7 @@ fun SummitSchedules(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(state = verticalScroll)
-            .padding(start = 20.dp)
+            .padding(start = 8.dp)
             .padding(top = 16.dp)
             .navigationBarsPadding()
     ) {

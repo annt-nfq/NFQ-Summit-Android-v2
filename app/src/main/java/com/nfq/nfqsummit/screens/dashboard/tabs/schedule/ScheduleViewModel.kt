@@ -71,7 +71,7 @@ class ScheduleViewModel @Inject constructor(
 
         val hourSize =
             if (techRockEvents.any { ChronoUnit.MINUTES.between(it.start, it.end) < 60 }) {
-                ScheduleSize.FixedSize(220.dp)
+                ScheduleSize.FixedSize(230.dp)
             } else {
                 ScheduleSize.FixedSize(130.dp)
             }

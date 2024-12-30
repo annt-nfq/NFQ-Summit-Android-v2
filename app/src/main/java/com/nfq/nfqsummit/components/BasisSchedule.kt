@@ -81,7 +81,7 @@ private fun PositionedEvent.overlapsWith(other: PositionedEvent): Boolean {
     return date == other.date &&
             start < other.end &&
             end > other.start &&
-            ChronoUnit.MINUTES.between(start, other.start) < 70
+            ChronoUnit.MINUTES.between(start, other.start) < 30
 }
 
 private fun List<PositionedEvent>.timesOverlapWith(event: PositionedEvent): Boolean {
@@ -215,7 +215,7 @@ fun BasicSchedulePreview() {
                     id = "1",
                     name = "Event 1",
                     start = LocalDate.now().atTime(9, 0),
-                    end = LocalDate.now().atTime(10, 0),
+                    end = LocalDate.now().atTime(10, 30),
                 ),
                 SummitEvent(
                     id = "2",

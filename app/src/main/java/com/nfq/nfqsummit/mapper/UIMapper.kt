@@ -90,7 +90,7 @@ private fun CategoryResponse?.toCategoryType(genre: GenreResponse?): CategoryTyp
         CategoryEnum.SUMMIT.code -> CategoryType.Summit(name)
         CategoryEnum.K5.code ->CategoryType.K5(name)
         CategoryEnum.TECH_ROCK.code -> CategoryType.TechRock(name)
-        else -> CategoryType.Summit()
+        else -> CategoryType.Unknown
     }
 }
 

@@ -40,7 +40,7 @@ fun Schedule(
 ) {
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes.toFloat() / 60f
-    var sidebarWidth by remember { mutableIntStateOf(150) }
+    var sidebarWidth by remember { mutableIntStateOf(120) }
     val headerHeight by remember { mutableIntStateOf(0) }
     BoxWithConstraints(modifier = modifier) {
 

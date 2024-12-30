@@ -1,11 +1,12 @@
 package com.nfq.nfqsummit.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,6 +36,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.nfq.data.domain.model.CategoryType
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.model.EventSize
 import com.nfq.nfqsummit.model.PositionedEvent
@@ -68,14 +70,17 @@ fun BasicEvent(
         bottomEnd = bottomRadius,
         bottomStart = 0.dp,
     )
+
     Row(
         modifier = modifier
-            .padding(vertical = 2.dp)
             .fillMaxSize()
             .bounceClick()
-            .padding(
-                bottom = if (positionedEvent.splitType == SplitType.End) 0.dp else 1.dp
+            .border(
+                width = 0.1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                shape = shape
             )
+            .padding(bottom = if (positionedEvent.splitType == SplitType.End) 0.dp else 1.dp)
             .coloredShadow(
                 MaterialTheme.colorScheme.secondary,
                 alpha = 0.1f,
@@ -90,12 +95,6 @@ fun BasicEvent(
             .clip(shape = shape)
             .clickable { onEventClick(event) }
     ) {
-        /* val color = when (event.ordering) {
-             1 -> Color(0xFFEF5350) // Red
-             2 -> Color(0xFF66BB6A) // Green
-             3 -> Color(0xFF26C6DA) // Blue
-             else -> Color(0xFFFFE1CC)      // Default color
-         }*/
         val contentColor = Color(event.category.contentColor)
         val containerColor = Color(event.category.containerColor)
 
@@ -106,41 +105,32 @@ fun BasicEvent(
                 .background(containerColor)
         )
 
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
+        val (top, end) = if (eventSize == EventSize.Small) 6.dp to 0.dp else 14.dp to 16.dp
+        FlowColumn(
             modifier = Modifier
-                .padding(
-                    start = 8.dp,
-                    end = if (eventSize == EventSize.Large) 16.dp else 0.dp
-                )
-                .padding(
-                    top = if (eventSize == EventSize.Large) 16.dp else 4.dp,
-                )
+                .padding(start = 8.dp, end = end)
+                .padding(top = top)
         ) {
             FlowRow(
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier
+                modifier = Modifier.padding(bottom = 6.dp)
             ) {
-                if (eventSize == EventSize.Large) {
+                if (event.category != CategoryType.Unknown && (eventSize != EventSize.Small || event.speakerName.isBlank())) {
                     TagItem(
                         tag = event.category.tag,
                         containerColor = containerColor,
                         contentColor = contentColor,
-                        modifier = Modifier
-                            .padding(end = 10.dp)
-                            .padding(bottom = 12.dp)
+                        modifier = Modifier.padding(end = 10.dp)
                     )
                     Spacer(modifier = Modifier.weight(1f))
                 }
 
-                val timeFormatter = DateTimeFormatter.ofPattern("h:mm a")
-                val startTime = event.start.format(timeFormatter).lowercase().replace(":00", "")
-                val endTime = event.end.format(timeFormatter).lowercase().replace(":00", "")
+                val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+                val startTime = event.start.format(timeFormatter).lowercase()
+                val endTime = event.end.format(timeFormatter).lowercase()
                 AutoResizedText(
                     text = "$startTime - $endTime",
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                     minFontSize = 10.sp,
                     maxLines = 1,
                     color = MaterialTheme.colorScheme.primary,
@@ -148,26 +138,27 @@ fun BasicEvent(
                 )
             }
 
-            AutoResizedText(
+            Text(
                 text = event.name,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    lineHeight = if (eventSize == EventSize.Small) 14.sp else 19.sp,
+                    lineHeight = if (eventSize == EventSize.Medium) 16.sp else 19.sp,
                 ),
                 maxLines = when (eventSize) {
-                    EventSize.Small, EventSize.Medium -> 4
-                    else -> 5
+                    EventSize.Small -> 2
+                    EventSize.Medium -> 3
+                    else -> 4
                 },
+                overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
-                modifier = Modifier.padding(top = if (eventSize == EventSize.Small) 0.dp else 4.dp)
             )
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.padding(top = if (eventSize == EventSize.Large) 16.dp else if (eventSize == EventSize.Medium) 4.dp else 1.dp)
+                modifier = Modifier.padding(top = if (eventSize == EventSize.Small) 2.dp else 6.dp)
             ) {
-                if (event.speakerAvatar.isNotBlank() && eventSize != EventSize.Small)
+                if (event.speakerAvatar.isNotBlank())
                     AsyncImage(
                         modifier = Modifier
                             .size(21.dp)
@@ -210,7 +201,7 @@ private fun BasicEventPreview(
         BasicEvent(
             positionedEvent = PositionedEvent(
                 event = SummitEvent(
-                    name = "Event Name",
+                    name = "How to migrate from an Android codebase to KMMHow to migrate from an Android codebase to KMM",
                     iconUrl = "https://www.example.com/image.jpg",
                     speakerName = "Speaker Name",
                     speakerAvatar = "https://www.example.com/speaker.jpg",
