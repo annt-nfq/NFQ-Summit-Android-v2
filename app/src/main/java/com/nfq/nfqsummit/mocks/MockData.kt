@@ -70,7 +70,6 @@ val mockEventDay1 = SummitEvent(
     iconUrl = "",
     speakerName = "Speaker Name",
     speakerPosition = "Speaker Position",
-    tag = "\uD83D\uDCBC Summit"
 )
 val mockEventDay1H1 = SummitEvent(
     id = "1",
@@ -84,7 +83,6 @@ val mockEventDay1H1 = SummitEvent(
     iconUrl = "",
     speakerName = "Speaker Name",
     speakerPosition = "Speaker Position",
-    tag = "\uD83D\uDCBC Summit"
 )
 val mockEventDay1H12 = SummitEvent(
     id = "1",
@@ -98,7 +96,6 @@ val mockEventDay1H12 = SummitEvent(
     iconUrl = "",
     speakerName = "Speaker Name",
     speakerPosition = "Speaker Position",
-    tag = "\uD83D\uDCBC Summit"
 )
 val mockEventDay1H13 = SummitEvent(
     id = "1",
@@ -112,7 +109,6 @@ val mockEventDay1H13 = SummitEvent(
     iconUrl = "",
     speakerName = "Speaker Name",
     speakerPosition = "Speaker Position",
-    tag = "\uD83D\uDCBC Summit"
 )
 
 val mockEventDay2H1 = SummitEvent(
@@ -120,7 +116,6 @@ val mockEventDay2H1 = SummitEvent(
     name = "Event name",
     start = LocalDateTime.of(2024, 1, 2, 11, 0),
     end = LocalDateTime.of(2024, 1, 2, 12, 0),
-    tag = "\uD83D\uDCBC Summit"
 )
 
 val mockEventDay2H2 = SummitEvent(
@@ -128,7 +123,6 @@ val mockEventDay2H2 = SummitEvent(
     name = "Event name",
     start = LocalDateTime.of(2024, 1, 2, 12, 0),
     end = LocalDateTime.of(2024, 1, 2, 13, 0),
-    tag = "\uD83D\uDCBC Summit"
 )
 
 val mockSpeakerEvent = SummitEvent(
@@ -139,7 +133,6 @@ val mockSpeakerEvent = SummitEvent(
     iconUrl = "",
     ordering = 1,
     speakerName = "Speaker One",
-    tag = "\uD83D\uDCBC Summit"
 )
 
 val mockSpeakerEvent2 = SummitEvent(
@@ -150,7 +143,6 @@ val mockSpeakerEvent2 = SummitEvent(
     iconUrl = "",
     ordering = 1,
     speakerName = "Speaker Two",
-    tag = "\uD83D\uDCBC Summit"
 )
 
 val mockAttraction = Attraction(
@@ -182,8 +174,7 @@ val mockUpcomingEvents = listOf(
         imageUrl = "",
         isFavorite = false,
         startAndEndTime = "10:00 - 12:00",
-        startDateTime = LocalDateTime.now(),
-        tag = "\uD83D\uDCBC Summit",
+        startDateTime = LocalDateTime.now()
     ),
     UpcomingEventUIModel(
         id = "2",
@@ -192,8 +183,7 @@ val mockUpcomingEvents = listOf(
         imageUrl = "",
         isFavorite = false,
         startAndEndTime = "12:00 - 13:00",
-        startDateTime = LocalDateTime.now(),
-        tag = "\uD83D\uDCBC Summit"
+        startDateTime = LocalDateTime.now()
     )
 )
 
@@ -202,21 +192,18 @@ val mockSavedEvents = listOf(
         id = "1",
         imageUrl = "",
         name = "E-Commerce Conference - Thai Market",
-        date = "Wed, Jun 28 •17:00",
-        tag = "\uD83D\uDCBC Summit"
+        date = "Wed, Jun 28 •17:00"
     ),
     SavedEventUIModel(
         id = "2",
         imageUrl = "",
         name = "E-Commerce Conference ",
-        date = "Wed, Jun 28 •17:00",
-        tag = "\uD83D\uDCBC Summit"
+        date = "Wed, Jun 28 •17:00"
     ),
     SavedEventUIModel(
         id = "3",
         imageUrl = "",
         name = " Thai Market",
-        date = "Wed, Jun 28 •17:00",
-        tag = "\uD83D\uDCBC Summit"
+        date = "Wed, Jun 28 •17:00"
     )
 )

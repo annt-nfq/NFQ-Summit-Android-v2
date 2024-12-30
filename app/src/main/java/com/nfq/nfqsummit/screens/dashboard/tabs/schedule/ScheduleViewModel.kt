@@ -3,7 +3,8 @@ package com.nfq.nfqsummit.screens.dashboard.tabs.schedule
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nfq.data.domain.model.CategoryEnum
+import com.nfq.data.domain.model.CategoryType.Companion.filterSummitOrK5
+import com.nfq.data.domain.model.CategoryType.Companion.filterTechRock
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.nfqsummit.components.ScheduleSize
@@ -107,11 +108,11 @@ class ScheduleViewModel @Inject constructor(
 }
 
 fun PersistentList<SummitEvent>.toTechRockEvents(): PersistentList<SummitEvent> {
-    return this.filter { it.category == CategoryEnum.TECH_ROCK }.toPersistentList()
+    return this.filter { filterTechRock(it.category.code) }.toPersistentList()
 }
 
 fun PersistentList<SummitEvent>.toSummitEvents(): PersistentList<SummitEvent> {
-    return this.filter { it.category == CategoryEnum.SUMMIT || it.category == CategoryEnum.K5 }
+    return this.filter { filterSummitOrK5(it.category.code) }
         .toPersistentList()
 }
 

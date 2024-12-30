@@ -3,8 +3,10 @@ package com.nfq.nfqsummit.mapper
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
 import com.nfq.data.domain.model.CategoryEnum
+import com.nfq.data.domain.model.CategoryType
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.remote.model.response.CategoryResponse
+import com.nfq.data.remote.model.response.GenreResponse
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTime
 import com.nfq.nfqsummit.model.SavedEventUIModel
@@ -16,13 +18,12 @@ fun List<EventEntity>.toSavedEventUIModels(): List<SavedEventUIModel> {
 }
 
 private fun EventEntity.toSavedEventUIModel(): SavedEventUIModel {
-    val categoryEnum = category.toCategoryEnum()
+    val categoryEnum = category.toCategoryType(genre)
     return SavedEventUIModel(
         id = id,
         imageUrl = images.find { it.isNotBlank() }.orEmpty(),
         name = name,
         date = timeStart.toFormattedDateTimeString(targetPattern = "EEE, MMM d • HH:mm"),
-        tag = category.toCategoryEnum().tag,
         category = categoryEnum
     )
 }
@@ -32,7 +33,7 @@ fun List<EventEntity>.toUpcomingEventUIModels(): List<UpcomingEventUIModel> {
 }
 
 private fun EventEntity.toUpcomingEventUIModel(): UpcomingEventUIModel {
-    val categoryEnum = category.toCategoryEnum()
+    val categoryType = category.toCategoryType(genre)
     return UpcomingEventUIModel(
         id = id,
         name = name,
@@ -43,8 +44,7 @@ private fun EventEntity.toUpcomingEventUIModel(): UpcomingEventUIModel {
         }",
         startDateTime = timeStart.toLocalDateTime(),
         isFavorite = isFavorite,
-        tag = categoryEnum.tag,
-        category = categoryEnum
+        category = categoryType
     )
 }
 
@@ -54,7 +54,7 @@ fun List<EventEntity>.toSubmitEvents(): List<SummitEvent> {
 }
 
 private fun EventEntity.toSubmitEvent(): SummitEvent {
-    val categoryEnum = category.toCategoryEnum()
+    val categoryType = category.toCategoryType(genre)
     return SummitEvent(
         id = id,
         name = name,
@@ -73,17 +73,24 @@ private fun EventEntity.toSubmitEvent(): SummitEvent {
         speakerAvatar = speaker?.avatar.orEmpty(),
         speakerPosition = gatherTime,
         isFavorite = isFavorite,
-        tag = categoryEnum.tag,
-        category = categoryEnum
+        category = categoryType
     )
 }
 
-private fun CategoryResponse?.toCategoryEnum(): CategoryEnum {
-    return when (this?.code) {
-        CategoryEnum.SUMMIT.code -> CategoryEnum.SUMMIT
-        CategoryEnum.K5.code -> CategoryEnum.K5
-        CategoryEnum.TECH_ROCK.code -> CategoryEnum.TECH_ROCK
-        else -> CategoryEnum.SUMMIT
+
+
+private fun CategoryResponse?.toCategoryType(genre: GenreResponse?): CategoryType {
+    val (code, name) = Pair(
+        genre?.code ?: this?.code.orEmpty(),
+        genre?.name ?: this?.name.orEmpty()
+    )
+    return when (code) {
+        CategoryEnum.PRODUCT.code -> CategoryType.Product(name)
+        CategoryEnum.BUSINESS.code -> CategoryType.Business(name)
+        CategoryEnum.SUMMIT.code -> CategoryType.Summit(name)
+        CategoryEnum.K5.code ->CategoryType.K5(name)
+        CategoryEnum.TECH_ROCK.code -> CategoryType.TechRock(name)
+        else -> CategoryType.Summit()
     }
 }
 

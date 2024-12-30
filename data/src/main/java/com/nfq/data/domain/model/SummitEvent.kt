@@ -33,20 +33,81 @@ data class SummitEvent(
     val speakerName: String = "",
     val speakerPosition: String? = null,
     val isFavorite: Boolean = false,
-    val tag: String,
-    val category: CategoryEnum = CategoryEnum.SUMMIT
+    val category: CategoryType = CategoryType.Summit("Summit")
 )
 
 
-enum class CategoryEnum(
+enum class CategoryEnum(val code: String) {
+    SUMMIT("summit"),
+    K5("k5"),
+    TECH_ROCK("tech_rock"),
+    PRODUCT("product"),
+    BUSINESS("business")
+}
+
+
+@Serializable
+sealed class CategoryType(
     val code: String,
     val containerColor: Int,
     val contentColor: Int,
     val tag: String
 ) {
-    SUMMIT("summit", 0xFFFFE1CC.toInt(), 0xFFFF6B00.toInt(), "\uD83D\uDCBC Summit"),
-    K5("k5", 0xFFB4EAFF.toInt(), 0xFF02A5E6.toInt(), "\uD83C\uDDE9\uD83C\uDDEA K5"),
-    TECH_ROCK("tech_rock", 0xFFE5EDFF.toInt(), 0xFF42389D.toInt(), "\uD83E\uDD16 Tech Rock")
+    data class Summit(val name: String = "Summit") :
+        CategoryType(
+            CategoryEnum.SUMMIT.code,
+            0xFFFFE1CC.toInt(),
+            0xFFFF6B00.toInt(),
+            "\uD83D\uDCBC $name"
+        )
+
+    data class K5(val name: String) :
+        CategoryType(
+            CategoryEnum.K5.code,
+            0xFFB4EAFF.toInt(),
+            0xFF02A5E6.toInt(),
+            "\uD83C\uDDE9\uD83C\uDDEA $name"
+        )
+
+    data class TechRock(val name: String) :
+        CategoryType(
+            CategoryEnum.TECH_ROCK.code,
+            0xFFE8F5E9.toInt(),
+            0xFF43A047.toInt(),
+            "\uD83D\uDCBB $name"
+        )
+
+    data class Product(val name: String) :
+        CategoryType(
+            CategoryEnum.PRODUCT.code,
+            0xFFFFF3F0.toInt(),
+            0xFFFF6B6B.toInt(),
+            "\uD83D\uDE80 $name"
+        )
+
+    data class Business(val name: String) :
+        CategoryType(
+            CategoryEnum.BUSINESS.code,
+            0xFFE5EDFF.toInt(),
+            0xFF42389D.toInt(),
+            "\uD83D\uDCC8 $name"
+        )
+
+    companion object {
+        fun filterTechRock(code: String): Boolean {
+            return when {
+                code == CategoryEnum.TECH_ROCK.code || code == CategoryEnum.PRODUCT.code || code == CategoryEnum.BUSINESS.code -> true
+                else -> false
+            }
+        }
+
+        fun filterSummitOrK5(code: String): Boolean {
+            return when {
+                code == CategoryEnum.SUMMIT.code || code == CategoryEnum.K5.code -> true
+                else -> false
+            }
+        }
+    }
 }
 
 
@@ -84,7 +145,6 @@ fun SummitEventRemoteModel.toSummitEvent(): SummitEvent {
         speakerName = speakerName ?: "",
         speakerAvatar = "",
         speakerPosition = speakerPosition,
-        isFavorite = isFavorite ?: false,
-        tag = tag ?: "\uD83D\uDCBC Summit"
+        isFavorite = isFavorite ?: false
     )
 }

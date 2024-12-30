@@ -59,7 +59,7 @@ fun SavedEventCard(
                         color = MaterialTheme.colorScheme.primary
                     )
                     TagItem(
-                        tag = uiModel.tag,
+                        tag = uiModel.category.tag,
                         containerColor = Color(uiModel.category.containerColor),
                         contentColor = Color(uiModel.category.contentColor),
                         modifier = Modifier.padding(start = 8.dp)
@@ -87,8 +87,7 @@ private fun SavedEventCardPreview() {
                 id = "1",
                 imageUrl = "",
                 name = "E-Commerce Conference - Thai Market",
-                date = "Wed, Jun 28 •17:00",
-                tag = "\uD83D\uDCBC Summit"
+                date = "Wed, Jun 28 •17:00"
             ),
             goToEventDetails = {}
         )

@@ -216,21 +216,18 @@ fun BasicSchedulePreview() {
                     name = "Event 1",
                     start = LocalDate.now().atTime(9, 0),
                     end = LocalDate.now().atTime(10, 0),
-                    tag = "\uD83D\uDCBC Summit"
                 ),
                 SummitEvent(
                     id = "2",
                     name = "Event 2",
                     start = LocalDate.now().atTime(10, 0),
                     end = LocalDate.now().atTime(11, 0),
-                    tag = "\uD83D\uDCBC Summit"
                 ),
                 SummitEvent(
                     id = "3",
                     name = "Event 3",
                     start = LocalDate.now().atTime(10, 0),
                     end = LocalDate.now().atTime(12, 0),
-                    tag = "\uD83D\uDCBC Summit"
                 ),
             ), dayWidth = 300.dp, hourHeight = 100.dp
         )

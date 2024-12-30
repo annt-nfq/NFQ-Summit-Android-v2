@@ -119,7 +119,7 @@ fun UpcomingEventCard(
                 }
                 TagItem(
                     modifier = Modifier.padding(start = 16.dp),
-                    tag = uiModel.tag,
+                    tag = uiModel.category.tag,
                     containerColor = Color(uiModel.category.containerColor),
                     contentColor = Color(uiModel.category.contentColor)
                 )
@@ -142,8 +142,7 @@ private fun UpcomingEventPreview() {
                     imageUrl = "",
                     isFavorite = false,
                     startAndEndTime = "10:00 - 12:00",
-                    startDateTime = LocalDateTime.now(),
-                    tag = "\uD83D\uDCBC Summit"
+                    startDateTime = LocalDateTime.now()
                 ),
                 goToDetails = { },
                 markAsFavorite = { _, _ -> },

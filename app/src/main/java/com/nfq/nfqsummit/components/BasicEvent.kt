@@ -123,7 +123,7 @@ fun BasicEvent(
             ) {
                 if (eventSize == EventSize.Large) {
                     TagItem(
-                        tag = event.tag,
+                        tag = event.category.tag,
                         containerColor = containerColor,
                         contentColor = contentColor,
                         modifier = Modifier
@@ -218,8 +218,7 @@ private fun BasicEventPreview(
                     id = "1",
                     start = java.time.LocalDateTime.now(),
                     end = java.time.LocalDateTime.now().plusHours(2),
-                    isFavorite = false,
-                    tag = "\uD83D\uDCBC Summit",
+                    isFavorite = false
                 ),
                 splitType = SplitType.None,
                 date = LocalDate.now(),
@@ -247,8 +246,7 @@ private fun BasicEventPreview() {
                     id = "1",
                     start = java.time.LocalDateTime.now(),
                     end = java.time.LocalDateTime.now().plusHours(2),
-                    isFavorite = false,
-                    tag = "\uD83D\uDCBC Summit",
+                    isFavorite = false
                 ),
                 splitType = SplitType.None,
                 date = LocalDate.now(),
