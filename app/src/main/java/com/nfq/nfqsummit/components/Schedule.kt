@@ -40,8 +40,9 @@ fun Schedule(
 ) {
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes.toFloat() / 60f
+    val hourHeights = calculateHourHeights(events, minTime, numHours.toInt())
     var sidebarWidth by remember { mutableIntStateOf(120) }
-    val headerHeight by remember { mutableIntStateOf(0) }
+
     BoxWithConstraints(modifier = modifier) {
 
         val dayWidth: Dp = with(LocalDensity.current) {
@@ -51,22 +52,11 @@ fun Schedule(
             constraints.maxWidth.toDp()
         }
 
-        val hourHeight: Dp = when (hourSize) {
-            is ScheduleSize.FixedSize -> hourSize.size
-            is ScheduleSize.FixedCount -> with(LocalDensity.current) { ((constraints.maxHeight - headerHeight) / hourSize.count).toDp() }
-            is ScheduleSize.Adaptive -> with(LocalDensity.current) {
-                maxOf(
-                    ((constraints.maxHeight - headerHeight) / numHours).toDp(),
-                    hourSize.minSize
-                )
-            }
-        }
-
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
             ScheduleSidebar(
-                hourHeight = hourHeight,
+                hourHeights = hourHeights,
                 minTime = minTime,
                 maxTime = maxTime,
                 label = timeLabel,
@@ -82,7 +72,7 @@ fun Schedule(
                 minTime = minTime,
                 maxTime = maxTime,
                 dayWidth = dayWidth,
-                hourHeight = hourHeight,
+                hourHeights = hourHeights,
                 modifier = Modifier
                     .padding(top = 10.dp)
                     .align(Alignment.TopEnd)
@@ -94,11 +84,40 @@ fun Schedule(
                 minTime = minTime,
                 maxTime = maxTime,
                 dayWidth = fullWidth,
-                hourHeight = hourHeight,
+                hourHeights = hourHeights,
                 modifier = Modifier
             )
         }
     }
+}
+
+data class HourHeight(
+    val hour: Int,
+    val startTime: LocalTime,
+    val endTime: LocalTime,
+    val height: Int
+)
+
+fun calculateHourHeights(
+    events: PersistentList<SummitEvent>,
+    minTime: LocalTime,
+    numHours: Int
+): List<HourHeight> {
+    val hourHeights = mutableListOf<HourHeight>()
+    repeat(numHours) { hour ->
+        val startTime = minTime.plusHours(hour.toLong())
+        val endTime = startTime.plusHours(1)
+        val height = events.any {
+            it.start.hour == startTime.hour && it.end.hour == endTime.hour && ChronoUnit.MINUTES.between(
+                it.start,
+                it.end
+            ) < 60
+        }.let {
+            if (it) 220 else 130
+        }
+        hourHeights.add(HourHeight(hour, startTime, endTime, height))
+    }
+    return hourHeights
 }
 
 sealed class ScheduleSize {

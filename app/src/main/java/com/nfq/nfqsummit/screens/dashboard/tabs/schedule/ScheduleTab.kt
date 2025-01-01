@@ -237,8 +237,7 @@ fun SummitSchedules(
             modifier = Modifier
                 .fillMaxWidth(),
             minTime = dailyEvents
-                .minByOrNull { it.start }!!.start.toLocalTime()
-                .minusHours(1),
+                .minByOrNull { it.start }!!.start.toLocalTime(),
             eventContent = {
                 BasicEvent(
                     positionedEvent = it,

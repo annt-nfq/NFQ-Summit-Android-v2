@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -69,20 +68,13 @@ class ScheduleViewModel @Inject constructor(
         val summitEvents = dailyEvents.toSummitEvents()
         val techRockEvents = dailyEvents.toTechRockEvents()
 
-        val hourSize =
-            if (techRockEvents.any { ChronoUnit.MINUTES.between(it.start, it.end) < 60 }) {
-                ScheduleSize.FixedSize(230.dp)
-            } else {
-                ScheduleSize.FixedSize(130.dp)
-            }
-
         ScheduleUIState(
             selectedDate = selectedDate,
             dailyEvents = dailyEvents,
             dayEventPairs = dayEventPairs,
             techRockEvents = techRockEvents,
             summitEvents = summitEvents,
-            hourSize = hourSize
+            hourSize = ScheduleSize.FixedSize(130.dp)
         )
 
     }.stateIn(
@@ -112,8 +104,7 @@ fun PersistentList<SummitEvent>.toTechRockEvents(): PersistentList<SummitEvent> 
 }
 
 fun PersistentList<SummitEvent>.toSummitEvents(): PersistentList<SummitEvent> {
-    return this.filter { filterSummitOrK5(it.category.code) }
-        .toPersistentList()
+    return this.filter { filterSummitOrK5(it.category.code) }.toPersistentList()
 }
 
 data class ScheduleUIState(

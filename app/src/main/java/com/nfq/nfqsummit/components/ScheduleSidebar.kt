@@ -17,10 +17,10 @@ import java.time.temporal.ChronoUnit
 
 @Composable
 fun ScheduleSidebar(
-    hourHeight: Dp,
     modifier: Modifier = Modifier,
     minTime: LocalTime = LocalTime.MIN,
     maxTime: LocalTime = LocalTime.MAX,
+    hourHeights: List<HourHeight> = emptyList(),
     label: @Composable (time: LocalTime) -> Unit = { BasicSidebarLabel(time = it) },
 ) {
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
@@ -28,16 +28,16 @@ fun ScheduleSidebar(
     val firstHour = minTime.truncatedTo(ChronoUnit.HOURS)
     val firstHourOffsetMinutes =
         if (firstHour == minTime) 0 else ChronoUnit.MINUTES.between(minTime, firstHour.plusHours(1))
-    val firstHourOffset = hourHeight * (firstHourOffsetMinutes / 60f)
+    val firstHourOffset = 130.dp * (firstHourOffsetMinutes / 60f)
     val startTime = if (firstHour == minTime) firstHour else firstHour.plusHours(1)
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.End
     ) {
         Spacer(modifier = Modifier.height(firstHourOffset))
-        repeat(numHours) { i ->
-            Box(modifier = Modifier.height(hourHeight)) {
-                label(startTime.plusHours(i.toLong()))
+        hourHeights.forEach {
+            Box(modifier = Modifier.height(it.height.dp)) {
+                label(it.startTime)
             }
         }
     }
@@ -47,6 +47,6 @@ fun ScheduleSidebar(
 @Composable
 fun ScheduleSidebarPreview() {
     NFQSnapshotTestThemeForPreview {
-        ScheduleSidebar(hourHeight = 64.dp)
+        ScheduleSidebar()
     }
 }
