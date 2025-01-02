@@ -16,6 +16,7 @@ import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -32,9 +33,8 @@ class ScheduleViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _selectedDate = MutableStateFlow<LocalDate?>(null)
-
-
-    val uiState = combine(
+    private val _currentTime = MutableStateFlow(LocalTime.now())
+    private val _uiState = combine(
         _selectedDate,
         repository.events.map { it.toSubmitEvents() }
     ) { oldSelectedDate, events ->
@@ -76,7 +76,13 @@ class ScheduleViewModel @Inject constructor(
             summitEvents = summitEvents,
             hourSize = ScheduleSize.FixedSize(130.dp)
         )
+    }
 
+    val uiState = combine(
+        _uiState,
+        _currentTime
+    ) { state, currentTime ->
+        state.copy(currentTime = currentTime)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -85,8 +91,17 @@ class ScheduleViewModel @Inject constructor(
 
     init {
         fetchEventActivities()
+        updateCurrentTime()
     }
 
+    private fun updateCurrentTime() {
+        viewModelScope.launch(Dispatchers.IO) {
+            while (true) {
+                delay(60000L) // Update every minute
+                _currentTime.value = LocalTime.now()
+            }
+        }
+    }
 
     fun onDateSelected(date: LocalDate) {
         _selectedDate.value = date
