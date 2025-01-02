@@ -1,6 +1,8 @@
 package com.nfq.nfqsummit.entry
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -47,6 +49,13 @@ class MainActivity : ComponentActivity() {
         android.graphics.Color.TRANSPARENT,
         android.graphics.Color.TRANSPARENT,
     ) { false }
+
+    override fun attachBaseContext(newBase: Context?) {
+        val configuration = Configuration(newBase?.resources?.configuration)
+        configuration.fontScale = 1.0f // Limit the font size to the default scale
+        val context = newBase?.createConfigurationContext(configuration)
+        super.attachBaseContext(context)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
