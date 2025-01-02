@@ -77,7 +77,7 @@ fun BasicEvent(
             .bounceClick()
             .border(
                 width = 0.1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
                 shape = shape
             )
             .padding(bottom = if (positionedEvent.splitType == SplitType.End) 0.dp else 1.dp)
@@ -113,7 +113,7 @@ fun BasicEvent(
         ) {
             FlowRow(
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(bottom = 6.dp)
+                modifier = Modifier.padding(bottom = if (eventSize == EventSize.Large) 6.dp else 4.dp)
             ) {
                 if (event.category != CategoryType.Unknown) {
                     TagItem(
