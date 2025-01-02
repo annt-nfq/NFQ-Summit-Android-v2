@@ -115,7 +115,7 @@ fun BasicEvent(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.padding(bottom = 6.dp)
             ) {
-                if (event.category != CategoryType.Unknown && (eventSize != EventSize.Small || event.speakerName.isBlank())) {
+                if (event.category != CategoryType.Unknown) {
                     TagItem(
                         tag = event.category.tag,
                         containerColor = containerColor,
