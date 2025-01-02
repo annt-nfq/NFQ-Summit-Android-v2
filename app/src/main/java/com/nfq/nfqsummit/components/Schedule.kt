@@ -113,7 +113,7 @@ fun calculateHourHeights(
                 it.end
             ) < 60
         }.let {
-            if (it) 220 else 130
+            if (it) 260 else 130
         }
         hourHeights.add(HourHeight(hour, startTime, endTime, height))
     }
