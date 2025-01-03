@@ -153,7 +153,8 @@ fun CurrentTimeIndicator(
     modifier: Modifier,
     hourHeights: List<HourHeight> = emptyList(),
 ) {
-    val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
+    val numDays = ChronoUnit.DAYS.between(minDate, minOf(minDate, maxDate)).toInt() + 1
+
     Layout(
         content = {
             Box(
