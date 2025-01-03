@@ -258,7 +258,7 @@ fun BasicSchedule(
     dayWidth: Dp,
     hourHeights: List<HourHeight> = emptyList(),
 ) {
-    val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
+    val numDays = ChronoUnit.DAYS.between(minDate, minOf(minDate, maxDate)).toInt() + 1
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes / 60
     val dividerColor = Color.LightGray

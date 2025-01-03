@@ -56,7 +56,7 @@ class ScheduleViewModel @Inject constructor(
 
         val dayEventPairs = distinctDates.map { date ->
             date to events.filter { event ->
-                event.start.toLocalDate() == date && event.start.hour <= event.end.hour
+                event.start.toLocalDate() == date
             }.sortedBy { it.start }.toPersistentList()
         }.toPersistentList()
 
