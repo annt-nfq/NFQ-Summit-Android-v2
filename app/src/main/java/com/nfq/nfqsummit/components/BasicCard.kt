@@ -35,10 +35,10 @@ fun BasicCard(
         modifier = modifier
             .bounceClick()
             .boxShadow(
-                color = shadowColor.copy(alpha = 0.08f),
+                color = shadowColor.copy(alpha = 0.15f),
                 blurRadius = blurRadius,
                 spreadRadius = 0.dp,
-                offset = DpOffset(0.dp, 8.dp)
+                offset = DpOffset(6.dp, 8.dp)
             )
             .clip(shape = shape)
             .clickable(onClick = onClick)
