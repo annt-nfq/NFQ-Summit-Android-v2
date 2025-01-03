@@ -115,12 +115,7 @@ class ScheduleViewModel @Inject constructor(
 }
 
 fun PersistentList<SummitEvent>.toTechRockEvents(): PersistentList<SummitEvent> {
-    val list = this.filter { filterTechRock(it.category.code) }
-        .toPersistentList()
-    val test = if (list.size>2) list+ list[2].copy(
-        end = list[2].end.plusMinutes(30),
-    ) else list
-    return test .toPersistentList()
+    return this.filter { filterTechRock(it.category.code) }.toPersistentList()
 }
 
 fun PersistentList<SummitEvent>.toSummitEvents(): PersistentList<SummitEvent> {
