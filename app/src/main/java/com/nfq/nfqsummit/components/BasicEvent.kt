@@ -81,11 +81,11 @@ fun BasicEvent(
             )
             .padding(bottom = if (positionedEvent.splitType == SplitType.End) 0.dp else 1.dp)
             .coloredShadow(
-                MaterialTheme.colorScheme.secondary,
-                alpha = 0.1f,
-                shadowRadius = 16.dp,
+                color = MaterialTheme.colorScheme.secondary,
+                alpha = 0.08f,
+                shadowRadius = 30.dp,
                 offsetX = 2.dp,
-                offsetY = 8.dp,
+                offsetY = 6.dp,
             )
             .background(
                 color = MaterialTheme.colorScheme.secondaryContainer,
@@ -106,7 +106,7 @@ fun BasicEvent(
 
         val (top, end) = when (eventSize) {
             EventSize.Small -> 8.dp to 0.dp
-            EventSize.Medium -> 14.dp to 8.dp
+            EventSize.Medium -> 14.dp to 0.dp
             else -> 14.dp to 16.dp
         }
         FlowColumn(
@@ -150,7 +150,8 @@ fun BasicEvent(
                     else -> 4
                 },
                 overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier.padding(end = end)
             )
 
             Row(
