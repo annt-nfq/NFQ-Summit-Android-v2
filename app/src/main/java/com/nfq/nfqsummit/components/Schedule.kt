@@ -108,7 +108,7 @@ fun calculateHourHeights(
         val startTime = minTime.plusHours(hour.toLong())
         val endTime = startTime.plusHours(1)
         val height = events.any {
-            it.start.hour == startTime.hour && it.end.hour == endTime.hour && ChronoUnit.MINUTES.between(
+            it.start.hour == startTime.hour && ChronoUnit.MINUTES.between(
                 it.start,
                 it.end
             ) < 60

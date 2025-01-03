@@ -53,7 +53,6 @@ sealed class CategoryType(
     val contentColor: Int,
     val tag: String
 ) {
-    data object Unknown : CategoryType("",0,0,"")
     data class Summit(val name: String = "Summit") :
         CategoryType(
             CategoryEnum.SUMMIT.code,
@@ -104,7 +103,7 @@ sealed class CategoryType(
 
         fun filterSummitOrK5(code: String): Boolean {
             return when {
-                code == CategoryEnum.SUMMIT.code || code == CategoryEnum.K5.code || code == CategoryEnum.SUMMIT.code -> true
+                code == CategoryEnum.SUMMIT.code || code == CategoryEnum.K5.code -> true
                 else -> false
             }
         }

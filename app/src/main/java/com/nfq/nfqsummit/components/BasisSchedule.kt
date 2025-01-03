@@ -304,25 +304,10 @@ fun BasicSchedule(
         val placeablesWithEvents = measureables.map { measurable ->
 
             val splitEvent = measurable.parentData as PositionedEvent
-            val eventDurationMinutes = ChronoUnit.MINUTES.between(
-                splitEvent.start,
-                minOf(splitEvent.end, maxTime)
-            )
 
-            val eventDurationHours = eventDurationMinutes / 60
-            val height = (0 until eventDurationHours.toInt()).sumOf { hour ->
-                hourHeights
-                    .find { it.startTime.hour == splitEvent.start.plusHours(hour.toLong()).hour }!!
-                    .height
-            }
+            val eventHeight =
+                calculateEventHeight(hourHeights, splitEvent, maxTime).dp.toPx().roundToInt()
 
-            val remainingMinutes = eventDurationMinutes % 60
-            val additionalHeight = hourHeights
-                .find { it.startTime.hour == splitEvent.start.plusHours(eventDurationHours).hour }
-                ?.let { it.height * (remainingMinutes / 60f) }
-                ?.roundToInt() ?: 0
-
-            val eventHeight = (height + additionalHeight).dp.toPx().roundToInt()
             val eventWidth =
                 ((splitEvent.colSpan.toFloat() / splitEvent.colTotal.toFloat()) * dayWidth.toPx()).roundToInt()
 
@@ -361,4 +346,39 @@ fun BasicSchedule(
             }
         }
     }
+}
+
+private fun calculateEventHeight(
+    hourHeights: List<HourHeight>,
+    splitEvent: PositionedEvent,
+    maxTime: LocalTime = LocalTime.MAX
+): Int {
+    val eventDurationMinutes = ChronoUnit.MINUTES.between(
+        splitEvent.start,
+        minOf(splitEvent.end, maxTime)
+    )
+
+    val eventDurationHours = eventDurationMinutes / 60
+    var remainingMinutes = eventDurationMinutes % 60
+
+    val height = (0 until eventDurationHours.toInt()).sumOf { hour ->
+        hourHeights
+            .find { it.startTime.hour == splitEvent.start.plusHours(hour.toLong()).hour }!!
+            .let {
+                if (splitEvent.start.minute > it.startTime.minute) {
+                    val minutes = splitEvent.start.minute - it.startTime.minute
+                    remainingMinutes += minutes
+                    ((minutes / 60f) * it.height).roundToInt()
+                } else {
+                    it.height
+                }
+            }
+    }
+
+    val additionalHeight = hourHeights
+        .find { it.startTime.hour == splitEvent.start.plusHours(eventDurationHours).hour }
+        ?.let { it.height * (remainingMinutes / 60f) }
+        ?.roundToInt() ?: 0
+
+    return height + additionalHeight
 }

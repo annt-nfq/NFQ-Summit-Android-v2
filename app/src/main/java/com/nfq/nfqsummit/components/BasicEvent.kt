@@ -36,7 +36,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.nfq.data.domain.model.CategoryType
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.model.EventSize
 import com.nfq.nfqsummit.model.PositionedEvent
@@ -105,25 +104,27 @@ fun BasicEvent(
                 .background(containerColor)
         )
 
-        val (top, end) = if (eventSize == EventSize.Small) 6.dp to 0.dp else 14.dp to 16.dp
+        val (top, end) = when (eventSize) {
+            EventSize.Small -> 8.dp to 0.dp
+            EventSize.Medium -> 14.dp to 8.dp
+            else -> 14.dp to 16.dp
+        }
         FlowColumn(
             modifier = Modifier
-                .padding(start = 8.dp, end = end)
+                .padding(start = 8.dp)
                 .padding(top = top)
         ) {
             FlowRow(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.padding(bottom = if (eventSize == EventSize.Large) 6.dp else 4.dp)
             ) {
-                if (event.category != CategoryType.Unknown) {
-                    TagItem(
-                        tag = event.category.tag,
-                        containerColor = containerColor,
-                        contentColor = contentColor,
-                        modifier = Modifier.padding(end = 10.dp)
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                }
+                TagItem(
+                    tag = event.category.tag,
+                    containerColor = containerColor,
+                    contentColor = contentColor,
+                    modifier = Modifier.padding(end = 10.dp)
+                )
+                Spacer(modifier = Modifier.weight(1f))
 
                 val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
                 val startTime = event.start.format(timeFormatter).lowercase()
@@ -134,10 +135,9 @@ fun BasicEvent(
                     minFontSize = 10.sp,
                     maxLines = 1,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier.padding(top = 4.dp, end = 16.dp)
                 )
             }
-
             Text(
                 text = event.name,
                 style = MaterialTheme.typography.bodyMedium.copy(
@@ -150,7 +150,7 @@ fun BasicEvent(
                     else -> 4
                 },
                 overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
 
             Row(
