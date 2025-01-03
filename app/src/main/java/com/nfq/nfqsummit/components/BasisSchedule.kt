@@ -194,10 +194,7 @@ fun CurrentTimeIndicator(
                 )
             }
             val totalHeights = hourHeights.filter { it.startTime.hour < currentTime.hour }
-            val eventOffsetMinutes = totalHeights
-                .lastOrNull()
-                ?.let { ChronoUnit.MINUTES.between(it.endTime, currentTime) }
-                ?: ChronoUnit.MINUTES.between(minTime, currentTime).coerceAtLeast(0)
+            val eventOffsetMinutes = totalHeights.eventOffsetMinutes(currentTime, minTime)
 
             val extraEventYOffset = hourHeights
                 .find { it.startTime.hour == currentTime.hour }
@@ -324,9 +321,7 @@ fun BasicSchedule(
         layout(width, totalHeight) {
             placeablesWithEvents.forEach { (placeable, splitEvent) ->
                 val totalHeights = hourHeights.filter { it.startTime.hour < splitEvent.start.hour }
-                val eventOffsetMinutes = totalHeights.lastOrNull()?.let {
-                    ChronoUnit.MINUTES.between(it.endTime, splitEvent.start)
-                } ?: ChronoUnit.MINUTES.between(minTime, splitEvent.start).coerceAtLeast(0)
+                val eventOffsetMinutes = totalHeights.eventOffsetMinutes(splitEvent.start, minTime)
 
                 val extraEventYOffset = hourHeights
                     .find { it.startTime.hour == splitEvent.start.hour }
@@ -348,14 +343,34 @@ fun BasicSchedule(
     }
 }
 
+private fun List<HourHeight>.eventOffsetMinutes(
+    currentTime: LocalTime,
+    minTime: LocalTime = LocalTime.MIN
+): Long {
+    return this
+        .lastOrNull()
+        ?.let { ChronoUnit.MINUTES.between(it.endTime, currentTime) }
+        ?: ChronoUnit.MINUTES.between(minTime, currentTime).coerceAtLeast(0)
+
+}
+
+
+/**
+ * Calculates the height of an event based on its duration and the heights of the hours it spans.
+ *
+ * @param hourHeights A list of `HourHeight` objects representing the heights of each hour in the schedule.
+ * @param positionedEvent The `PositionedEvent` for which the height is being calculated.
+ * @param maxTime The maximum time considered for the event height calculation. Defaults to `LocalTime.MAX`.
+ * @return The calculated height of the event in pixels.
+ */
 private fun calculateEventHeight(
     hourHeights: List<HourHeight>,
-    splitEvent: PositionedEvent,
+    positionedEvent: PositionedEvent,
     maxTime: LocalTime = LocalTime.MAX
 ): Int {
     val eventDurationMinutes = ChronoUnit.MINUTES.between(
-        splitEvent.start,
-        minOf(splitEvent.end, maxTime)
+        positionedEvent.start,
+        minOf(positionedEvent.end, maxTime)
     )
 
     val eventDurationHours = eventDurationMinutes / 60
@@ -363,10 +378,10 @@ private fun calculateEventHeight(
 
     val height = (0 until eventDurationHours.toInt()).sumOf { hour ->
         hourHeights
-            .find { it.startTime.hour == splitEvent.start.plusHours(hour.toLong()).hour }!!
+            .find { it.startTime.hour == positionedEvent.start.plusHours(hour.toLong()).hour }!!
             .let {
-                if (splitEvent.start.minute > it.startTime.minute) {
-                    val minutes = splitEvent.start.minute - it.startTime.minute
+                if (positionedEvent.start.minute > it.startTime.minute) {
+                    val minutes = positionedEvent.start.minute - it.startTime.minute
                     remainingMinutes += minutes
                     ((minutes / 60f) * it.height).roundToInt()
                 } else {
@@ -376,7 +391,7 @@ private fun calculateEventHeight(
     }
 
     val additionalHeight = hourHeights
-        .find { it.startTime.hour == splitEvent.start.plusHours(eventDurationHours).hour }
+        .find { it.startTime.hour == positionedEvent.start.plusHours(eventDurationHours).hour }
         ?.let { it.height * (remainingMinutes / 60f) }
         ?.roundToInt() ?: 0
 
