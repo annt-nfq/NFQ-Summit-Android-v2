@@ -40,7 +40,7 @@ fun Schedule(
 ) {
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes.toFloat() / 60f
-    val hourHeights = calculateHourHeights(events, minTime, numHours.toInt())
+    val hourlySegments = calculateHourlySegments(events, minTime, numHours.toInt())
     var sidebarWidth by remember { mutableIntStateOf(120) }
 
     BoxWithConstraints(modifier = modifier) {
@@ -56,7 +56,7 @@ fun Schedule(
             modifier = Modifier.fillMaxWidth()
         ) {
             ScheduleSidebar(
-                hourHeights = hourHeights,
+                hourlySegments = hourlySegments,
                 minTime = minTime,
                 maxTime = maxTime,
                 label = timeLabel,
@@ -72,7 +72,7 @@ fun Schedule(
                 minTime = minTime,
                 maxTime = maxTime,
                 dayWidth = dayWidth,
-                hourHeights = hourHeights,
+                hourlySegments = hourlySegments,
                 modifier = Modifier
                     .padding(top = 10.dp)
                     .align(Alignment.TopEnd)
@@ -84,26 +84,26 @@ fun Schedule(
                 minTime = minTime,
                 maxTime = maxTime,
                 dayWidth = fullWidth,
-                hourHeights = hourHeights,
+                hourlySegments = hourlySegments,
                 modifier = Modifier
             )
         }
     }
 }
 
-data class HourHeight(
+data class HourlySegment(
     val hour: Int,
     val startTime: LocalTime,
     val endTime: LocalTime,
     val height: Int
 )
 
-fun calculateHourHeights(
+private fun calculateHourlySegments(
     events: PersistentList<SummitEvent>,
     minTime: LocalTime,
     numHours: Int
-): List<HourHeight> {
-    val hourHeights = mutableListOf<HourHeight>()
+): List<HourlySegment> {
+    val hourlySegments = mutableListOf<HourlySegment>()
     repeat(numHours) { hour ->
         val startTime = minTime.plusHours(hour.toLong())
         val endTime = startTime.plusHours(1)
@@ -115,9 +115,9 @@ fun calculateHourHeights(
         }.let {
             if (it) 260 else 130
         }
-        hourHeights.add(HourHeight(hour, startTime, endTime, height))
+        hourlySegments.add(HourlySegment(hour, startTime, endTime, height))
     }
-    return hourHeights
+    return hourlySegments
 }
 
 sealed class ScheduleSize {

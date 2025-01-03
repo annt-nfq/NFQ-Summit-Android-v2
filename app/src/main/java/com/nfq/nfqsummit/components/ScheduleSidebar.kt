@@ -19,19 +19,18 @@ fun ScheduleSidebar(
     modifier: Modifier = Modifier,
     minTime: LocalTime = LocalTime.MIN,
     maxTime: LocalTime = LocalTime.MAX,
-    hourHeights: List<HourHeight> = emptyList(),
+    hourlySegments: List<HourlySegment> = emptyList(),
     label: @Composable (time: LocalTime) -> Unit = { BasicSidebarLabel(time = it) },
 ) {
-    val firstHour = minTime.truncatedTo(ChronoUnit.HOURS)
-    val firstHourOffsetMinutes =
-        if (firstHour == minTime) 0 else ChronoUnit.MINUTES.between(minTime, firstHour.plusHours(1))
-    val firstHourOffset = 130.dp * (firstHourOffsetMinutes / 60f)
+    val startTime = hourlySegments.first().startTime.truncatedTo(ChronoUnit.HOURS)
+    val firstHourOffsetInMinutes = if (startTime == minTime) 0 else startTime.minute
+    val firstHourOffsetDp = 130.dp * (firstHourOffsetInMinutes / 60f)
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.End
     ) {
-        Spacer(modifier = Modifier.height(firstHourOffset))
-        hourHeights.forEach {
+        Spacer(modifier = Modifier.height(firstHourOffsetDp))
+        hourlySegments.forEach {
             Box(modifier = Modifier.height(it.height.dp)) {
                 label(it.startTime)
             }
