@@ -156,7 +156,9 @@ private fun ScheduleHeader(
 ) {
     val coroutineScope = rememberCoroutineScope()
     Surface {
-        Column {
+        Column(
+            modifier = Modifier.animateContentSize()
+        ) {
             Row(
                 verticalAlignment = Alignment.Bottom,
                 modifier = Modifier
@@ -189,20 +191,23 @@ private fun ScheduleHeader(
                     Spacer(modifier = Modifier.width(21.dp))
                 }
             }
-            SegmentedControl(
-                items = listOf(
-                    "Summit & K5 \uD83D\uDCBC",
-                    "Tech Rock \uD83E\uDD16 "
-                ),
-                selectedIndex = pagerState.currentPage,
-                onItemSelection = {
-                    coroutineScope.launch { pagerState.animateScrollToPage(it) }
-                },
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 24.dp)
-                    .padding()
-            )
+            if (uiState.summitEvents.isNotEmpty() && uiState.techRockEvents.isNotEmpty()) {
+                SegmentedControl(
+                    items = listOf(
+                        "Summit & K5 \uD83D\uDCBC",
+                        "Tech Rock \uD83E\uDD16 "
+                    ),
+                    selectedIndex = pagerState.currentPage,
+                    onItemSelection = {
+                        coroutineScope.launch { pagerState.animateScrollToPage(it) }
+                    },
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 24.dp)
+                        .padding()
+                )
+            }
+
             HorizontalDivider(color = Color(0xFFCFCAE4), thickness = 1.dp)
         }
     }
