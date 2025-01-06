@@ -179,7 +179,7 @@ fun CurrentTimeIndicator(
         modifier = modifier.padding(start = 40.dp)
     ) { measureables, constraints ->
 
-        val initialYOffset = if (minTime.minute == 0) 2.dp else
+        val initialYOffset = if (currentTime.hour <= minTime.hour) 2.dp else
             hourlySegments.first().height.dp * (minTime.minute / 60f)
 
         val layoutHeight = hourlySegments.sumOf { it.height }.dp.roundToPx()
