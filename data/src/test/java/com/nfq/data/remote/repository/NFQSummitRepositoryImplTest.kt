@@ -52,7 +52,9 @@ class NFQSummitRepositoryImplTest {
     @Test
     fun `events flow returns all events from dao`() = runTest {
         val mockEvents = listOf(mockk<EventEntity>(), mockk<EventEntity>())
-        every { mockEventDao.getAllEvents() } returns flowOf(mockEvents)
+        every { mockEventDao.getUpcomingEvents(currentTime = any()) } returns flowOf(
+            mockEvents
+        )
 
         val result = repository.events.first()
 
@@ -138,12 +140,18 @@ class NFQSummitRepositoryImplTest {
     @Test
     fun `updateFavorite successfully updates event favorite status`() = runTest {
         val eventId = "1"
-        coEvery { mockEventDao.updateFavorite(eventId, true) } returns Unit
+        coEvery {
+            mockEventDao.updateFavorite(
+                eventId = eventId,
+                updatedAt = any(),
+                isFavorite = true
+            )
+        } returns Unit
 
         val result = repository.updateFavorite(eventId, true)
 
         assertTrue(result.isRight())
-        coVerify { mockEventDao.updateFavorite(eventId, true) }
+        coVerify { mockEventDao.updateFavorite(eventId, updatedAt = any(), isFavorite = true) }
     }
 
     @Test
@@ -255,7 +263,8 @@ object EventActivityResponseMock {
             quantity = 0,
             isMain = false,
             timeEnd = 0L,
-            speaker = null
+            speaker = null,
+            updatedAt = 0L
         )
     )
     val mockEventEntity = EventEntity(
@@ -284,7 +293,8 @@ object EventActivityResponseMock {
         quantity = 0,
         isMain = false,
         timeEnd = 0L,
-        speaker = null
+        speaker = null,
+        updatedAt = 0L
     )
     val eventsList = listOf(event1, event2)
 }
