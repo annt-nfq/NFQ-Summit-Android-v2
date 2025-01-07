@@ -362,16 +362,26 @@ private fun calculateYPosition(
     hourlySegments: List<HourlySegment>,
     startTime: LocalTime,
 ): Int {
-    val pastHourSegmentsHeight = hourlySegments
-        .takeWhile { it.startTime.hour < startTime.hour }
+    if (hourlySegments.isEmpty()) return 0
+
+    // Find the segment containing the start time
+    val targetSegment = hourlySegments.find { segment ->
+        startTime >= segment.startTime && startTime < segment.endTime
+    }
+
+    // Calculate height of all complete segments before the target time
+    val precedingHeight = hourlySegments
+        .takeWhile { it.endTime <= startTime }
         .sumOf { it.height }
 
-    val additionalEventYOffset = hourlySegments
-        .firstOrNull { it.startTime.hour == startTime.hour }
-        ?.let {
-            val duration = startTime.minute - it.startTime.minute
-            ((duration / 60f) * it.height).roundToInt()
-        } ?: 0
+    // Calculate additional offset within the target segment
+    val withinSegmentOffset = targetSegment?.let { segment ->
+        val minutesFromSegmentStart = ChronoUnit.MINUTES.between(
+            segment.startTime,
+            startTime
+        ).toInt()
+        ((minutesFromSegmentStart / 60f) * segment.height).roundToInt()
+    } ?: 0
 
-    return pastHourSegmentsHeight + additionalEventYOffset
+    return precedingHeight + withinSegmentOffset
 }
