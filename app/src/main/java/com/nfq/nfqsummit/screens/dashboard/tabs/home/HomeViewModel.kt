@@ -29,7 +29,7 @@ class HomeViewModel @Inject constructor(
 
     val uiState = combine(
         repository.user,
-        repository.events.map { it.sortedBy { event -> event.timeStart }.take(3) },
+        repository.events.map { it.take(3) },
         repository.savedEvents,
         loadingFlow
     ) { user, events, savedEvents, isLoading ->

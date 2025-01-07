@@ -26,7 +26,8 @@ class NFQSummitRepositoryImpl @Inject constructor(
     private val userDao: UserDao
 ) : NFQSummitRepository {
     override val events: Flow<List<EventEntity>>
-        get() = eventDao.getAllEvents()
+        get() = eventDao.getUpcomingEvents(currentTime = System.currentTimeMillis())
+
     override val savedEvents: Flow<List<EventEntity>>
         get() = eventDao.getFavoriteEvents()
     override val user: Flow<UserEntity?>

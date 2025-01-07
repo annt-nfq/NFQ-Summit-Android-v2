@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EventDao {
-    @Query("SELECT * FROM event_entity ORDER BY timeStart ASC")
-    fun getAllEvents(): Flow<List<EventEntity>>
+    @Query("SELECT * FROM event_entity WHERE timeStart >= :currentTime ORDER BY timeStart ASC")
+    fun getUpcomingEvents(currentTime: Long): Flow<List<EventEntity>>
 
     @Query("SELECT * FROM event_entity WHERE isFavorite = 1 ORDER BY updatedAt DESC")
     fun getFavoriteEvents(): Flow<List<EventEntity>>
@@ -28,6 +28,6 @@ interface EventDao {
     @Query("SELECT * FROM event_entity WHERE id=:eventId")
     suspend fun getEventById(eventId: String): EventEntity
 
-    @Query("DELETE FROM event_entity")
+    @Query("DELETE FROM event_entity WHERE isFavorite=0")
     suspend fun deleteAllEvents()
 }
