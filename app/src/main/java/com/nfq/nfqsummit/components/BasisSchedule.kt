@@ -388,8 +388,8 @@ private fun calculateEventHeight(
 
     val height = (0 until eventDurationHours.toInt()).sumOf { hour ->
         hourlySegments
-            .find { it.startTime.hour == positionedEvent.start.plusHours(hour.toLong()).hour }!!
-            .let {
+            .firstOrNull { it.startTime.hour == positionedEvent.start.plusHours(hour.toLong()).hour }
+            ?.let {
                 if (positionedEvent.start.minute > it.startTime.minute) {
                     val minutes = positionedEvent.start.minute - it.startTime.minute
                     remainingMinutes += minutes
@@ -397,7 +397,7 @@ private fun calculateEventHeight(
                 } else {
                     it.height
                 }
-            }
+            }?.coerceAtLeast(0) ?: 0
     }
 
     val additionalHeight = hourlySegments
