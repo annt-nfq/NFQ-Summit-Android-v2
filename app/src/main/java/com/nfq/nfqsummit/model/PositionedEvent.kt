@@ -18,6 +18,7 @@ data class PositionedEvent(
     fun getEventSize(): EventSize {
         val durationMinutes = ChronoUnit.MINUTES.between(start, end)
         return when {
+            durationMinutes < 30 -> EventSize.Small
             durationMinutes < 60 && colTotal > 1 -> EventSize.Small
             durationMinutes < 60 && colTotal == 1 -> EventSize.Medium
             durationMinutes > 60 && colTotal > 1 -> EventSize.Medium

@@ -323,36 +323,37 @@ fun BasicSchedule(
     }
 }
 
-
-/**
- * Calculates the height of an event based on its duration and the heights of the hours it spans.
- *
- * @param hourlySegments A list of `HourHeight` objects representing the heights of each hour in the schedule.
- * @param positionedEvent The `PositionedEvent` for which the height is being calculated.
- * @return The calculated height of the event in pixels.
- */
 private fun calculateEventHeight(
     hourlySegments: List<HourlySegment>,
-    positionedEvent: PositionedEvent,
+    event: PositionedEvent,
 ): Int {
 
-    val hourSegmentsHeight = hourlySegments
-        .filter { it.startTime.hour >= positionedEvent.start.hour && it.endTime.hour <= positionedEvent.end.hour }
+    // Filter relevant hour segments that overlap with the event
+    val relevantSegments = hourlySegments.filter { segment ->
+        val segmentStart = segment.startTime
+        val segmentEnd = segment.endTime
 
-    val firstHeight = hourSegmentsHeight.firstOrNull()?.let {
-        val duration = positionedEvent.start.minute - it.startTime.minute
-        ((duration / 60f) * it.height).roundToInt()
-    } ?: 0
-    val lastHeight = if (hourSegmentsHeight.size > 1) {
-        hourSegmentsHeight.lastOrNull()?.let {
-            val duration = it.endTime.minute - positionedEvent.end.minute
-            ((duration / 60f) * it.height).roundToInt()
-        } ?: 0
-    } else {
-        0
+        // Check if segment overlaps with event
+        !(event.end.isBefore(segmentStart) || event.start.isAfter(segmentEnd))
     }
 
-    val totalHeight = hourSegmentsHeight.sumOf { it.height } - firstHeight - lastHeight
+    if (relevantSegments.isEmpty()) return 0
+
+    var totalHeight = 0
+
+    relevantSegments.forEach { segment ->
+        val segmentStart = segment.startTime
+        val segmentEnd = segment.endTime
+
+        // Calculate the overlap duration in minutes
+        val overlapStart = maxOf(event.start, segmentStart)
+        val overlapEnd = minOf(event.end, segmentEnd)
+        val overlapDuration = ChronoUnit.MINUTES.between(overlapStart, overlapEnd).toInt()
+
+        // Calculate the height proportion based on overlap duration
+        val heightProportion = overlapDuration / 60f
+        totalHeight += (heightProportion * segment.height).roundToInt()
+    }
 
     return totalHeight
 }
