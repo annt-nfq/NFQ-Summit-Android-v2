@@ -41,6 +41,7 @@ enum class CategoryEnum(val code: String) {
     SUMMIT("summit"),
     K5("k5"),
     TECH_ROCK("tech_rock"),
+    TECH("tech"),
     PRODUCT("product"),
     BUSINESS("business")
 }
@@ -77,6 +78,14 @@ sealed class CategoryType(
             "\uD83D\uDCBB $name"
         )
 
+    data class Tech(val name: String) :
+        CategoryType(
+            CategoryEnum.TECH.code,
+            0xFFE8F5E9.toInt(),
+            0xFF43A047.toInt(),
+            "\uD83D\uDCBB $name"
+        )
+
     data class Product(val name: String) :
         CategoryType(
             CategoryEnum.PRODUCT.code,
@@ -96,7 +105,7 @@ sealed class CategoryType(
     companion object {
         fun filterTechRock(code: String): Boolean {
             return when {
-                code == CategoryEnum.TECH_ROCK.code || code == CategoryEnum.PRODUCT.code || code == CategoryEnum.BUSINESS.code -> true
+                code == CategoryEnum.TECH_ROCK.code || code == CategoryEnum.PRODUCT.code || code == CategoryEnum.BUSINESS.code || code == CategoryEnum.TECH.code -> true
                 else -> false
             }
         }

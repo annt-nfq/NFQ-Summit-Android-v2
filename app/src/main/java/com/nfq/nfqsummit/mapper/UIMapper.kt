@@ -78,17 +78,17 @@ private fun EventEntity.toSubmitEvent(): SummitEvent {
 }
 
 
-
 private fun CategoryResponse?.toCategoryType(genre: GenreResponse?): CategoryType {
     val (code, name) = Pair(
         genre?.code ?: this?.code.orEmpty(),
         genre?.name ?: this?.name.orEmpty()
     )
     return when (code) {
+        CategoryEnum.SUMMIT.code -> CategoryType.Summit(name)
+        CategoryEnum.K5.code -> CategoryType.K5(name)
         CategoryEnum.PRODUCT.code -> CategoryType.Product(name)
         CategoryEnum.BUSINESS.code -> CategoryType.Business(name)
-        CategoryEnum.SUMMIT.code -> CategoryType.Summit(name)
-        CategoryEnum.K5.code ->CategoryType.K5(name)
+        CategoryEnum.TECH.code -> CategoryType.Tech(name)
         CategoryEnum.TECH_ROCK.code -> CategoryType.TechRock("Tech")
         else -> CategoryType.Summit("Summit")
     }
