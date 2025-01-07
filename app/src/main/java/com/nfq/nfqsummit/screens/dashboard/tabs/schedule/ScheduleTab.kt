@@ -105,7 +105,9 @@ fun ScheduleTabUI(
 ) {
 
     val verticalScroll = rememberScrollState()
-    val pagerState = rememberPagerState { 2 }
+    val pagerState = rememberPagerState {
+        if (uiState.summitEvents.isNotEmpty() && uiState.techRockEvents.isNotEmpty()) 2 else 1
+    }
 
     Scaffold(
         topBar = {
