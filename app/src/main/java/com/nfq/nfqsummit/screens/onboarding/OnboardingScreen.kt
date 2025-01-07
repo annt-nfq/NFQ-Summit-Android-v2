@@ -2,9 +2,11 @@ package com.nfq.nfqsummit.screens.onboarding
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -73,7 +75,10 @@ fun OnboardingScreen(
         onNext = {
             coroutineScope.launch {
                 if (pagerState.currentPage < pagerState.pageCount - 1) {
-                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                    pagerState.animateScrollToPage(
+                        page = pagerState.currentPage + 1,
+                        animationSpec = tween(durationMillis = 500, easing = LinearOutSlowInEasing)
+                    )
                 } else {
                     viewModel.updateOnboardingStatus(true)
                 }
@@ -191,6 +196,7 @@ private fun OnboardingContent(
             HorizontalPager(
                 state = pagerState,
                 verticalAlignment = Alignment.Top,
+                beyondViewportPageCount = 2
             ) { page ->
                 when (page) {
                     0 -> OnboardingPage(
