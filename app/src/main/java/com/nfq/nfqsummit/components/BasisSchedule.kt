@@ -193,7 +193,7 @@ fun CurrentTimeIndicator(
             }
 
             val currentYPosition =
-                calculateYPosition(hourlySegments, currentTime).dp.toPx().roundToInt()
+                calculateYPosition(hourlySegments, currentTime).plus(2).dp.toPx().roundToInt()
 
             measuredPlaceables.first().place(0, currentYPosition)
         }
@@ -290,7 +290,7 @@ fun BasicSchedule(
             val splitEvent = measurable.parentData as PositionedEvent
 
             val eventHeight =
-                calculateEventHeight(hourlySegments, splitEvent, maxTime).dp.toPx().roundToInt()
+                calculateEventHeight(hourlySegments, splitEvent).dp.toPx().roundToInt()
 
             val eventWidth =
                 ((splitEvent.colSpan.toFloat() / splitEvent.colTotal.toFloat()) * dayWidth.toPx()).roundToInt()
@@ -329,42 +329,32 @@ fun BasicSchedule(
  *
  * @param hourlySegments A list of `HourHeight` objects representing the heights of each hour in the schedule.
  * @param positionedEvent The `PositionedEvent` for which the height is being calculated.
- * @param maxTime The maximum time considered for the event height calculation. Defaults to `LocalTime.MAX`.
  * @return The calculated height of the event in pixels.
  */
 private fun calculateEventHeight(
     hourlySegments: List<HourlySegment>,
     positionedEvent: PositionedEvent,
-    maxTime: LocalTime = LocalTime.MAX
 ): Int {
-    val eventDurationMinutes = ChronoUnit.MINUTES.between(
-        positionedEvent.start,
-        minOf(positionedEvent.end, maxTime)
-    )
 
-    val eventDurationHours = eventDurationMinutes / 60
-    var remainingMinutes = eventDurationMinutes % 60
+    val hourSegmentsHeight = hourlySegments
+        .filter { it.startTime.hour >= positionedEvent.start.hour && it.endTime.hour <= positionedEvent.end.hour }
 
-    val height = (0 until eventDurationHours.toInt()).sumOf { hour ->
-        hourlySegments
-            .firstOrNull { it.startTime.hour == positionedEvent.start.plusHours(hour.toLong()).hour }
-            ?.let {
-                if (positionedEvent.start.minute > it.startTime.minute) {
-                    val minutes = positionedEvent.start.minute - it.startTime.minute
-                    remainingMinutes += minutes
-                    ((minutes / 60f) * it.height).roundToInt()
-                } else {
-                    it.height
-                }
-            }?.coerceAtLeast(0) ?: 0
+    val firstHeight = hourSegmentsHeight.firstOrNull()?.let {
+        val duration = positionedEvent.start.minute - it.startTime.minute
+        ((duration / 60f) * it.height).roundToInt()
+    } ?: 0
+    val lastHeight = if (hourSegmentsHeight.size > 1) {
+        hourSegmentsHeight.lastOrNull()?.let {
+            val duration = it.endTime.minute - positionedEvent.end.minute
+            ((duration / 60f) * it.height).roundToInt()
+        } ?: 0
+    } else {
+        0
     }
 
-    val additionalHeight = hourlySegments
-        .find { it.startTime.hour == positionedEvent.start.plusHours(eventDurationHours).hour }
-        ?.let { it.height * (remainingMinutes / 60f) }
-        ?.roundToInt() ?: 0
+    val totalHeight = hourSegmentsHeight.sumOf { it.height } - firstHeight - lastHeight
 
-    return height + additionalHeight
+    return totalHeight
 }
 
 private fun calculateYPosition(
