@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.Loading
@@ -159,7 +160,7 @@ private fun SignInUI(
                     Text(
                         text = "Please check your email for your booking number or upload your booking QR code here to sign in.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
@@ -203,6 +204,7 @@ private fun SignInButton(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp,
             modifier = Modifier.align(Alignment.Center)
         )
         Row(modifier = Modifier.align(Alignment.CenterEnd)) {
@@ -247,6 +249,7 @@ private fun UploadQRCodeButton(
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp,
             ),
             modifier = Modifier.align(Alignment.Center)
         )
@@ -267,7 +270,8 @@ private fun ContinueAsGuestButton(onEvent: (SignInEvent) -> Unit) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            letterSpacing = 1.sp,
         )
     }
 }
