@@ -43,16 +43,17 @@ class ScheduleViewModel @Inject constructor(
         val firstEventDate = events.firstOrNull()?.start?.toLocalDate() ?: today
         val lastEventDate = events.lastOrNull()?.end?.toLocalDate() ?: today
 
-        val selectedDate = oldSelectedDate ?: when {
-            today < firstEventDate -> firstEventDate
-            today > lastEventDate -> lastEventDate
-            else -> today
-        }
-
         val distinctDates = events
             .mapNotNull { it.start.toLocalDate() }
             .distinct()
             .sorted()
+
+        val selectedDate = oldSelectedDate ?: when {
+            distinctDates.any { it.isSame(today) } -> today
+            today < firstEventDate -> firstEventDate
+            today > lastEventDate -> lastEventDate
+            else -> distinctDates.first { it > today }
+        }
 
         val dayEventPairs = distinctDates.map { date ->
             date to events.filter { event ->
