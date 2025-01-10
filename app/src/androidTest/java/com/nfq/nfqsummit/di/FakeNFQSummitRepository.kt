@@ -25,9 +25,11 @@ class FakeNFQSummitRepository : NFQSummitRepository {
     private var shouldFailFetchEvents = false
     private var shouldFailGetEventDetails = false
     private var shouldFailUpdateFavorite = false
+    override val events: Flow<List<EventEntity>>
+        get() = _events.asStateFlow()
 
     // Exposed flows
-    override val events: Flow<List<EventEntity>> = _events.asStateFlow()
+    override val upcomingEvents: Flow<List<EventEntity>> = _events.asStateFlow()
     override val savedEvents: Flow<List<EventEntity>> = _savedEvents.asStateFlow()
     override val user: Flow<UserEntity?> = _user.asStateFlow()
     override val isCompletedOnboarding: Flow<Boolean> = _isCompletedOnboarding.asStateFlow()

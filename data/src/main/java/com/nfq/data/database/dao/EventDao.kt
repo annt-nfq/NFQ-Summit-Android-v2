@@ -8,6 +8,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EventDao {
+
+    @Query("SELECT * FROM event_entity ORDER BY timeStart ASC")
+    fun getAllEvents(): Flow<List<EventEntity>>
+
     @Query("SELECT * FROM event_entity WHERE timeStart >= :currentTime ORDER BY timeStart ASC")
     fun getUpcomingEvents(currentTime: Long): Flow<List<EventEntity>>
 

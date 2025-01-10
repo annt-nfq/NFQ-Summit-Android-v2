@@ -26,8 +26,9 @@ class NFQSummitRepositoryImpl @Inject constructor(
     private val userDao: UserDao
 ) : NFQSummitRepository {
     override val events: Flow<List<EventEntity>>
+        get() = eventDao.getAllEvents()
+    override val upcomingEvents: Flow<List<EventEntity>>
         get() = eventDao.getUpcomingEvents(currentTime = System.currentTimeMillis())
-
     override val savedEvents: Flow<List<EventEntity>>
         get() = eventDao.getFavoriteEvents()
     override val user: Flow<UserEntity?>
@@ -61,7 +62,7 @@ class NFQSummitRepositoryImpl @Inject constructor(
             .map { latestEvents ->
                 val favoriteEvents = eventDao.getFavoriteEvents().firstOrNull().orEmpty()
                 val updatedEvents = updateEventsWithFavorites(latestEvents, favoriteEvents)
-                if (forceUpdate) eventDao.deleteAllEvents()
+                // if (forceUpdate) eventDao.deleteAllEvents()
                 eventDao.insertEvents(updatedEvents)
             }
     }

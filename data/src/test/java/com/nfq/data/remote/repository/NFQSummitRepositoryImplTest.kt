@@ -56,7 +56,7 @@ class NFQSummitRepositoryImplTest {
             mockEvents
         )
 
-        val result = repository.events.first()
+        val result = repository.upcomingEvents.first()
 
         assertEquals(mockEvents, result)
     }

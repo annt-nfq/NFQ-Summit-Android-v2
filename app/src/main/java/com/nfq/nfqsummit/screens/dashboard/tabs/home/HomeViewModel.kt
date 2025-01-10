@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +28,7 @@ class HomeViewModel @Inject constructor(
 
     val uiState = combine(
         repository.user,
-        repository.events.map { it.take(3) },
+        repository.upcomingEvents,
         repository.savedEvents,
         loadingFlow
     ) { user, events, savedEvents, isLoading ->
@@ -65,7 +64,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun updateLoadingStateIfNeeded() {
-        val events = repository.events.firstOrNull()
+        val events = repository.upcomingEvents.firstOrNull()
         loadingFlow.value = events.isNullOrEmpty()
     }
 

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface NFQSummitRepository {
     val events: Flow<List<EventEntity>>
+    val upcomingEvents: Flow<List<EventEntity>>
     val savedEvents: Flow<List<EventEntity>>
     val user: Flow<UserEntity?>
     val isCompletedOnboarding: Flow<Boolean>
