@@ -170,7 +170,14 @@ private fun ScheduleHeader(
             }
         }
     }
-
+    val scrollState = rememberScrollState()
+    LaunchedEffect(uiState.selectedDate) {
+        val selectedIndex = uiState.dayEventPairs.indexOfFirst { it.first.isSame(uiState.selectedDate) }
+        if (selectedIndex != -1) {
+            scrollState.animateScrollTo(selectedIndex * 120)
+        }
+    }
+    
     Surface {
         Column(
             modifier = Modifier.animateContentSize()
@@ -178,7 +185,8 @@ private fun ScheduleHeader(
             Row(
                 verticalAlignment = Alignment.Bottom,
                 modifier = Modifier
-                    .horizontalScroll(state = rememberScrollState())
+                    .fillMaxWidth()
+                    .horizontalScroll(state = scrollState)
                     .animateContentSize()
                     .padding(vertical = 24.dp)
             ) {
