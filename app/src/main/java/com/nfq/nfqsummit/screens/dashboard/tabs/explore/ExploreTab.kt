@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.CountryEnum
+import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.components.SegmentedControl
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.components.networkImagePainter
@@ -57,6 +58,11 @@ fun ExploreTab(
             viewModel.configCountry(CountryEnum.VIETNAM)
         }
     }
+
+    if (uiState.isLoading) {
+        Loading()
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
