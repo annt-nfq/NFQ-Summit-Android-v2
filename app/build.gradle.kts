@@ -171,6 +171,10 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
+    // Firebase App Check
+    implementation(libs.firebase.appcheck.playintegrity)
+    // Optional: Debug provider for development
+    implementation(libs.firebase.appcheck.debug)
 
     implementation(libs.google.code.scanner)
     implementation(libs.security.crypto)
