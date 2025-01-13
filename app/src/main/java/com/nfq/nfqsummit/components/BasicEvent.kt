@@ -126,17 +126,19 @@ fun BasicEvent(
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
-                val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-                val startTime = event.start.format(timeFormatter).lowercase()
-                val endTime = event.end.format(timeFormatter).lowercase()
-                AutoResizedText(
-                    text = "$startTime - $endTime",
-                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-                    minFontSize = 10.sp,
-                    maxLines = 1,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(top = 4.dp, end = 16.dp)
-                )
+                if (eventSize != EventSize.Small) {
+                    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+                    val startTime = event.start.format(timeFormatter).lowercase()
+                    val endTime = event.end.format(timeFormatter).lowercase()
+                    AutoResizedText(
+                        text = "$startTime - $endTime",
+                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                        minFontSize = 10.sp,
+                        maxLines = 1,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(top = 4.dp, end = 16.dp)
+                    )
+                }
             }
             Text(
                 text = event.name,
@@ -145,9 +147,8 @@ fun BasicEvent(
                     lineHeight = if (eventSize == EventSize.Medium) 16.sp else 19.sp,
                 ),
                 maxLines = when (eventSize) {
-                    EventSize.Small -> 2
-                    EventSize.Medium -> 3
-                    else -> 4
+                    EventSize.Large -> 4
+                    else -> 3
                 },
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
