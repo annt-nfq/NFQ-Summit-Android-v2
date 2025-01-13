@@ -125,7 +125,7 @@ fun PersistentList<SummitEvent>.toSummitEvents(): PersistentList<SummitEvent> {
 
 data class ScheduleUIState(
     val isLoading: Boolean = false,
-    val selectedDate: LocalDate = LocalDate.now(),
+    val selectedDate: LocalDate = LocalDate.MIN,
     val currentTime: LocalTime = LocalTime.now(),
     val dailyEvents: PersistentList<SummitEvent> = persistentListOf(),
     val summitEvents: PersistentList<SummitEvent> = persistentListOf(),

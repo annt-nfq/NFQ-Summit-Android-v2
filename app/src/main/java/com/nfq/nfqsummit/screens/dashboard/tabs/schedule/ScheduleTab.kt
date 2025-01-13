@@ -135,6 +135,7 @@ fun ScheduleTabUI(
                         SummitSchedules(
                             dailyEvents = uiState.summitEvents,
                             currentTime = uiState.currentTime,
+                            verticalScroll = verticalScroll,
                             onEventClick = onEventClick
                         )
                     }
@@ -144,6 +145,7 @@ fun ScheduleTabUI(
                             dailyEvents = uiState.techRockEvents,
                             currentTime = uiState.currentTime,
                             hourSize = uiState.hourSize,
+                            verticalScroll = verticalScroll,
                             onEventClick = onEventClick
                         )
                     }
