@@ -110,13 +110,15 @@ private fun calculateHourlySegments(
     numHours: Int
 ): List<HourlySegment> {
     val hourlySegments = mutableListOf<HourlySegment>()
-    repeat(numHours) { hour ->
+    repeat(numHours + 1) { hour ->
         val startTime = minTime.truncatedTo(ChronoUnit.HOURS).plusHours(hour.toLong())
-        val endTime = startTime.plusHours(1)
+        val endTime = startTime.plusHours(1).let {
+            if (it.hour == 0) startTime.plusMinutes(59) else it
+        }
         val height = events.any {
             it.start.hour == startTime.hour && ChronoUnit.MINUTES.between(
                 it.start,
-                it.end
+                it.end.let { end -> if (end.hour == 0) it.start.plusMinutes(59) else end }
             ) < 60
         }.let {
             if (it) 260 else 130

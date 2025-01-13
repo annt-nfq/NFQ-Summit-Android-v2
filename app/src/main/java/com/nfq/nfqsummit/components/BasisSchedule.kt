@@ -270,7 +270,7 @@ fun BasicSchedule(
                 val firstHourOffsetMinutes = if (startTime == minTime) 0 else startTime.minute
                 val firstHourOffsetPx = (firstHourOffsetMinutes / 60f) * 130.dp.toPx()
                 var accumulatedHeight = 0.dp
-                repeat(numHours) {
+                repeat(numHours + 1) {
                     val hourHeight =
                         hourlySegments.find { hourHeight -> hourHeight.hour == it }!!.height
                     drawLine(
