@@ -20,7 +20,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-        buildConfigField("String", "BASE_URL", "\"${p.getProperty("BASE_URL")}\"")
         buildConfigField("String", "PASS_PHRASE", "\"${p.getProperty("PASS_PHRASE")}\"")
         buildConfigField("String", "BASIC_TOKEN", "\"${p.getProperty("BASIC_TOKEN")}\"")
 
@@ -29,10 +28,13 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            buildConfigField("String", "BASIC_TOKEN", "\"${p.getProperty("BASIC_TOKEN")}\"")
+            buildConfigField("String", "BASE_URL", "\"${p.getProperty("BASE_URL")}\"")
+        }
+        debug {
+            isMinifyEnabled = false
+            buildConfigField("String", "BASIC_TOKEN", "\"${p.getProperty("DEV_BASIC_TOKEN")}\"")
+            buildConfigField("String", "BASE_URL", "\"${p.getProperty("DEV_BASE_URL")}\"")
         }
     }
     compileOptions {
