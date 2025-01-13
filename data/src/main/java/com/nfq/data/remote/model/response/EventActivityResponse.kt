@@ -36,15 +36,15 @@ data class EventActivityResponse(
 @Serializable
 data class CategoryResponse(
     @SerialName("id") val id: Int,
-    @SerialName("name") val name: String,
-    @SerialName("code") val code: String
+    @SerialName("name") val name: String?,
+    @SerialName("code") val code: String?
 )
 
 @Serializable
 data class GenreResponse(
     @SerialName("id") val id: Int,
-    @SerialName("name") val name: String,
-    @SerialName("code") val code: String
+    @SerialName("name") val name: String?,
+    @SerialName("code") val code: String?
 )
 
 
