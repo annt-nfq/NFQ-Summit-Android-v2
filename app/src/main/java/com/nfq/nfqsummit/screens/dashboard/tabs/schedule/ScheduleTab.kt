@@ -43,6 +43,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,6 +69,7 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
@@ -170,11 +173,39 @@ private fun ScheduleHeader(
             }
         }
     }
+
     val scrollState = rememberScrollState()
+    val density = LocalDensity.current
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    var delayIfTheFirstTime by remember { mutableStateOf(true) }
+
     LaunchedEffect(uiState.selectedDate) {
-        val selectedIndex = uiState.dayEventPairs.indexOfFirst { it.first.isSame(uiState.selectedDate) }
-        if (selectedIndex != -1) {
-            scrollState.animateScrollTo(selectedIndex * 120)
+
+        val index = uiState.dayEventPairs.indexOfFirst { it.first.isSame(uiState.selectedDate) }
+        if (index != -1) {
+            // Delay if the first time only
+            if (delayIfTheFirstTime) {
+                delay(300L)
+                delayIfTheFirstTime = false
+            }
+
+            // Convert measurements to pixels
+            val itemWidthPx = with(density) { 80.dp.toPx() }
+            val screenWidthPx = with(density) { screenWidth.toPx() }
+
+            // Calculate center position
+            val itemPosition = index * itemWidthPx
+            val centerOffset = (screenWidthPx - itemWidthPx) / 2
+            val targetScroll = (itemPosition - centerOffset).coerceIn(
+                0f,
+                scrollState.maxValue.toFloat()
+            )
+            // Delay if the first time only
+            if (targetScroll == 0f) {
+                delay(300L)
+            }
+            // Animate to center position
+            scrollState.animateScrollTo(targetScroll.toInt())
         }
     }
     
