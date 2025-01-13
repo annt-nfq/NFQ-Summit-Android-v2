@@ -42,6 +42,10 @@ fun Schedule(
     val numHours = numMinutes.toFloat() / 60f
     val hourlySegments = calculateHourlySegments(events, minTime, numHours.toInt())
     var sidebarWidth by remember { mutableIntStateOf(120) }
+    val showTimeIndicator = remember(minDate, maxDate) {
+        val today = LocalDate.now()
+        !today.isBefore(minDate) && !today.isAfter(maxDate)
+    }
 
     BoxWithConstraints(modifier = modifier) {
 
@@ -77,16 +81,18 @@ fun Schedule(
                     .padding(top = 10.dp)
                     .align(Alignment.TopEnd)
             )
-            CurrentTimeIndicator(
-                currentTime = currentTime,
-                minDate = minDate,
-                maxDate = maxDate,
-                minTime = minTime,
-                maxTime = maxTime,
-                dayWidth = fullWidth,
-                hourlySegments = hourlySegments,
-                modifier = Modifier
-            )
+            if (showTimeIndicator) {
+                CurrentTimeIndicator(
+                    currentTime = currentTime,
+                    minDate = minDate,
+                    maxDate = maxDate,
+                    minTime = minTime,
+                    maxTime = maxTime,
+                    dayWidth = fullWidth,
+                    hourlySegments = hourlySegments,
+                    modifier = Modifier
+                )
+            }
         }
     }
 }
