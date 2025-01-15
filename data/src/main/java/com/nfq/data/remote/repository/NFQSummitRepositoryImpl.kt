@@ -47,8 +47,13 @@ class NFQSummitRepositoryImpl @Inject constructor(
     override suspend fun logout(): Either<DataException, Unit> {
         return dataSource
             .logout()
-            .onLeft { userDao.deleteUser() }
-            .map { userDao.deleteUser() }
+            .onLeft { clearUserData() }
+            .map { clearUserData() }
+    }
+
+    private suspend fun clearUserData() {
+        userDao.deleteUser()
+        eventDao.deleteAllEvents()
     }
 
     override suspend fun fetchEventActivities(forceUpdate: Boolean): Either<DataException, Unit> {
