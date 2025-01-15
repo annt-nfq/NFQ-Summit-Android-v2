@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,6 +49,9 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.components.bounceClick
@@ -75,6 +79,12 @@ fun SignInScreen(
             )
         }
     }
+    val options = GmsBarcodeScannerOptions.Builder()
+        .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+        .enableAutoZoom()
+        .build()
+    val scanner = GmsBarcodeScanning.getClient(LocalContext.current, options)
+
 
     SignInUI(
         onEvent = { event ->
@@ -85,6 +95,13 @@ fun SignInScreen(
 
                 is SignInEvent.UploadMyQRCode -> {
                     imagePickerLauncher.launch("image/*")
+                }
+
+                is SignInEvent.ScanQRCode -> {
+                    scanner.startScan()
+                        .addOnSuccessListener {
+                            viewModel.signIn(it.rawValue ?: "")
+                        }
                 }
 
                 SignInEvent.ContinueAsGuest -> {
@@ -164,6 +181,14 @@ private fun SignInUI(
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
+                    ScanQRButton(onEvent = onEvent)
+                    Text(
+                        text = "Or",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
                     UploadQRCodeButton(onEvent = onEvent)
                     Spacer(modifier = Modifier.weight(1f))
                     ContinueAsGuestButton(onEvent)
@@ -231,6 +256,38 @@ private fun UploadQRCodeButton(
     onEvent: (SignInEvent) -> Unit = {}
 ) {
     val shape = RoundedCornerShape(16.dp)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .bounceClick()
+            .height(58.dp)
+            .clip(shape)
+            .clickable { onEvent(SignInEvent.UploadMyQRCode("")) }
+    ) {
+        Text(
+            text = "Upload My QR Code",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp,
+            )
+        )
+
+        Image(
+            painter = painterResource(id = R.drawable.ic_upload),
+            contentDescription = "ic_upload",
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
+
+@Composable
+private fun ScanQRButton(
+    onEvent: (SignInEvent) -> Unit = {}
+) {
+    val shape = RoundedCornerShape(16.dp)
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -242,10 +299,10 @@ private fun UploadQRCodeButton(
                 color = MaterialTheme.colorScheme.primary,
                 shape = shape
             )
-            .clickable { onEvent(SignInEvent.UploadMyQRCode("")) }
+            .clickable { onEvent(SignInEvent.ScanQRCode) }
     ) {
         Text(
-            text = "Upload My QR Code",
+            text = "Scan to register",
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
