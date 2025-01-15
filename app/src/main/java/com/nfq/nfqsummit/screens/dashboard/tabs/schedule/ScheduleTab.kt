@@ -251,7 +251,7 @@ private fun ScheduleHeader(
             if (uiState.summitEvents.isNotEmpty() && uiState.techRockEvents.isNotEmpty()) {
                 SegmentedControl(
                     items = listOf(
-                        "Summit & K5 \uD83D\uDCBC",
+                        "Summit \uD83D\uDCBC",
                         "Tech Rock \uD83E\uDD16 "
                     ),
                     selectedIndex = pagerState.currentPage,
