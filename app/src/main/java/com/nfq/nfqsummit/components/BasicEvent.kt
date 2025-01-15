@@ -105,6 +105,7 @@ fun BasicEvent(
         )
 
         val (top, end) = when (eventSize) {
+            EventSize.XSmall -> 6.dp to 0.dp
             EventSize.Small -> 8.dp to 0.dp
             EventSize.Medium -> 14.dp to 0.dp
             else -> 14.dp to 16.dp
@@ -114,6 +115,7 @@ fun BasicEvent(
                 .padding(start = 8.dp)
                 .padding(top = top)
         ) {
+
             FlowRow(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.padding(bottom = if (eventSize == EventSize.Large) 6.dp else 4.dp)
@@ -126,7 +128,7 @@ fun BasicEvent(
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
-                if (eventSize != EventSize.Small) {
+                if (eventSize != EventSize.Small && eventSize != EventSize.XSmall) {
                     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
                     val startTime = event.start.format(timeFormatter).lowercase()
                     val endTime = event.end.format(timeFormatter).lowercase()

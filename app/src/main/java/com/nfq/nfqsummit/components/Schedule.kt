@@ -109,23 +109,24 @@ private fun calculateHourlySegments(
     minTime: LocalTime,
     numHours: Int
 ): List<HourlySegment> {
-    val hourlySegments = mutableListOf<HourlySegment>()
-    repeat(numHours + 1) { hour ->
+    return (0..numHours).map { hour ->
         val startTime = minTime.truncatedTo(ChronoUnit.HOURS).plusHours(hour.toLong())
-        val endTime = startTime.plusHours(1).let {
-            if (it.hour == 0) startTime.plusMinutes(59) else it
+        val endTime = if (startTime.hour == 23) {
+            startTime.plusMinutes(59)
+        } else {
+            startTime.plusHours(1)
         }
-        val height = events.any {
-            it.start.hour == startTime.hour && ChronoUnit.MINUTES.between(
-                it.start,
-                it.end.let { end -> if (end.hour == 0) it.start.plusMinutes(59) else end }
-            ) < 60
-        }.let {
-            if (it) 260 else 130
-        }
-        hourlySegments.add(HourlySegment(hour, startTime, endTime, height))
+
+        val height = events.find { it.start.hour == startTime.hour }?.let { event ->
+            val duration = ChronoUnit.MINUTES.between(event.start, event.end)
+            when {
+                duration < 30 -> 390
+                duration < 60 -> 260
+                else -> 130
+            }
+        } ?: 130
+        HourlySegment(hour, startTime, endTime, height)
     }
-    return hourlySegments
 }
 
 sealed class ScheduleSize {
