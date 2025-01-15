@@ -117,16 +117,19 @@ private fun calculateHourlySegments(
             startTime.plusHours(1)
         }
 
-        val height = events.find { it.start.hour == startTime.hour }?.let { event ->
-            val duration = ChronoUnit.MINUTES.between(event.start, event.end)
-            when {
-                duration < 30 -> 390
-                duration < 60 -> 260
-                else -> 130
-            }
-        } ?: 130
+        val height = when {
+            events.any { it.start.hour == startTime.hour && it.getDurationMinutes() < 30 } -> 390
+            events.any { it.start.hour == startTime.hour && it.getDurationMinutes() < 60 } -> 260
+            else -> 130
+        }
+
         HourlySegment(hour, startTime, endTime, height)
     }
+}
+
+private fun SummitEvent.getDurationMinutes(): Long {
+    val end = if (start.hour == 23) start.plusMinutes(59) else end
+    return ChronoUnit.MINUTES.between(start, end)
 }
 
 sealed class ScheduleSize {
