@@ -108,9 +108,7 @@ fun ScheduleTabUI(
 ) {
 
     val verticalScroll = rememberScrollState()
-    val pagerState = rememberPagerState {
-        if (uiState.summitEvents.isNotEmpty() && uiState.techRockEvents.isNotEmpty()) 2 else 1
-    }
+    val pagerState = rememberPagerState { 2 }
 
     Scaffold(
         topBar = {
@@ -124,6 +122,7 @@ fun ScheduleTabUI(
     ) { innerPadding ->
         HorizontalPager(
             state = pagerState,
+            userScrollEnabled = uiState.summitEvents.isNotEmpty() && uiState.techRockEvents.isNotEmpty(),
             modifier = Modifier.padding(innerPadding)
         ) { page ->
             Surface(
@@ -210,7 +209,7 @@ private fun ScheduleHeader(
             scrollState.animateScrollTo(targetScroll.toInt())
         }
     }
-    
+
     Surface {
         Column(
             modifier = Modifier.animateContentSize()

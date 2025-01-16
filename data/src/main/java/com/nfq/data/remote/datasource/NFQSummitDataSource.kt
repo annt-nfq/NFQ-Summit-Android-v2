@@ -17,7 +17,7 @@ interface NFQSummitDataSource {
 
     suspend fun getProfile(): Either<DataException, ProfileResponse>
 
-    suspend fun getEventActivities(): Either<DataException, List<EventActivityResponse>>
+    suspend fun getEventActivities(registrantId: String? = ""): Either<DataException, List<EventActivityResponse>>
 
     suspend fun getEventActivityByID(
         id: String

@@ -50,10 +50,10 @@ class NFQSummitDataSourceImpl @Inject constructor(
         )
     }
 
-    override suspend fun getEventActivities(): Either<DataException, List<EventActivityResponse>> {
+    override suspend fun getEventActivities(registrantId: String?): Either<DataException, List<EventActivityResponse>> {
         return handleCall(
             apiCall = {
-                service.getEventActivities()
+                service.getEventActivities(registrantId)
             },
             mapper = { data, _ ->
                 data

@@ -12,6 +12,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface NFQSummitService {
     @POST("attendees/auth")
@@ -26,7 +27,9 @@ interface NFQSummitService {
     suspend fun getProfile(): Response<BaseResponse<ProfileResponse>>
 
     @GET("event-activities?detailed=1")
-    suspend fun getEventActivities(): Response<BaseResponse<List<EventActivityResponse>>>
+    suspend fun getEventActivities(
+        @Query("registrantId") registrantId: String? = null
+    ): Response<BaseResponse<List<EventActivityResponse>>>
 
     @GET("event-activities/{id}")
     suspend fun getEventActivityByID(

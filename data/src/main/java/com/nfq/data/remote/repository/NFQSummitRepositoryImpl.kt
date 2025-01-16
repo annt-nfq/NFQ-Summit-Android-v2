@@ -58,7 +58,7 @@ class NFQSummitRepositoryImpl @Inject constructor(
 
     override suspend fun fetchEventActivities(forceUpdate: Boolean): Either<DataException, Unit> {
         return dataSource
-            .getEventActivities()
+            .getEventActivities(userDao.getRegistrantId().orEmpty())
             .onLeft {
                 if (it is DataException.Api && it.errorCode == 401) {
                     userDao.deleteUser()

@@ -11,6 +11,9 @@ interface UserDao {
     @Query("SELECT * FROM user_entity")
     fun getUser(): Flow<UserEntity?>
 
+    @Query("SELECT id FROM user_entity")
+    fun getRegistrantId(): String?
+
     @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
     suspend fun insertUser(user: UserEntity)
 
