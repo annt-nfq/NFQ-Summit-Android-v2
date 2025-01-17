@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -85,6 +86,14 @@ fun EventDetailsBottomSheet(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    var pendingAction = {}
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            pendingAction.invoke()
+        }
+    }
     val viewModel: EventDetailsBottomSheetViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = eventId) {
@@ -141,18 +150,22 @@ fun EventDetailsBottomSheet(
                 EventDetailsUI(
                     event = event,
                     markAsFavorite = { isFavorite, _ ->
-                        setUpScheduler(
-                            context = context,
-                            alarmManager = alarmManager,
-                            setReminder = isFavorite,
-                            startDateTime = event.startDateTime,
-                            eventName = event.name,
-                            eventId = event.id,
-                            notificationPermissionState = notificationPermissionState,
-                            showAlarmRequest = { showAlarmRequest = it },
-                            showNotificationRequest = { showNotificationRequest = it },
-                            markEventAsFavorite = viewModel::markEventAsFavorite
-                        )
+                        pendingAction = {
+                            setUpScheduler(
+                                context = context,
+                                alarmManager = alarmManager,
+                                setReminder = isFavorite,
+                                startDateTime = event.startDateTime,
+                                eventName = event.name,
+                                eventId = event.id,
+                                notificationPermissionState = notificationPermissionState,
+                                showAlarmRequest = { showAlarmRequest = it },
+                                showNotificationRequest = { showNotificationRequest = it },
+                                markEventAsFavorite = viewModel::markEventAsFavorite,
+                                permissionLauncher = { permissionLauncher.launch(permission) },
+                            )
+                        }
+                        pendingAction()
                     },
                     onViewLocation = { latitude, longitude, locationName ->
                         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {

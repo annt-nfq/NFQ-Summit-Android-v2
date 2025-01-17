@@ -214,18 +214,22 @@ fun HomeTab(
         goToAttractions = goToAttractions,
         goToSignIn = goToSignIn,
         markAsFavorite = { isFavorite, event ->
-            setUpScheduler(
-                context = context,
-                alarmManager = alarmManager,
-                setReminder = isFavorite,
-                startDateTime = event.startDateTime,
-                eventName = event.name,
-                eventId = event.id,
-                notificationPermissionState = notificationPermissionState,
-                showAlarmRequest = { showAlarmRequest = it },
-                showNotificationRequest = { showNotificationRequest = it },
-                markEventAsFavorite = viewModel::markAsFavorite
-            )
+            pendingAction = {
+                setUpScheduler(
+                    context = context,
+                    alarmManager = alarmManager,
+                    setReminder = isFavorite,
+                    startDateTime = event.startDateTime,
+                    eventName = event.name,
+                    eventId = event.id,
+                    notificationPermissionState = notificationPermissionState,
+                    showAlarmRequest = { showAlarmRequest = it },
+                    showNotificationRequest = { showNotificationRequest = it },
+                    markEventAsFavorite = viewModel::markAsFavorite,
+                    permissionLauncher = { permissionLauncher.launch(permission) }
+                )
+            }
+            pendingAction()
         },
         seeAllSavedEvents = seeAllSavedEvents,
         seeAllEvents = seeAllEvents,
