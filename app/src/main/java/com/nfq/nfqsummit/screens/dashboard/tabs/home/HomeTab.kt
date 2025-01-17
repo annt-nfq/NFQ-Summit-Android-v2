@@ -3,10 +3,14 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
 import android.Manifest
+import android.app.AlarmManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
@@ -53,6 +57,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -85,10 +90,12 @@ fun HomeTab(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val showReminderOptionDialog by viewModel.showReminderOptionDialog.collectAsState()
+
     var showEventDetailsBottomSheet by remember { mutableStateOf(false) }
     var eventId by remember { mutableStateOf("") }
     var showQRCodeBottomSheet by remember { mutableStateOf(false) }
-
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val permission =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS
         else Manifest.permission.ACCESS_NOTIFICATION_POLICY
@@ -96,6 +103,14 @@ fun HomeTab(
 
     var showAlarmRequest by remember { mutableStateOf(false) }
     var showNotificationRequest by remember { mutableStateOf(false) }
+    var pendingAction = {}
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            pendingAction.invoke()
+        }
+    }
 
     if (uiState.isLoading) {
         Loading()
@@ -112,6 +127,48 @@ fun HomeTab(
         EventDetailsBottomSheet(
             eventId = eventId,
             onDismissRequest = { showEventDetailsBottomSheet = false }
+        )
+    }
+
+    if (showReminderOptionDialog) {
+        BasicAlertDialog(
+            title = "Enable Event Reminders",
+            body = "Would you like to enable reminders for all your upcoming events?",
+            properties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            ),
+            confirmButtonText = "Enable",
+            confirmButton = {
+                if (uiState.upcomingEventsWithoutTechRocks.isEmpty()) {
+                    viewModel.updateNotificationSetting(true)
+                } else {
+                    pendingAction = {
+                        uiState.upcomingEventsWithoutTechRocks.forEach { event ->
+                            setUpScheduler(
+                                context = context,
+                                alarmManager = alarmManager,
+                                setReminder = true,
+                                startDateTime = event.startDateTime,
+                                eventName = event.name,
+                                eventId = event.id,
+                                notificationPermissionState = notificationPermissionState,
+                                showAlarmRequest = { showAlarmRequest = it },
+                                showNotificationRequest = { showNotificationRequest = it },
+                                permissionLauncher = { permissionLauncher.launch(permission) },
+                                updateNotificationSetting = {
+                                    viewModel.updateNotificationSetting(true)
+                                }
+                            )
+                        }
+                    }
+                    pendingAction.invoke()
+                }
+            },
+            dismissButtonText = "Not now",
+            dismissButton = {
+                viewModel.updateNotificationSetting(true)
+            }
         )
     }
 
@@ -151,6 +208,7 @@ fun HomeTab(
     }
 
 
+
     HomeTabUI(
         uiState = uiState,
         goToAttractions = goToAttractions,
@@ -158,7 +216,8 @@ fun HomeTab(
         markAsFavorite = { isFavorite, event ->
             setUpScheduler(
                 context = context,
-                isFavorite = isFavorite,
+                alarmManager = alarmManager,
+                setReminder = isFavorite,
                 startDateTime = event.startDateTime,
                 eventName = event.name,
                 eventId = event.id,

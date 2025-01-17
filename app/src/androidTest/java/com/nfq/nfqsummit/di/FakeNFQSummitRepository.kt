@@ -10,6 +10,7 @@ import com.nfq.data.network.exception.DataException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 
 class FakeNFQSummitRepository : NFQSummitRepository {
@@ -18,6 +19,7 @@ class FakeNFQSummitRepository : NFQSummitRepository {
     private val _savedEvents = MutableStateFlow<List<EventEntity>>(emptyList())
     private val _user = MutableStateFlow<UserEntity?>(null)
     private val _isCompletedOnboarding = MutableStateFlow(false)
+    private val _isShownNotificationPermissionDialog = MutableStateFlow(false)
 
     // Simulation control variables
     private var shouldFailAuthentication = false
@@ -33,6 +35,8 @@ class FakeNFQSummitRepository : NFQSummitRepository {
     override val savedEvents: Flow<List<EventEntity>> = _savedEvents.asStateFlow()
     override val user: Flow<UserEntity?> = _user.asStateFlow()
     override val isCompletedOnboarding: Flow<Boolean> = _isCompletedOnboarding.asStateFlow()
+    override val isShownNotificationPermissionDialog: Flow<Boolean>
+        get() = _isShownNotificationPermissionDialog.asStateFlow()
 
     // Simulation methods to control repository state
     fun setEvents(events: List<EventEntity>) {
@@ -121,7 +125,10 @@ class FakeNFQSummitRepository : NFQSummitRepository {
         }
     }
 
-    override suspend fun updateFavorite(eventId: String, isFavorite: Boolean): Either<DataException, Unit> {
+    override suspend fun updateFavorite(
+        eventId: String,
+        isFavorite: Boolean
+    ): Either<DataException, Unit> {
         return if (shouldFailUpdateFavorite) {
             Either.Left(DataException.Api("Update favorite failed"))
         } else {
@@ -141,5 +148,9 @@ class FakeNFQSummitRepository : NFQSummitRepository {
 
     override suspend fun updateOnboardingStatus(isCompletedOnboarding: Boolean) {
         _isCompletedOnboarding.value = isCompletedOnboarding
+    }
+
+    override suspend fun updateNotificationSetting(isShownNotificationPermissionDialog: Boolean) {
+        _isShownNotificationPermissionDialog.value = isShownNotificationPermissionDialog
     }
 }

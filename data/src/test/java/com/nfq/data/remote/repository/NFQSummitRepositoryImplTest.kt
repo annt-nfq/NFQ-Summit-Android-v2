@@ -156,7 +156,7 @@ class NFQSummitRepositoryImplTest {
 
     @Test
     fun `updateOnboardingStatus updates preferences`() = runTest {
-        coEvery { mockDataStore.updateData(any()) } returns AppConfigResponse(isCompletedOnboarding = true)
+        coEvery { mockDataStore.updateData(any()) } returns AppConfigResponse(isCompletedOnboarding = true, isShownNotificationPermissionDialog = false)
 
         repository.updateOnboardingStatus(true)
 

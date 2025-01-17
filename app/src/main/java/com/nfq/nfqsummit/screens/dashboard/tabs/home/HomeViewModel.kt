@@ -2,6 +2,7 @@ package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nfq.data.domain.model.CategoryEnum
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.nfqsummit.mapper.toSavedEventUIModels
 import com.nfq.nfqsummit.mapper.toUpcomingEventUIModels
@@ -26,16 +27,29 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val loadingFlow = MutableStateFlow(false)
 
+    val showReminderOptionDialog = combine(
+        repository.user,
+        repository.isShownNotificationPermissionDialog
+    ) { user, isShownNotificationPermissionDialog ->
+        !isShownNotificationPermissionDialog && user != null
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
+
     val uiState = combine(
         repository.user,
         repository.upcomingEvents,
         repository.savedEvents,
         loadingFlow
     ) { user, events, savedEvents, isLoading ->
+        val upcomingEvents = events.toUpcomingEventUIModels()
         HomeUIState(
             isLoading = isLoading,
             user = user?.toUserUIModel(),
-            upcomingEvents = events.toUpcomingEventUIModels(),
+            upcomingEvents = upcomingEvents,
+            upcomingEventsWithoutTechRocks = upcomingEvents.filter { filterOutTechRock(it.category.code) },
             savedEvents = savedEvents.toSavedEventUIModels()
         )
     }.stateIn(
@@ -73,12 +87,26 @@ class HomeViewModel @Inject constructor(
             repository.updateFavorite(eventId, favorite)
         }
     }
+
+    fun updateNotificationSetting(isShownNotificationPermissionDialog: Boolean) {
+        viewModelScope.launch {
+            repository.updateNotificationSetting(isShownNotificationPermissionDialog)
+        }
+    }
+
+    fun filterOutTechRock(code: String): Boolean {
+        return when {
+            code == CategoryEnum.TECH_ROCK.code || code == CategoryEnum.PRODUCT.code || code == CategoryEnum.BUSINESS.code || code == CategoryEnum.TECH.code -> false
+            else -> true
+        }
+    }
 }
 
 
 data class HomeUIState(
     val user: UserUIModel? = null,
     val upcomingEvents: List<UpcomingEventUIModel> = emptyList(),
+    val upcomingEventsWithoutTechRocks: List<UpcomingEventUIModel> = emptyList(),
     val savedEvents: List<SavedEventUIModel> = emptyList(),
     val isLoading: Boolean = false
 )

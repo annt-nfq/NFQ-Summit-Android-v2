@@ -15,4 +15,7 @@ class PreferencesDataSource @Inject constructor(
         appConfigDataStore.updateData { it.copy(isCompletedOnboarding = isCompletedOnboarding) }
     }
 
+    suspend fun updateNotificationSetting(isShownNotificationPermissionDialog: Boolean) {
+        appConfigDataStore.updateData { it.copy(isShownNotificationPermissionDialog = isShownNotificationPermissionDialog) }
+    }
 }

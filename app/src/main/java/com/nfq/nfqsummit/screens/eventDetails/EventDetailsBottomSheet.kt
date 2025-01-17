@@ -10,6 +10,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -79,10 +80,11 @@ fun EventDetailsBottomSheet(
     onDismissRequest: () -> Unit
 ) {
     val skipPartiallyExpanded by remember { mutableStateOf(false) }
+
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val viewModel: EventDetailsBottomSheetViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = eventId) {
@@ -141,7 +143,8 @@ fun EventDetailsBottomSheet(
                     markAsFavorite = { isFavorite, _ ->
                         setUpScheduler(
                             context = context,
-                            isFavorite = isFavorite,
+                            alarmManager = alarmManager,
+                            setReminder = isFavorite,
                             startDateTime = event.startDateTime,
                             eventName = event.name,
                             eventId = event.id,
@@ -198,16 +201,19 @@ fun scheduleAlarm(context: Context) {
 
 fun setUpScheduler(
     context: Context,
-    isFavorite: Boolean,
+    alarmManager: AlarmManager,
+    setReminder: Boolean,
     startDateTime: LocalDateTime,
     eventName: String,
     eventId: String,
     notificationPermissionState: PermissionState,
     showAlarmRequest: (Boolean) -> Unit,
     showNotificationRequest: (Boolean) -> Unit,
-    markEventAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit
+    markEventAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit = { _, _ -> },
+    updateNotificationSetting: () -> Unit = {},
+    permissionLauncher: () -> Unit = {}
 ) {
-    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
     val hasAlarmPermission: Boolean = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
         // For Android 30 and below
         true
@@ -225,12 +231,13 @@ fun setUpScheduler(
         if (notificationPermissionState.status.shouldShowRationale) {
             showNotificationRequest(true)
         } else {
-            notificationPermissionState.launchPermissionRequest()
+            permissionLauncher.invoke()
         }
         return
     }
+    updateNotificationSetting()
 
-    if (isFavorite) {
+    if (setReminder) {
         markEventAsFavorite(true, eventId)
         createNotificationChannel(context)
         scheduleNotification(

@@ -15,7 +15,10 @@ import kotlinx.serialization.json.Json
 class AppConfigSerializer @Inject constructor() : Serializer<AppConfigResponse> {
 
     override val defaultValue: AppConfigResponse
-        get() = AppConfigResponse(isCompletedOnboarding = false)
+        get() = AppConfigResponse(
+            isCompletedOnboarding = false,
+            isShownNotificationPermissionDialog = false
+        )
 
     override suspend fun readFrom(input: InputStream): AppConfigResponse {
         return try {
