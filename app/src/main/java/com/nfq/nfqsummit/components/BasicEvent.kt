@@ -22,11 +22,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,6 +49,7 @@ import com.nfq.nfqsummit.model.SplitType
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.TagItem
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import com.nfq.nfqsummit.ui.theme.coloredShadow
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -56,6 +63,7 @@ fun BasicEvent(
     compact: Boolean = false,
     onEventClick: (SummitEvent) -> Unit = {},
 ) {
+    var eventHeight by remember { mutableStateOf(150.dp) }
     val event = positionedEvent.event
     val eventSize = positionedEvent.getEventSize()
     val topRadius =
@@ -70,6 +78,9 @@ fun BasicEvent(
         bottomStart = 0.dp,
     )
 
+    LaunchedEffect(eventHeight) {
+        Timber.i("BasicEvent ${event.name}-$eventHeight")
+    }
     Row(
         modifier = modifier
             .fillMaxSize()
@@ -93,6 +104,9 @@ fun BasicEvent(
             )
             .clip(shape = shape)
             .clickable { onEventClick(event) }
+            .onGloballyPositioned { coordinates ->
+                eventHeight = coordinates.size.height.dp
+            }
     ) {
         val contentColor = Color(event.category.contentColor)
         val containerColor = Color(event.category.containerColor)
@@ -128,7 +142,7 @@ fun BasicEvent(
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
-                if (eventSize != EventSize.Small && eventSize != EventSize.XSmall) {
+                if ((eventSize != EventSize.Small && eventSize != EventSize.XSmall) || eventHeight > 580.dp) {
                     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
                     val startTime = event.start.format(timeFormatter).lowercase()
                     val endTime = event.end.format(timeFormatter).lowercase()
@@ -148,8 +162,9 @@ fun BasicEvent(
                     fontWeight = FontWeight.Bold,
                     lineHeight = if (eventSize == EventSize.Medium) 16.sp else 19.sp,
                 ),
-                maxLines = when (eventSize) {
-                    EventSize.Large -> 4
+                maxLines = when {
+                    eventSize == EventSize.Large || eventHeight in 439.dp..599.dp -> 4
+                    eventHeight > 589.dp -> 5
                     else -> 3
                 },
                 overflow = TextOverflow.Ellipsis,
