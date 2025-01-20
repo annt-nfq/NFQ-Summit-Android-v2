@@ -85,13 +85,18 @@ fun EventDetailsBottomSheet(
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    var pendingAction = {}
+    var showAlarmRequest by remember { mutableStateOf(false) }
+    var showNotificationRequest by remember { mutableStateOf(false) }
+    var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+    val alarmScheduler = rememberAlarmScheduler(
+        onAlarmSet = { pendingAction?.invoke() },
+        onPermissionDenied = {}
+    )
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            pendingAction.invoke()
+            showAlarmRequest = true
         }
     }
     val viewModel: EventDetailsBottomSheetViewModel = hiltViewModel()
@@ -105,8 +110,6 @@ fun EventDetailsBottomSheet(
         else Manifest.permission.ACCESS_NOTIFICATION_POLICY
     val notificationPermissionState = rememberPermissionState(permission = permission)
 
-    var showAlarmRequest by remember { mutableStateOf(false) }
-    var showNotificationRequest by remember { mutableStateOf(false) }
 
     if (showNotificationRequest) {
         BasicAlertDialog(
@@ -137,8 +140,8 @@ fun EventDetailsBottomSheet(
             dismissButton = { showAlarmRequest = false },
             confirmButtonText = "Allow",
             confirmButton = {
+                alarmScheduler.scheduleAlarm()
                 showAlarmRequest = false
-                scheduleAlarm(context)
             }
         )
     }
@@ -153,19 +156,17 @@ fun EventDetailsBottomSheet(
                         pendingAction = {
                             setUpScheduler(
                                 context = context,
-                                alarmManager = alarmManager,
                                 setReminder = isFavorite,
                                 startDateTime = event.startDateTime,
                                 eventName = event.name,
                                 eventId = event.id,
                                 notificationPermissionState = notificationPermissionState,
-                                showAlarmRequest = { showAlarmRequest = it },
                                 showNotificationRequest = { showNotificationRequest = it },
                                 markEventAsFavorite = viewModel::markEventAsFavorite,
                                 permissionLauncher = { permissionLauncher.launch(permission) },
                             )
                         }
-                        pendingAction()
+                        pendingAction?.invoke()
                     },
                     onViewLocation = { latitude, longitude, locationName ->
                         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
@@ -214,31 +215,17 @@ fun scheduleAlarm(context: Context) {
 
 fun setUpScheduler(
     context: Context,
-    alarmManager: AlarmManager,
     setReminder: Boolean,
     startDateTime: LocalDateTime,
     eventName: String,
     eventId: String,
     notificationPermissionState: PermissionState,
-    showAlarmRequest: (Boolean) -> Unit,
     showNotificationRequest: (Boolean) -> Unit,
     markEventAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit = { _, _ -> },
     updateNotificationSetting: () -> Unit = {},
     permissionLauncher: () -> Unit = {}
 ) {
 
-    val hasAlarmPermission: Boolean = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
-        // For Android 30 and below
-        true
-    } else {
-        // For Android 31+
-        alarmManager.canScheduleExactAlarms()
-    }
-
-    if (!hasAlarmPermission) {
-        showAlarmRequest(true)
-        return
-    }
 
     if (!notificationPermissionState.status.isGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         if (notificationPermissionState.status.shouldShowRationale) {
@@ -248,6 +235,7 @@ fun setUpScheduler(
         }
         return
     }
+
     updateNotificationSetting()
 
     if (setReminder) {
@@ -266,6 +254,102 @@ fun setUpScheduler(
     }
 }
 
+
+@Composable
+fun rememberAlarmScheduler(
+    onAlarmSet: () -> Unit = {},
+    onPermissionDenied: () -> Unit = {}
+): AlarmScheduler {
+    val context = LocalContext.current
+    val alarmManager = remember {
+        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            when {
+                alarmManager.canScheduleExactAlarms() -> onAlarmSet()
+                else -> onPermissionDenied()
+            }
+        }
+    }
+
+    return remember(permissionLauncher) {
+        AlarmScheduler(
+            context = context,
+            alarmManager = alarmManager,
+            permissionLauncher = permissionLauncher
+        )
+    }
+}
+
+class AlarmScheduler(
+    private val context: Context,
+    private val alarmManager: AlarmManager,
+    private val permissionLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
+) {
+    fun scheduleAlarm() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!alarmManager.canScheduleExactAlarms()) {
+                // Launch permission request for Android 12+
+                val intent = Intent(
+                    Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                    Uri.parse("package:${context.packageName}")
+                )
+                permissionLauncher.launch(intent)
+            } else {
+                scheduleExactAlarm()
+            }
+        } else {
+            // For Android 11 and below, directly schedule the alarm
+            scheduleExactAlarm()
+        }
+    }
+
+    private fun scheduleExactAlarm() {
+        val intent = Intent(context, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis(),
+                pendingIntent
+            )
+        }
+    }
+}
+
+@Composable
+fun rememberPendingAction(): PendingActionState {
+    var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    return remember {
+        PendingActionState(
+            setPendingAction = { action -> pendingAction = action },
+            executePendingAction = {
+                pendingAction?.invoke()
+                pendingAction = null
+            },
+            clearPendingAction = { pendingAction = null },
+            hasPendingAction = { pendingAction != null }
+        )
+    }
+}
+
+class PendingActionState(
+    val setPendingAction: (() -> Unit) -> Unit,
+    val executePendingAction: () -> Unit,
+    val clearPendingAction: () -> Unit,
+    val hasPendingAction: () -> Boolean
+)
 
 @Composable
 private fun EventDetailsUI(

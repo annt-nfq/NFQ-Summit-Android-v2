@@ -40,6 +40,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,7 +74,7 @@ import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.SavedEventCard
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.UpcomingEventCard
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
-import com.nfq.nfqsummit.screens.eventDetails.scheduleAlarm
+import com.nfq.nfqsummit.screens.eventDetails.rememberAlarmScheduler
 import com.nfq.nfqsummit.screens.eventDetails.setUpScheduler
 import com.nfq.nfqsummit.screens.qrCode.QRCodeBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQOrange
@@ -95,7 +96,6 @@ fun HomeTab(
     var showEventDetailsBottomSheet by remember { mutableStateOf(false) }
     var eventId by remember { mutableStateOf("") }
     var showQRCodeBottomSheet by remember { mutableStateOf(false) }
-    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val permission =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS
         else Manifest.permission.ACCESS_NOTIFICATION_POLICY
@@ -103,13 +103,24 @@ fun HomeTab(
 
     var showAlarmRequest by remember { mutableStateOf(false) }
     var showNotificationRequest by remember { mutableStateOf(false) }
-    var pendingAction = {}
+    var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    val alarmScheduler = rememberAlarmScheduler(
+        onAlarmSet = {
+            pendingAction?.invoke()
+        },
+        onPermissionDenied = {}
+    )
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            pendingAction.invoke()
+            showAlarmRequest = true
         }
+    }
+
+    LaunchedEffect(Unit) {
+        pendingAction?.invoke()
     }
 
     if (uiState.isLoading) {
@@ -132,13 +143,13 @@ fun HomeTab(
 
     if (showReminderOptionDialog) {
         BasicAlertDialog(
-            title = "Enable Event Reminders",
-            body = "Would you like to enable reminders for all your upcoming events?",
+            title = "\"NFQ-summit\" Would Like to Send You Notifications",
+            body = "Receive reminders 30 minutes before registered Summit events and saved Tech Rock events start",
             properties = DialogProperties(
                 dismissOnBackPress = false,
                 dismissOnClickOutside = false
             ),
-            confirmButtonText = "Enable",
+            confirmButtonText = "Allow",
             confirmButton = {
                 if (uiState.upcomingEventsWithoutTechRocks.isEmpty()) {
                     viewModel.updateNotificationSetting(
@@ -150,15 +161,15 @@ fun HomeTab(
                         uiState.upcomingEventsWithoutTechRocks.forEach { event ->
                             setUpScheduler(
                                 context = context,
-                                alarmManager = alarmManager,
                                 setReminder = true,
                                 startDateTime = event.startDateTime,
                                 eventName = event.name,
                                 eventId = event.id,
                                 notificationPermissionState = notificationPermissionState,
-                                showAlarmRequest = { showAlarmRequest = it },
                                 showNotificationRequest = { showNotificationRequest = it },
-                                permissionLauncher = { permissionLauncher.launch(permission) },
+                                permissionLauncher = {
+                                    permissionLauncher.launch(permission)
+                                },
                                 updateNotificationSetting = {
                                     viewModel.updateNotificationSetting(
                                         isShownNotificationPermissionDialog = true,
@@ -168,10 +179,11 @@ fun HomeTab(
                             )
                         }
                     }
-                    pendingAction.invoke()
+
+                    pendingAction?.invoke()
                 }
             },
-            dismissButtonText = "Not now",
+            dismissButtonText = "Don't Allow",
             dismissButton = {
                 viewModel.updateNotificationSetting(
                     isShownNotificationPermissionDialog = true,
@@ -210,13 +222,11 @@ fun HomeTab(
             dismissButton = { showAlarmRequest = false },
             confirmButtonText = "Allow",
             confirmButton = {
+                alarmScheduler.scheduleAlarm()
                 showAlarmRequest = false
-                scheduleAlarm(context)
             }
         )
     }
-
-
 
     HomeTabUI(
         uiState = uiState,
@@ -226,19 +236,17 @@ fun HomeTab(
             pendingAction = {
                 setUpScheduler(
                     context = context,
-                    alarmManager = alarmManager,
                     setReminder = isFavorite,
                     startDateTime = event.startDateTime,
                     eventName = event.name,
                     eventId = event.id,
                     notificationPermissionState = notificationPermissionState,
-                    showAlarmRequest = { showAlarmRequest = it },
                     showNotificationRequest = { showNotificationRequest = it },
                     markEventAsFavorite = viewModel::markAsFavorite,
                     permissionLauncher = { permissionLauncher.launch(permission) }
                 )
             }
-            pendingAction()
+            pendingAction?.invoke()
         },
         seeAllSavedEvents = seeAllSavedEvents,
         seeAllEvents = seeAllEvents,

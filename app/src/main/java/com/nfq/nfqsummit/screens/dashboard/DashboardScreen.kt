@@ -3,8 +3,6 @@
 package com.nfq.nfqsummit.screens.dashboard
 
 import android.Manifest
-import android.app.AlarmManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -75,7 +73,7 @@ import com.nfq.nfqsummit.navigation.MainTransition
 import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.HomeTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
-import com.nfq.nfqsummit.screens.eventDetails.scheduleAlarm
+import com.nfq.nfqsummit.screens.eventDetails.rememberAlarmScheduler
 import com.nfq.nfqsummit.screens.eventDetails.setUpScheduler
 import com.nfq.nfqsummit.screens.savedEvents.SavedEventTab
 import com.nfq.nfqsummit.ui.theme.MainGreen
@@ -343,35 +341,41 @@ private fun PushNotificationSection(
         Manifest.permission.ACCESS_NOTIFICATION_POLICY
     }
     val context = LocalContext.current
-    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     val notificationPermissionState = rememberPermissionState(permission = permission)
-    var pendingAction = {}
-    var showNotificationRequest by remember { mutableStateOf(false) }
-    var showAlarmRequest by remember { mutableStateOf(false) }
-    val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            pendingAction.invoke()
-        } else {
+    var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var showNotificationRequestDialog by remember { mutableStateOf(false) }
+    var showAlarmRequestDialog by remember { mutableStateOf(false) }
+    var showTurnOffDialog by remember { mutableStateOf(false) }
+
+    val alarmScheduler = rememberAlarmScheduler(
+        onAlarmSet = { pendingAction?.invoke() },
+        onPermissionDenied = {
             if (notificationPermissionState.status.shouldShowRationale) {
-                showNotificationRequest = true
+                showNotificationRequestDialog = true
             } else {
                 notificationPermissionState.launchPermissionRequest()
             }
         }
+    )
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            showAlarmRequestDialog = true
+        }
     }
 
-    if (showNotificationRequest) {
+    if (showNotificationRequestDialog) {
         BasicAlertDialog(
             title = "Allow notification permission",
             body = "This app requires notification permission to show you reminders of your saved events",
             dismissButtonText = "Deny",
-            dismissButton = { showNotificationRequest = false },
+            dismissButton = { showNotificationRequestDialog = false },
             confirmButtonText = "Allow",
             confirmButton = {
-                showNotificationRequest = false
+                showNotificationRequestDialog = false
                 context.startActivity(
                     Intent(
                         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -384,19 +388,47 @@ private fun PushNotificationSection(
         )
     }
 
-    if (showAlarmRequest) {
+    if (showAlarmRequestDialog) {
         BasicAlertDialog(
             title = "Allow alarm permission",
             body = "This app requires alarm permission to show you reminders of your saved events",
             dismissButtonText = "Deny",
-            dismissButton = { showAlarmRequest = false },
+            dismissButton = { showAlarmRequestDialog = false },
             confirmButtonText = "Allow",
             confirmButton = {
-                showAlarmRequest = false
-                scheduleAlarm(context)
+                alarmScheduler.scheduleAlarm()
+                showAlarmRequestDialog = false
             }
         )
     }
+    if (showAlarmRequestDialog) {
+        BasicAlertDialog(
+            title = "Allow alarm permission",
+            body = "This app requires alarm permission to show you reminders of your saved events",
+            dismissButtonText = "Deny",
+            dismissButton = { showAlarmRequestDialog = false },
+            confirmButtonText = "Allow",
+            confirmButton = {
+                alarmScheduler.scheduleAlarm()
+                showAlarmRequestDialog = false
+            }
+        )
+    }
+
+    if (showTurnOffDialog) {
+        BasicAlertDialog(
+            title = "Turn off notifications?",
+            body = "You will no longer receive event reminders",
+            dismissButtonText = "Cancel",
+            dismissButton = { showTurnOffDialog = false },
+            confirmButtonText = "Turn Off",
+            confirmButton = {
+                pendingAction?.invoke()
+                showTurnOffDialog = false
+            }
+        )
+    }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -415,28 +447,30 @@ private fun PushNotificationSection(
                             uiState.upcomingEventsWithoutTechRocks.forEach { event ->
                                 setUpScheduler(
                                     context = context,
-                                    alarmManager = alarmManager,
                                     setReminder = !uiState.isEnabledNotification,
                                     startDateTime = event.startDateTime,
                                     eventName = event.name,
                                     eventId = event.id,
                                     notificationPermissionState = notificationPermissionState,
-                                    showAlarmRequest = { showAlarmRequest = it },
                                     showNotificationRequest = {
-                                        showNotificationRequest = it
+                                        showNotificationRequestDialog = it
                                     },
-                                    permissionLauncher = {
-                                        launcher.launch(permission)
-                                    },
+                                    permissionLauncher = { launcher.launch(permission) },
                                     updateNotificationSetting = {
-                                        onUpdateNotificationSetting(true, !uiState.isEnabledNotification)
+                                        onUpdateNotificationSetting(
+                                            true,
+                                            !uiState.isEnabledNotification
+                                        )
                                     }
                                 )
                             }
                         }
                     }
-
-                    pendingAction.invoke()
+                    if (uiState.isEnabledNotification) {
+                        showTurnOffDialog = true
+                    } else {
+                        pendingAction?.invoke()
+                    }
                 },
                 colors = SwitchDefaults.colors(
                     checkedTrackColor = MainGreen
@@ -456,7 +490,7 @@ private fun PushNotificationSection(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Turning this on will send a notification to your device as a reminder of the event time.",
+                    text = "Receive reminders 30 minutes before events start",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                 )
