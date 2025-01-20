@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.model.CategoryEnum
 import com.nfq.data.domain.repository.NFQSummitRepository
+import com.nfq.data.filterOutTechRock
 import com.nfq.nfqsummit.mapper.toSavedEventUIModels
 import com.nfq.nfqsummit.mapper.toUpcomingEventUIModels
 import com.nfq.nfqsummit.mapper.toUserUIModel
@@ -49,7 +50,7 @@ class HomeViewModel @Inject constructor(
             isLoading = isLoading,
             user = user?.toUserUIModel(),
             upcomingEvents = upcomingEvents,
-            upcomingEventsWithoutTechRocks = upcomingEvents.filter { filterOutTechRock(it.category.code) },
+            upcomingEventsWithoutTechRocks = upcomingEvents.filter { it.category.code.filterOutTechRock() },
             savedEvents = savedEvents.toSavedEventUIModels()
         )
     }.stateIn(
@@ -88,16 +89,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun updateNotificationSetting(isShownNotificationPermissionDialog: Boolean) {
-        viewModelScope.launch {
-            repository.updateNotificationSetting(isShownNotificationPermissionDialog)
-        }
-    }
-
-    fun filterOutTechRock(code: String): Boolean {
-        return when {
-            code == CategoryEnum.TECH_ROCK.code || code == CategoryEnum.PRODUCT.code || code == CategoryEnum.BUSINESS.code || code == CategoryEnum.TECH.code -> false
-            else -> true
+    fun updateNotificationSetting(
+        isShownNotificationPermissionDialog: Boolean,
+        isEnabledNotification: Boolean
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateNotificationSetting(
+                isShownNotificationPermissionDialog,
+                isEnabledNotification
+            )
         }
     }
 }

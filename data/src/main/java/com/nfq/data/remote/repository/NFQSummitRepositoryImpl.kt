@@ -42,6 +42,10 @@ class NFQSummitRepositoryImpl @Inject constructor(
         get() = preferencesDataSource
             .appConfigDataFlow
             .map { it.isShownNotificationPermissionDialog }
+    override val isEnabledNotification: Flow<Boolean>
+        get() = preferencesDataSource
+            .appConfigDataFlow
+            .map { it.isEnabledNotification }
 
     override suspend fun authenticateWithAttendeeCode(attendeeCode: String): Either<DataException, Unit> {
         return dataSource
@@ -59,7 +63,10 @@ class NFQSummitRepositoryImpl @Inject constructor(
     private suspend fun clearUserData() {
         userDao.deleteUser()
         eventDao.deleteAllEvents()
-        preferencesDataSource.updateNotificationSetting(false)
+        preferencesDataSource.updateNotificationSetting(
+            isShownNotificationPermissionDialog = false,
+            isEnabledNotification = false
+        )
     }
 
     override suspend fun fetchEventActivities(forceUpdate: Boolean): Either<DataException, Unit> {
@@ -117,7 +124,13 @@ class NFQSummitRepositoryImpl @Inject constructor(
         preferencesDataSource.updateOnboardingStatus(isCompletedOnboarding)
     }
 
-    override suspend fun updateNotificationSetting(isShownNotificationPermissionDialog: Boolean) {
-        preferencesDataSource.updateNotificationSetting(isShownNotificationPermissionDialog)
+    override suspend fun updateNotificationSetting(
+        isShownNotificationPermissionDialog: Boolean,
+        isEnabledNotification: Boolean
+    ) {
+        preferencesDataSource.updateNotificationSetting(
+            isShownNotificationPermissionDialog,
+            isEnabledNotification
+        )
     }
 }

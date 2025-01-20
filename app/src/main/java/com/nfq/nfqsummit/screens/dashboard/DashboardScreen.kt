@@ -3,6 +3,8 @@
 package com.nfq.nfqsummit.screens.dashboard
 
 import android.Manifest
+import android.app.AlarmManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -63,7 +65,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.nfq.nfqsummit.R
@@ -74,6 +75,8 @@ import com.nfq.nfqsummit.navigation.MainTransition
 import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.HomeTab
 import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
+import com.nfq.nfqsummit.screens.eventDetails.scheduleAlarm
+import com.nfq.nfqsummit.screens.eventDetails.setUpScheduler
 import com.nfq.nfqsummit.screens.savedEvents.SavedEventTab
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -114,8 +117,10 @@ fun DashboardScreen(
                 windowInsets = WindowInsets(0)
             ) {
                 DrawerContent(
-                    isLoggedIn = uiState.isLoggedIn,
+                    uiState = uiState,
                     menus = items,
+                    onSignOutClick = viewModel::logout,
+                    onUpdateNotificationSetting = viewModel::updateNotificationSetting,
                     onMenuClick = {
                         coroutineScope.launch {
                             drawerState.close()
@@ -130,18 +135,13 @@ fun DashboardScreen(
                             }
                         }
                     },
-                    onSignOutClick = {
-                        viewModel.logout()
-                    },
                     isSelected = { item ->
                         currentDestination?.hierarchy?.any { it.route == item.destination.route } == true
                     }
                 )
             }
         },
-        modifier = Modifier
-            .fillMaxSize()
-
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
@@ -236,59 +236,13 @@ fun DashBoardHeader(
 
 @Composable
 fun DrawerContent(
-    isLoggedIn: Boolean,
     menus: List<BottomNavItem>,
+    uiState: DashboardUIState,
     onMenuClick: (String) -> Unit,
     onSignOutClick: () -> Unit,
+    onUpdateNotificationSetting: (isShownNotificationPermissionDialog: Boolean, isEnabledNotification: Boolean) -> Unit,
     isSelected: (BottomNavItem) -> Boolean,
 ) {
-    val context = LocalContext.current
-    var showNotificationRequest by remember { mutableStateOf(false) }
-    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Manifest.permission.POST_NOTIFICATIONS
-    } else {
-        Manifest.permission.ACCESS_NOTIFICATION_POLICY
-    }
-
-    val notificationPermissionState = rememberPermissionState(permission = permission)
-    var switchCheckedState by remember {
-        mutableStateOf(notificationPermissionState.status.isGranted || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
-    }
-
-    if (showNotificationRequest) {
-        BasicAlertDialog(
-            title = "Allow notification permission",
-            body = "This app requires notification permission to show you reminders of your saved events",
-            dismissButtonText = "Deny",
-            dismissButton = { showNotificationRequest = false },
-            confirmButtonText = "Allow",
-            confirmButton = {
-                showNotificationRequest = false
-                context.startActivity(
-                    Intent(
-                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                        Uri.parse("package:${context.packageName}")
-                    ).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                )
-            }
-        )
-    }
-
-    val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            switchCheckedState = true
-        } else {
-            if (notificationPermissionState.status.shouldShowRationale) {
-                showNotificationRequest = true
-            } else {
-                notificationPermissionState.launchPermissionRequest()
-            }
-        }
-    }
 
     Surface {
         Column(
@@ -349,46 +303,12 @@ fun DrawerContent(
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 19.dp, end = 16.dp),
-            ) {
-                Row(
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Switch(
-                        checked = switchCheckedState,
-                        onCheckedChange = {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                launcher.launch(permission)
-                            }
-                        },
-                        colors = SwitchDefaults.colors(
-                            checkedTrackColor = MainGreen
-                        ),
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(
-                        modifier = Modifier
-                            .weight(1f),
-                    ) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Push Notification",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = MaterialTheme.colorScheme.onBackground,
-                            ),
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Turning this on will send a notification to your device as a reminder of the event time.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                        )
-                    }
-                }
-            }
+
+            PushNotificationSection(
+                uiState = uiState,
+                onUpdateNotificationSetting = onUpdateNotificationSetting
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
             Box(
                 modifier = Modifier
@@ -397,12 +317,149 @@ fun DrawerContent(
                     .padding(bottom = 24.dp)
                     .navigationBarsPadding(),
             ) {
-                if (isLoggedIn) {
+                if (uiState.isLoggedIn) {
                     SignOutButton(
                         onSignOutClick = onSignOutClick,
                         modifier = Modifier.align(Alignment.CenterEnd)
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PushNotificationSection(
+    modifier: Modifier = Modifier,
+    uiState: DashboardUIState,
+    onUpdateNotificationSetting: (isShownNotificationPermissionDialog: Boolean, isEnabledNotification: Boolean) -> Unit,
+) {
+
+    if (!uiState.isLoggedIn) return
+
+    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        Manifest.permission.POST_NOTIFICATIONS
+    } else {
+        Manifest.permission.ACCESS_NOTIFICATION_POLICY
+    }
+    val context = LocalContext.current
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+    val notificationPermissionState = rememberPermissionState(permission = permission)
+    var pendingAction = {}
+    var showNotificationRequest by remember { mutableStateOf(false) }
+    var showAlarmRequest by remember { mutableStateOf(false) }
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            pendingAction.invoke()
+        } else {
+            if (notificationPermissionState.status.shouldShowRationale) {
+                showNotificationRequest = true
+            } else {
+                notificationPermissionState.launchPermissionRequest()
+            }
+        }
+    }
+
+    if (showNotificationRequest) {
+        BasicAlertDialog(
+            title = "Allow notification permission",
+            body = "This app requires notification permission to show you reminders of your saved events",
+            dismissButtonText = "Deny",
+            dismissButton = { showNotificationRequest = false },
+            confirmButtonText = "Allow",
+            confirmButton = {
+                showNotificationRequest = false
+                context.startActivity(
+                    Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:${context.packageName}")
+                    ).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                )
+            }
+        )
+    }
+
+    if (showAlarmRequest) {
+        BasicAlertDialog(
+            title = "Allow alarm permission",
+            body = "This app requires alarm permission to show you reminders of your saved events",
+            dismissButtonText = "Deny",
+            dismissButton = { showAlarmRequest = false },
+            confirmButtonText = "Allow",
+            confirmButton = {
+                showAlarmRequest = false
+                scheduleAlarm(context)
+            }
+        )
+    }
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 19.dp, end = 16.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.Top
+        ) {
+            Switch(
+                checked = uiState.isEnabledNotification,
+                onCheckedChange = {
+                    if (uiState.upcomingEventsWithoutTechRocks.isEmpty()) {
+                        onUpdateNotificationSetting(true, !uiState.isEnabledNotification)
+                    } else {
+                        pendingAction = {
+                            uiState.upcomingEventsWithoutTechRocks.forEach { event ->
+                                setUpScheduler(
+                                    context = context,
+                                    alarmManager = alarmManager,
+                                    setReminder = !uiState.isEnabledNotification,
+                                    startDateTime = event.startDateTime,
+                                    eventName = event.name,
+                                    eventId = event.id,
+                                    notificationPermissionState = notificationPermissionState,
+                                    showAlarmRequest = { showAlarmRequest = it },
+                                    showNotificationRequest = {
+                                        showNotificationRequest = it
+                                    },
+                                    permissionLauncher = {
+                                        launcher.launch(permission)
+                                    },
+                                    updateNotificationSetting = {
+                                        onUpdateNotificationSetting(true, !uiState.isEnabledNotification)
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    pendingAction.invoke()
+                },
+                colors = SwitchDefaults.colors(
+                    checkedTrackColor = MainGreen
+                ),
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(
+                modifier = Modifier
+                    .weight(1f),
+            ) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Push Notification",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onBackground,
+                    ),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Turning this on will send a notification to your device as a reminder of the event time.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                )
             }
         }
     }

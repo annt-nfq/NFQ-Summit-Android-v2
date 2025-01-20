@@ -141,7 +141,10 @@ fun HomeTab(
             confirmButtonText = "Enable",
             confirmButton = {
                 if (uiState.upcomingEventsWithoutTechRocks.isEmpty()) {
-                    viewModel.updateNotificationSetting(true)
+                    viewModel.updateNotificationSetting(
+                        isShownNotificationPermissionDialog = true,
+                        isEnabledNotification = true
+                    )
                 } else {
                     pendingAction = {
                         uiState.upcomingEventsWithoutTechRocks.forEach { event ->
@@ -157,7 +160,10 @@ fun HomeTab(
                                 showNotificationRequest = { showNotificationRequest = it },
                                 permissionLauncher = { permissionLauncher.launch(permission) },
                                 updateNotificationSetting = {
-                                    viewModel.updateNotificationSetting(true)
+                                    viewModel.updateNotificationSetting(
+                                        isShownNotificationPermissionDialog = true,
+                                        isEnabledNotification = true
+                                    )
                                 }
                             )
                         }
@@ -167,7 +173,10 @@ fun HomeTab(
             },
             dismissButtonText = "Not now",
             dismissButton = {
-                viewModel.updateNotificationSetting(true)
+                viewModel.updateNotificationSetting(
+                    isShownNotificationPermissionDialog = true,
+                    isEnabledNotification = false
+                )
             }
         )
     }

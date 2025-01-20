@@ -1,5 +1,6 @@
 package com.nfq.data
 
+import com.nfq.data.domain.model.CategoryEnum
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -40,4 +41,11 @@ fun Long.toFormattedDateTimeString(
 
 fun Long.toLocalDateTime(): LocalDateTime {
     return LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
+}
+
+fun String?.filterOutTechRock(): Boolean {
+    return when {
+        this == CategoryEnum.TECH_ROCK.code || this == CategoryEnum.PRODUCT.code || this == CategoryEnum.BUSINESS.code || this == CategoryEnum.TECH.code -> false
+        else -> true
+    }
 }

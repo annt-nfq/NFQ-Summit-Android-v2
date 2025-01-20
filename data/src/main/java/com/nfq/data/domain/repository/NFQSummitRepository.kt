@@ -14,11 +14,15 @@ interface NFQSummitRepository {
     val user: Flow<UserEntity?>
     val isCompletedOnboarding: Flow<Boolean>
     val isShownNotificationPermissionDialog: Flow<Boolean>
+    val isEnabledNotification: Flow<Boolean>
     suspend fun authenticateWithAttendeeCode(attendeeCode: String): Either<DataException, Unit>
     suspend fun logout(): Either<DataException, Unit>
     suspend fun fetchEventActivities(forceUpdate: Boolean = false): Either<DataException, Unit>
     suspend fun getEventActivityByID(id: String): Either<DataException, EventDetailsModel>
     suspend fun updateFavorite(eventId: String, isFavorite: Boolean): Either<DataException, Unit>
     suspend fun updateOnboardingStatus(isCompletedOnboarding: Boolean)
-    suspend fun updateNotificationSetting(isShownNotificationPermissionDialog: Boolean)
+    suspend fun updateNotificationSetting(
+        isShownNotificationPermissionDialog: Boolean,
+        isEnabledNotification: Boolean
+    )
 }

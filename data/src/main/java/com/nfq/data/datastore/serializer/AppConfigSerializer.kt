@@ -17,7 +17,8 @@ class AppConfigSerializer @Inject constructor() : Serializer<AppConfigResponse> 
     override val defaultValue: AppConfigResponse
         get() = AppConfigResponse(
             isCompletedOnboarding = false,
-            isShownNotificationPermissionDialog = false
+            isShownNotificationPermissionDialog = false,
+            isEnabledNotification = false
         )
 
     override suspend fun readFrom(input: InputStream): AppConfigResponse {
