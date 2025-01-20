@@ -255,9 +255,9 @@ fun setUpScheduler(
         createNotificationChannel(context)
         scheduleNotification(
             context,
-            startDateTime.minusMinutes(15),
+            startDateTime.minusMinutes(30),
             eventName,
-            "This event is starting in 15 minutes",
+            "This event is starting in 30 minutes",
             eventId
         )
     } else {
