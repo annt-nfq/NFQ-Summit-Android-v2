@@ -3,8 +3,6 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
 import android.Manifest
-import android.app.AlarmManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -279,8 +277,12 @@ private fun HomeTabUI(
             modifier = Modifier.navigationBarsPadding()
         ) {
 
-            showQRCodeSection(
-                onShowQRCode = {
+            tapToShowSection(
+                modifier = Modifier.padding(top = 12.dp),
+                iconRes = R.drawable.ic_logo_qrcode,
+                title = "Tap to show my QR Code",
+                description = "You'll need to show this at NFQ Summit registration \uD83D\uDCCB",
+                onTap = {
                     if (uiState.user == null) {
                         goToSignIn()
                     } else {
@@ -288,6 +290,17 @@ private fun HomeTabUI(
                     }
                 }
             )
+            if (uiState.user != null) {
+                tapToShowSection(
+                    modifier = Modifier.padding(bottom = 24.dp, top = 8.dp),
+                    iconRes = R.drawable.ic_voucher,
+                    title = "Tap to show my vouchers",
+                    description = "Quick access to your vouchers at a tap! \uD83C\uDFAB",
+                    onTap = {
+
+                    }
+                )
+            }
 
             upcomingEventsSection(
                 upcomingEvents = uiState.upcomingEvents,
@@ -305,15 +318,16 @@ private fun HomeTabUI(
     }
 }
 
-private fun LazyListScope.showQRCodeSection(
-    onShowQRCode: () -> Unit,
+private fun LazyListScope.tapToShowSection(
+    onTap: () -> Unit,
+    iconRes: Int,
+    title: String,
+    description: String,
+    modifier: Modifier = Modifier
 ) {
     item {
         Box(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 24.dp)
-                .padding(top = 12.dp)
+            modifier = modifier.padding(horizontal = 24.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -327,7 +341,7 @@ private fun LazyListScope.showQRCodeSection(
                         offset = DpOffset(0.dp, 24.dp)
                     )
                     .clip(RoundedCornerShape(32.dp))
-                    .clickable { onShowQRCode() }
+                    .clickable { onTap() }
                     .background(MaterialTheme.colorScheme.surface)) {
                 Row(
                     modifier = Modifier
@@ -336,7 +350,7 @@ private fun LazyListScope.showQRCodeSection(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_logo_qrcode),
+                        painter = painterResource(id = iconRes),
                         contentDescription = null,
                         modifier = Modifier.size(75.dp)
                     )
@@ -345,7 +359,7 @@ private fun LazyListScope.showQRCodeSection(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Tap to show my QR Code",
+                            text = title,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
@@ -353,7 +367,7 @@ private fun LazyListScope.showQRCodeSection(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "You'll need to show this at NFQ Summit registration \uD83D\uDCCB",
+                            text = description,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = MaterialTheme.colorScheme.onBackground.copy(0.5f)
                             )
