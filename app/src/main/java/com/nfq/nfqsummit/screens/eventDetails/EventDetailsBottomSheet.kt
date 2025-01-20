@@ -185,34 +185,6 @@ fun EventDetailsBottomSheet(
     )
 }
 
-fun scheduleAlarm(context: Context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        context.startActivity(
-            Intent(
-                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                Uri.parse("package:${context.packageName}")
-            )
-        )
-    } else {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        // For Android 30 and below, you can use setExactAndAllowWhileIdle
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis(),
-                pendingIntent
-            )
-        }
-    }
-}
-
 fun setUpScheduler(
     context: Context,
     setReminder: Boolean,
@@ -243,9 +215,16 @@ fun setUpScheduler(
         createNotificationChannel(context)
         scheduleNotification(
             context,
-            startDateTime.minusMinutes(30),
+            startDateTime.minusMinutes(10),
             eventName,
-            "This event is starting in 30 minutes",
+            "This event is starting in 10 minutes",
+            eventId
+        )
+        scheduleNotification(
+            context,
+            startDateTime.minusMinutes(45),
+            eventName,
+            "This event is starting in 45 minutes",
             eventId
         )
     } else {
@@ -326,30 +305,6 @@ class AlarmScheduler(
         }
     }
 }
-
-@Composable
-fun rememberPendingAction(): PendingActionState {
-    var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
-
-    return remember {
-        PendingActionState(
-            setPendingAction = { action -> pendingAction = action },
-            executePendingAction = {
-                pendingAction?.invoke()
-                pendingAction = null
-            },
-            clearPendingAction = { pendingAction = null },
-            hasPendingAction = { pendingAction != null }
-        )
-    }
-}
-
-class PendingActionState(
-    val setPendingAction: (() -> Unit) -> Unit,
-    val executePendingAction: () -> Unit,
-    val clearPendingAction: () -> Unit,
-    val hasPendingAction: () -> Boolean
-)
 
 @Composable
 private fun EventDetailsUI(

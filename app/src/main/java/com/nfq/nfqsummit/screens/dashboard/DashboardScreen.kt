@@ -490,7 +490,7 @@ private fun PushNotificationSection(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Receive reminders 30 minutes before events start",
+                    text = "Receive reminders 45 minutes and 10 minutes before events start",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                 )

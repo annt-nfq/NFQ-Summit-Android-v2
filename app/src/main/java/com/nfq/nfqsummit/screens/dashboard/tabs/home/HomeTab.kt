@@ -144,7 +144,7 @@ fun HomeTab(
     if (showReminderOptionDialog) {
         BasicAlertDialog(
             title = "\"NFQ-summit\" Would Like to Send You Notifications",
-            body = "Receive reminders 30 minutes before registered Summit events and saved Tech Rock events start",
+            body = "Receive reminders 45 minutes and 10 minutes before registered Summit events and saved Tech Rock events start",
             properties = DialogProperties(
                 dismissOnBackPress = false,
                 dismissOnClickOutside = false
