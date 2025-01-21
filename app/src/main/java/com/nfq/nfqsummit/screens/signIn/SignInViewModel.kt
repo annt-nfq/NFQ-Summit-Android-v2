@@ -20,6 +20,7 @@ class SignInViewModel @Inject constructor(
 
     fun signIn(attendeeCode: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            if (loading.value) return@launch
             loading.value = true
             repository
                 .authenticateWithAttendeeCode(attendeeCode)

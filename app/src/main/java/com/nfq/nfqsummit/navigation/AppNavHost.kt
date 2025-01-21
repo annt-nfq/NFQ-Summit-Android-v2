@@ -23,6 +23,7 @@ import com.nfq.nfqsummit.screens.dashboard.DashboardScreen
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsScreen
 import com.nfq.nfqsummit.screens.onboarding.OnboardingScreen
 import com.nfq.nfqsummit.screens.payment.PaymentScreen
+import com.nfq.nfqsummit.screens.qrCode.QRScannerScreen
 import com.nfq.nfqsummit.screens.signIn.SignInScreen
 import com.nfq.nfqsummit.screens.splash.SplashScreen
 import com.nfq.nfqsummit.screens.survival.SurvivalScreen
@@ -68,6 +69,16 @@ fun AppNavHost(
                     navController.navigate(AppDestination.Dashboard.route) {
                         popUpTo(AppDestination.SignIn.route) { inclusive = true }
                     }
+                },
+                navigateToScanner = {
+                    navController.navigate(AppDestination.QRCodeScanner.route)
+                }
+            )
+        }
+        composable(AppDestination.QRCodeScanner.route) {
+            QRScannerScreen(
+                navigateUp = {
+                    navController.navigateUp()
                 }
             )
         }

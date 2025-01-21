@@ -210,6 +210,10 @@ dependencies {
 
     implementation(libs.zxing.android.embedded)
     implementation(libs.zxing.core)
+    implementation (libs.androidx.camera.camera2)
+    implementation( libs.androidx.camera.lifecycle)
+    implementation (libs.androidx.camera.view)
+    implementation (libs.barcode.scanning)
 
     implementation(libs.timber)
 

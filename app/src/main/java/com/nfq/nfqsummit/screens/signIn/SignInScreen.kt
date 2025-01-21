@@ -1,8 +1,12 @@
 package com.nfq.nfqsummit.screens.signIn
 
+import QRCodeScanner
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.OptIn
+import androidx.camera.core.ExperimentalGetImage
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -59,9 +63,11 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import com.nfq.nfqsummit.ui.theme.boxShadow
 import com.nfq.nfqsummit.utils.handleQRCodeUri
 
+@OptIn(ExperimentalGetImage::class)
 @Composable
 fun SignInScreen(
     continueAsGuest: () -> Unit,
+    navigateToScanner: () -> Unit,
     viewModel: SignInViewModel = hiltViewModel()
 ) {
     val loading by viewModel.loading.collectAsState()
@@ -98,10 +104,15 @@ fun SignInScreen(
                 }
 
                 is SignInEvent.ScanQRCode -> {
-                    scanner.startScan()
-                        .addOnSuccessListener {
-                            viewModel.signIn(it.rawValue ?: "")
-                        }
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                        navigateToScanner()
+                    } else {
+                        scanner
+                            .startScan()
+                            .addOnSuccessListener {
+                                viewModel.signIn(it.rawValue ?: "")
+                            }
+                    }
                 }
 
                 SignInEvent.ContinueAsGuest -> {

@@ -30,6 +30,8 @@ sealed class AppDestination(var route: String) {
 
     data object SignIn : AppDestination(route = "signIn")
 
+    data object QRCodeScanner : AppDestination(route = "qrCodeScanner")
+
     data object Blogs : AppDestination(route = "blogs") {
         const val blogIdArg = "blogId"
         val routeWithArgs = "$route/{$blogIdArg}"
