@@ -119,18 +119,20 @@ private fun VouchersContent(
 
 val previewVouchers = listOf(
     VoucherModel(
-        name = "Lunch",
+        type = "Lunch",
         date = "26th Feb 2025",
         location = "The Sentry",
         price = "350.000",
-        image = "https://picsum.photos/200"
+        imageUrl = "https://picsum.photos/200",
+        sponsorLogoUrls = listOf("https://picsum.photos/200")
     ),
     VoucherModel(
-        name = "Snack",
+        type = "Snack",
         date = "27th Feb 2025",
         location = "The Sentry",
         price = "20.000",
-        image = "https://picsum.photos/200"
+        imageUrl = "https://picsum.photos/200",
+        sponsorLogoUrls = listOf("https://picsum.photos/200")
     )
 ).groupBy { it.date }
 

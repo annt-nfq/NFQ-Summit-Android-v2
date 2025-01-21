@@ -8,6 +8,7 @@ import com.nfq.data.remote.model.response.AttendeeResponse
 import com.nfq.data.remote.model.response.EventActivityDetailsResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
 import com.nfq.data.remote.model.response.ProfileResponse
+import com.nfq.data.remote.model.response.VoucherResponse
 import com.nfq.data.remote.service.NFQSummitService
 import javax.inject.Inject
 
@@ -65,6 +66,17 @@ class NFQSummitDataSourceImpl @Inject constructor(
         return handleCall(
             apiCall = {
                 service.getEventActivityByID(id)
+            },
+            mapper = { data, _ ->
+                data
+            }
+        )
+    }
+
+    override suspend fun getMealVouchers(): Either<DataException, List<VoucherResponse>> {
+        return handleCall(
+            apiCall = {
+                service.getMealVouchers()
             },
             mapper = { data, _ ->
                 data

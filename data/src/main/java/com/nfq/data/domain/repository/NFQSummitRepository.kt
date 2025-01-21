@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
 import com.nfq.data.domain.model.EventDetailsModel
+import com.nfq.data.domain.model.VoucherModel
 import com.nfq.data.network.exception.DataException
 import kotlinx.coroutines.flow.Flow
 
@@ -25,4 +26,5 @@ interface NFQSummitRepository {
         isShownNotificationPermissionDialog: Boolean,
         isEnabledNotification: Boolean
     )
+    suspend fun getMealVouchers(): Either<DataException, List<VoucherModel>>
 }

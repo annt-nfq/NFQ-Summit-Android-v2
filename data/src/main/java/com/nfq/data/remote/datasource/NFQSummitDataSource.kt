@@ -6,6 +6,7 @@ import com.nfq.data.remote.model.response.AttendeeResponse
 import com.nfq.data.remote.model.response.EventActivityDetailsResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
 import com.nfq.data.remote.model.response.ProfileResponse
+import com.nfq.data.remote.model.response.VoucherResponse
 
 interface NFQSummitDataSource {
 
@@ -22,4 +23,6 @@ interface NFQSummitDataSource {
     suspend fun getEventActivityByID(
         id: String
     ): Either<DataException, EventActivityDetailsResponse>
+
+    suspend fun getMealVouchers(): Either<DataException, List<VoucherResponse>>
 }

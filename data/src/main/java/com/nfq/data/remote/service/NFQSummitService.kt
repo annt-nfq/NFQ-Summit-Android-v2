@@ -7,6 +7,7 @@ import com.nfq.data.remote.model.response.AttendeeResponse
 import com.nfq.data.remote.model.response.EventActivityDetailsResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
 import com.nfq.data.remote.model.response.ProfileResponse
+import com.nfq.data.remote.model.response.VoucherResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -35,4 +36,7 @@ interface NFQSummitService {
     suspend fun getEventActivityByID(
         @Path("id") id: String,
     ): Response<BaseResponse<EventActivityDetailsResponse>>
+
+    @GET("meal-vouchers")
+    suspend fun getMealVouchers(): Response<BaseResponse<List<VoucherResponse>>>
 }

@@ -4,11 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -17,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +33,7 @@ import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VoucherCard(
     attendeeName: String,
@@ -51,7 +57,7 @@ fun VoucherCard(
                         contentDescription = "voucher_logo"
                     )
                     Text(
-                        text = model.name,
+                        text = model.type.replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.ROOT) else it.toString() },
                         style = MaterialTheme.typography.displaySmall,
                         fontSize = 20.sp,
                         color = MaterialTheme.colorScheme.onPrimary
@@ -76,8 +82,9 @@ fun VoucherCard(
                 )
             }
             Image(
-                painter = networkImagePainter(model.image),
+                painter = networkImagePainter(model.imageUrl),
                 contentDescription = "voucher_image",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .padding(32.dp)
                     .clip(CircleShape)
@@ -97,7 +104,7 @@ fun VoucherCard(
                 color = MaterialTheme.colorScheme.onPrimary
             )
 
-            Row(
+            FlowRow(
                 modifier = Modifier.padding(top = 24.dp)
             ) {
                 Image(
@@ -123,30 +130,20 @@ fun VoucherCard(
                 )
             }
 
-            Row(
+            LazyRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(18.dp),
                 modifier = Modifier
                     .padding(top = 35.dp)
                     .padding(bottom = 2.dp)
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_nfq_text_white),
-                    contentDescription = "ic_nfq_text_white",
-                    modifier = Modifier.size(66.dp, 20.dp)
-                )
-
-                Image(
-                    painter = painterResource(R.drawable.ic_sentry),
-                    contentDescription = "ic_sentry",
-                    modifier = Modifier.size(65.dp, 20.dp)
-                )
-
-                Image(
-                    painter = painterResource(R.drawable.ic_tech_rocks),
-                    contentDescription = "ic_tech_rocks",
-                    modifier = Modifier.size(31.dp, 35.dp)
-                )
+                items(model.sponsorLogoUrls) { url ->
+                    Image(
+                        painter = networkImagePainter(url),
+                        contentDescription = "sponsor_logo",
+                        modifier = Modifier.height(35.dp)
+                    )
+                }
             }
         }
     }
@@ -159,11 +156,12 @@ private fun VoucherCardPreview() {
         VoucherCard(
             attendeeName = "Pattarawit Gochgornkamud",
             model = VoucherModel(
-                name = "Lunch",
+                type = "Lunch",
                 date = "26th Feb 2025",
                 location = "The Sentry",
                 price = "350.000",
-                image = "https://picsum.photos/200"
+                imageUrl = "https://picsum.photos/200",
+                sponsorLogoUrls = listOf("https://picsum.photos/200")
             )
         )
     }

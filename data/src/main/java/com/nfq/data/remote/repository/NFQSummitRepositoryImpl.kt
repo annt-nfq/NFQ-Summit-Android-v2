@@ -7,6 +7,7 @@ import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
 import com.nfq.data.datastore.PreferencesDataSource
 import com.nfq.data.domain.model.EventDetailsModel
+import com.nfq.data.domain.model.VoucherModel
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.data.mapper.toEventDetailsModel
 import com.nfq.data.mapper.toEventEntity
@@ -132,5 +133,22 @@ class NFQSummitRepositoryImpl @Inject constructor(
             isShownNotificationPermissionDialog,
             isEnabledNotification
         )
+    }
+
+    override suspend fun getMealVouchers(): Either<DataException, List<VoucherModel>> {
+        return dataSource
+            .getMealVouchers()
+            .map { response ->
+                response.map {
+                    VoucherModel(
+                        type = it.type,
+                        date = it.date,
+                        location = it.locations.joinToString(", ") { location -> location.name },
+                        price = it.price.toString(),
+                        imageUrl = it.imageUrl,
+                        sponsorLogoUrls = it.sponsorLogoUrls
+                    )
+                }
+            }
     }
 }

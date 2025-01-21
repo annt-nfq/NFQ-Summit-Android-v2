@@ -11,7 +11,6 @@ import com.nfq.nfqsummit.mapper.toUserUIModel
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.model.UserUIModel
-import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.previewVouchers
 import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +27,7 @@ class HomeViewModel @Inject constructor(
     private val repository: NFQSummitRepository
 ) : ViewModel() {
     private val loadingFlow = MutableStateFlow(false)
+    private val vouchersFlow = MutableStateFlow<List<VoucherModel>>(emptyList())
 
     val showReminderOptionDialog = combine(
         repository.user,
@@ -44,15 +44,17 @@ class HomeViewModel @Inject constructor(
         repository.user,
         repository.upcomingEvents,
         repository.savedEvents,
-        loadingFlow
-    ) { user, events, savedEvents, isLoading ->
+        loadingFlow,
+        vouchersFlow
+    ) { user, events, savedEvents, isLoading,vouchers ->
         val upcomingEvents = events.toUpcomingEventUIModels()
         HomeUIState(
             isLoading = isLoading,
             user = user?.toUserUIModel(),
             upcomingEvents = upcomingEvents,
             upcomingEventsWithoutTechRocks = upcomingEvents.filter { it.category.code.filterOutTechRock() },
-            savedEvents = savedEvents.toSavedEventUIModels()
+            savedEvents = savedEvents.toSavedEventUIModels(),
+            vouchers = vouchers.groupBy { it.date }
         )
     }.stateIn(
         scope = viewModelScope,
@@ -62,6 +64,16 @@ class HomeViewModel @Inject constructor(
 
     init {
         fetchEventActivities()
+        fetchVouchers()
+    }
+
+    private fun fetchVouchers() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository
+                .getMealVouchers()
+                .onLeft { e -> UserMessageManager.showMessage(e) }
+                .onRight { vouchersFlow.value = it }
+        }
     }
 
     private fun fetchEventActivities() {
@@ -106,7 +118,7 @@ class HomeViewModel @Inject constructor(
 
 data class HomeUIState(
     val user: UserUIModel? = null,
-    val vouchers: Map<String, List<VoucherModel>> = previewVouchers,
+    val vouchers: Map<String, List<VoucherModel>> = emptyMap(),
     val upcomingEvents: List<UpcomingEventUIModel> = emptyList(),
     val upcomingEventsWithoutTechRocks: List<UpcomingEventUIModel> = emptyList(),
     val savedEvents: List<SavedEventUIModel> = emptyList(),
