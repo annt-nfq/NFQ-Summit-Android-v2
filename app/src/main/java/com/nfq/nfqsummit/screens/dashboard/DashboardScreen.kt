@@ -440,10 +440,10 @@ private fun PushNotificationSection(
             Switch(
                 checked = uiState.isEnabledNotification,
                 onCheckedChange = {
-                    if (uiState.upcomingEventsWithoutTechRocks.isEmpty()) {
-                        onUpdateNotificationSetting(true, !uiState.isEnabledNotification)
-                    } else {
-                        pendingAction = {
+                    pendingAction = {
+                        if (uiState.upcomingEventsWithoutTechRocks.isEmpty()) {
+                            onUpdateNotificationSetting(true, !uiState.isEnabledNotification)
+                        } else {
                             uiState.upcomingEventsWithoutTechRocks.forEach { event ->
                                 setUpScheduler(
                                     context = context,
