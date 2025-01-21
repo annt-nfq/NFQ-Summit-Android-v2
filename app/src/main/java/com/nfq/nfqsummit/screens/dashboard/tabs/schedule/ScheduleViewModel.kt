@@ -41,7 +41,7 @@ class ScheduleViewModel @Inject constructor(
 
         val today = LocalDate.now()
         val firstEventDate = events.firstOrNull()?.start?.toLocalDate() ?: today
-        val lastEventDate = events.lastOrNull()?.end?.toLocalDate() ?: today
+        val lastEventDate = events.lastOrNull()?.start?.toLocalDate() ?: today
 
         val distinctDates = events
             .mapNotNull { it.start.toLocalDate() }
