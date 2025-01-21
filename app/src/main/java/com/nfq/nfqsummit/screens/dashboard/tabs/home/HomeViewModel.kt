@@ -2,7 +2,7 @@ package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nfq.data.domain.model.CategoryEnum
+import com.nfq.data.domain.model.VoucherModel
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.data.filterOutTechRock
 import com.nfq.nfqsummit.mapper.toSavedEventUIModels
@@ -11,6 +11,7 @@ import com.nfq.nfqsummit.mapper.toUserUIModel
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.model.UserUIModel
+import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.previewVouchers
 import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -105,6 +106,7 @@ class HomeViewModel @Inject constructor(
 
 data class HomeUIState(
     val user: UserUIModel? = null,
+    val vouchers: Map<String, List<VoucherModel>> = previewVouchers,
     val upcomingEvents: List<UpcomingEventUIModel> = emptyList(),
     val upcomingEventsWithoutTechRocks: List<UpcomingEventUIModel> = emptyList(),
     val savedEvents: List<SavedEventUIModel> = emptyList(),

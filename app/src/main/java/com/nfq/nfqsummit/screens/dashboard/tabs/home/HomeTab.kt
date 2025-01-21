@@ -71,6 +71,7 @@ import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.SavedEventCard
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.UpcomingEventCard
+import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.VouchersDialog
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.screens.eventDetails.rememberAlarmScheduler
 import com.nfq.nfqsummit.screens.eventDetails.setUpScheduler
@@ -94,6 +95,7 @@ fun HomeTab(
     var showEventDetailsBottomSheet by remember { mutableStateOf(false) }
     var eventId by remember { mutableStateOf("") }
     var showQRCodeBottomSheet by remember { mutableStateOf(false) }
+    var showVoucherDialog by remember { mutableStateOf(false) }
     val permission =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS
         else Manifest.permission.ACCESS_NOTIFICATION_POLICY
@@ -129,6 +131,14 @@ fun HomeTab(
         QRCodeBottomSheet(
             user = uiState.user!!,
             onDismissRequest = { showQRCodeBottomSheet = false }
+        )
+    }
+
+    if (showVoucherDialog) {
+        VouchersDialog(
+            attendeeName = uiState.user!!.name,
+            vouchers = uiState.vouchers,
+            onDismissRequest = { showVoucherDialog = false }
         )
     }
 
@@ -252,6 +262,9 @@ fun HomeTab(
             eventId = it
             showEventDetailsBottomSheet = true
         },
+        onShowVoucher = {
+            showVoucherDialog = true
+        },
         onShowQRCode = {
             showQRCodeBottomSheet = true
         }
@@ -267,6 +280,7 @@ private fun HomeTabUI(
     seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
     onShowQRCode: () -> Unit,
+    onShowVoucher: () -> Unit,
     markAsFavorite: (favorite: Boolean, event: UpcomingEventUIModel) -> Unit
 ) {
     Surface(
@@ -296,9 +310,7 @@ private fun HomeTabUI(
                     iconRes = R.drawable.ic_voucher,
                     title = "Tap to show my vouchers",
                     description = "Quick access to your vouchers at a tap! \uD83C\uDFAB",
-                    onTap = {
-
-                    }
+                    onTap = onShowVoucher
                 )
             }
 
@@ -526,7 +538,8 @@ fun HomeTabUIPreview() {
                 upcomingEvents = mockUpcomingEvents,
                 savedEvents = mockSavedEvents
             ),
-            onShowQRCode = {}
+            onShowQRCode = {},
+            onShowVoucher = {}
         )
     }
 }
@@ -545,6 +558,7 @@ fun HomeTabUIDarkPreview() {
                 savedEvents = mockSavedEvents
             ),
             onShowQRCode = {},
+            onShowVoucher = {}
         )
     }
 }

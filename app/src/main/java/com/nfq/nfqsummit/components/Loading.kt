@@ -20,7 +20,6 @@ fun Loading() {
     Dialog(
         onDismissRequest = { },
         properties = DialogProperties(
-            decorFitsSystemWindows = false,
             dismissOnBackPress = false,
             dismissOnClickOutside = false
         )
