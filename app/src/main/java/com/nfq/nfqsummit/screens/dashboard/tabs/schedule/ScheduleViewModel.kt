@@ -52,7 +52,7 @@ class ScheduleViewModel @Inject constructor(
             distinctDates.any { it.isSame(today) } -> today
             today < firstEventDate -> firstEventDate
             today > lastEventDate -> lastEventDate
-            else -> distinctDates.first { it > today }
+            else -> distinctDates.firstOrNull { it > today } ?: today
         }
 
         val dayEventPairs = distinctDates.map { date ->
