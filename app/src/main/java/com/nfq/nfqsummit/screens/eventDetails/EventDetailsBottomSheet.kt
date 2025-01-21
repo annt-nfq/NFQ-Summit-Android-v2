@@ -218,18 +218,21 @@ fun setUpScheduler(
             startDateTime.minusMinutes(10),
             eventName,
             "This event is starting in 10 minutes",
-            eventId
+            eventId,
+            "1"
         )
         scheduleNotification(
             context,
             startDateTime.minusMinutes(45),
             eventName,
             "This event is starting in 45 minutes",
-            eventId
+            eventId,
+            "2"
         )
     } else {
         markEventAsFavorite(false, eventId)
-        cancelNotification(context, eventId)
+        cancelNotification(context, eventId, "1")
+        cancelNotification(context, eventId, "2")
     }
 }
 
