@@ -2,6 +2,8 @@ package com.nfq.nfqsummit.screens.dashboard.tabs.home.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -23,6 +24,7 @@ import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SavedEventCard(
     modifier: Modifier = Modifier,
@@ -50,27 +52,25 @@ fun SavedEventCard(
             Column(
                 modifier = Modifier.padding(start = 18.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                FlowRow {
                     Text(
                         text = uiModel.date,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(top = 4.dp, end = 8.dp, bottom = 6.dp)
                     )
                     TagItem(
                         tag = uiModel.category.tag,
                         containerColor = Color(uiModel.category.containerColor),
                         contentColor = Color(uiModel.category.contentColor),
-                        modifier = Modifier.padding(start = 8.dp)
+                        modifier = Modifier.padding(bottom = 6.dp)
                     )
                 }
 
                 Text(
                     text = uiModel.name,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 8.dp)
+                    fontWeight = FontWeight.Bold
                 )
             }
         }

@@ -35,7 +35,7 @@ fun TagItem(
             style = MaterialTheme.typography.bodySmall.copy(
                 fontWeight = FontWeight.Medium
             ),
-            minFontSize = 9.sp,
+            minFontSize = 10.sp,
             maxLines = 1,
             color = contentColor,
         )

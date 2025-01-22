@@ -73,8 +73,8 @@ sealed class CategoryType(
     data class TechRock(val name: String) :
         CategoryType(
             CategoryEnum.TECH_ROCK.code,
-            0xFFE8F5E9.toInt(),
-            0xFF43A047.toInt(),
+            0xFFE5EDFF.toInt(),
+            0xFF42389D.toInt(),
             "\uD83D\uDCC8 $name"
         )
 
