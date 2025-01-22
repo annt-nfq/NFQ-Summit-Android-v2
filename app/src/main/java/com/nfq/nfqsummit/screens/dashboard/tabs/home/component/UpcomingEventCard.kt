@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.em
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
+import com.nfq.nfqsummit.ui.theme.Grey
+import com.nfq.nfqsummit.ui.theme.LightGrey
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import java.time.LocalDateTime
 
@@ -82,7 +84,7 @@ fun UpcomingEventCard(
                         .sizeIn(minWidth = 45.dp, minHeight = 45.dp)
                         .clip(RoundedCornerShape(7.dp))
                         .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
-                        .background(color = MaterialTheme.colorScheme.background.copy(alpha = 0.7f))
+                        .background(color = Color(0xFFB2B2B2))
                         .align(Alignment.TopStart)
                         .padding(8.dp)
                 )
