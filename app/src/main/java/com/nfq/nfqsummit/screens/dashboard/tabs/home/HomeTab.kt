@@ -304,9 +304,9 @@ private fun HomeTabUI(
                     }
                 }
             )
-            if (uiState.user != null) {
+            if (uiState.user != null && uiState.vouchers.isNotEmpty()) {
                 tapToShowSection(
-                    modifier = Modifier.padding(bottom = 24.dp, top = 8.dp),
+                    modifier = Modifier.padding(top = 8.dp),
                     iconRes = R.drawable.ic_voucher,
                     title = "Tap to show my vouchers",
                     description = "Quick access to your vouchers at a tap! \uD83C\uDFAB",
@@ -318,7 +318,8 @@ private fun HomeTabUI(
                 upcomingEvents = uiState.upcomingEvents,
                 markAsFavorite = markAsFavorite,
                 goToDetails = goToDetails,
-                seeAllEvents = seeAllEvents
+                seeAllEvents = seeAllEvents,
+                modifier = Modifier.padding(top = 24.dp)
             )
             savedEventSection(
                 savedEvents = uiState.savedEvents,
@@ -395,12 +396,13 @@ fun LazyListScope.upcomingEventsSection(
     upcomingEvents: List<UpcomingEventUIModel>,
     goToDetails: (String) -> Unit,
     seeAllEvents: () -> Unit = {},
+    modifier: Modifier = Modifier,
     markAsFavorite: (isFavorite: Boolean, event: UpcomingEventUIModel) -> Unit
 ) {
     item {
         if (upcomingEvents.isEmpty()) return@item
         val pagerState = rememberPagerState { upcomingEvents.size }
-        Column {
+        Column(modifier = modifier) {
             SectionHeader(title = "Upcoming Events", onSeeAll = seeAllEvents)
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalPager(
@@ -426,6 +428,7 @@ fun LazyListScope.upcomingEventsSection(
 @Composable
 fun SectionHeader(
     modifier: Modifier = Modifier,
+    showSeeAllBtn: Boolean = true,
     title: String, onSeeAll: () -> Unit
 ) {
     Row(
@@ -438,19 +441,21 @@ fun SectionHeader(
             color = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.weight(1f))
-        Box(
-            modifier = Modifier
-                .bounceClick()
-                .clip(RoundedCornerShape(8.dp))
-                .clickable { onSeeAll() }
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
-                .padding(horizontal = 12.dp, vertical = 8.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = null,
-                modifier = Modifier.size(16.dp)
-            )
+        if (showSeeAllBtn) {
+            Box(
+                modifier = Modifier
+                    .bounceClick()
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { onSeeAll() }
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_arrow_right),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }
@@ -465,6 +470,7 @@ private fun LazyListScope.savedEventSection(
         SectionHeader(
             title = "Saved Event",
             onSeeAll = seeAllSavedEvents,
+            showSeeAllBtn = savedEvents.isNotEmpty(),
             modifier = Modifier
                 .padding(top = 24.dp)
                 .padding(bottom = 16.dp)

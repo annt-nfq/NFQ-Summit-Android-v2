@@ -18,6 +18,8 @@ import com.nfq.data.remote.model.response.EventActivityResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import javax.inject.Inject
 
 class NFQSummitRepositoryImpl @Inject constructor(
@@ -140,11 +142,17 @@ class NFQSummitRepositoryImpl @Inject constructor(
             .getMealVouchers()
             .map { response ->
                 response.map {
+                    val vietnamPriceFormatter = DecimalFormat("#,###").apply {
+                        decimalFormatSymbols = DecimalFormatSymbols().apply {
+                            groupingSeparator = '.'
+                            decimalSeparator = ','
+                        }
+                    }
                     VoucherModel(
                         type = it.type,
                         date = it.date,
                         location = it.locations.joinToString(", ") { location -> location.name },
-                        price = it.price.toString(),
+                        price = vietnamPriceFormatter.format(it.price),
                         imageUrl = it.imageUrl,
                         sponsorLogoUrls = it.sponsorLogoUrls
                     )
