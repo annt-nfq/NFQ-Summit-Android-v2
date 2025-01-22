@@ -17,7 +17,7 @@ fun Context.openMapView(latitude: Double?, longitude: Double?, locationName: Str
 fun String.convertTimeFormat(): String {
     return if (this.endsWith("AM", true) || this.endsWith("PM", true)) {
         this.substring(0, this.length - 2) + this.substring(this.length - 2, this.length - 1) +
-                this.substring(this.length - 1).uppercase()
+                this.substring(this.length - 1)
     } else {
         this // Return as is if not AM/PM format
     }

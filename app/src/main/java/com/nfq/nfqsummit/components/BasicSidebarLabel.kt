@@ -29,7 +29,7 @@ fun BasicSidebarLabel(
         horizontalAlignment = Alignment.End
     ) {
         Text(
-            text = time.format(HourFormatter).convertTimeFormat(),
+            text = time.format(HourFormatter).convertTimeFormat().uppercase(),
             style = MaterialTheme.typography.bodyMedium,
             fontSize = 15.sp,
             modifier = modifier
