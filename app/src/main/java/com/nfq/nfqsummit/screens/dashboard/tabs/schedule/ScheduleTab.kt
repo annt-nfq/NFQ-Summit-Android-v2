@@ -251,7 +251,7 @@ private fun ScheduleHeader(
                 SegmentedControl(
                     items = listOf(
                         "Summit \uD83D\uDCBC",
-                        "Tech Rock \uD83E\uDD16 "
+                        "Scaling Business Day \uD83D\uDCC8"
                     ),
                     selectedIndex = pagerState.currentPage,
                     onItemSelection = {

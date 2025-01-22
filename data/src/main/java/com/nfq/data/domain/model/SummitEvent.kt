@@ -75,7 +75,7 @@ sealed class CategoryType(
             CategoryEnum.TECH_ROCK.code,
             0xFFE8F5E9.toInt(),
             0xFF43A047.toInt(),
-            "\uD83D\uDCBB $name"
+            "\uD83D\uDCC8 $name"
         )
 
     data class Tech(val name: String) :
