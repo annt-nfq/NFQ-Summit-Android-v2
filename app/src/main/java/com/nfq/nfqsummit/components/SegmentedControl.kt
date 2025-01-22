@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
+import timber.log.Timber
 
 @Composable
 fun SegmentedControl(
@@ -79,7 +80,7 @@ fun SegmentedControl(
             items.forEachIndexed { index, item ->
                 Box(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(if (index == 0) 1f else 1.3f)
                         .height(itemHeight)
                         .clip(shape)
                         .clickable { onItemSelection(index) }
@@ -89,6 +90,7 @@ fun SegmentedControl(
                                 .also { list ->
                                     list[index] = with(density) { coordinates.size.width.toDp() }
                                 }
+                            Timber.i("Item Widths: $itemWidths")
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -110,7 +112,10 @@ fun SegmentedControl(
 fun SegmentedControlPreview() {
     NFQSnapshotTestThemeForPreview {
         SegmentedControl(
-            items = listOf("Thailand \uD83C\uDDF9\uD83C\uDDED", "Vietnam \uD83C\uDDFB\uD83C\uDDF3 "),
+            items = listOf(
+                "Thailand \uD83C\uDDF9\uD83C\uDDED",
+                "Vietnam \uD83C\uDDFB\uD83C\uDDF3 "
+            ),
             selectedIndex = 0,
             onItemSelection = { }
         )
