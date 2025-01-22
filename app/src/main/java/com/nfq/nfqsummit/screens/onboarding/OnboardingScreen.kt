@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -209,7 +211,7 @@ private fun OnboardingContent(
                     1 -> OnboardingPage(
                         modifier = Modifier.fillMaxHeight(0.75f),
                         imageRes = R.drawable.onboarding2,
-                        title = "Experience Thailand & Vietnam",
+                        title = "Experience Vietnam",
                         description = "Explore these vibrant destinations with expert guides, uncovering landmarks, culture, and local flavors."
                     )
                 }
@@ -293,7 +295,10 @@ private fun OnboardingPage(
             Image(
                 painter = painterResource(id = imageRes),
                 contentDescription = "onboarding_image",
-                modifier = Modifier.padding(top = 48.dp)
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .padding(top = 48.dp)
+                    .aspectRatio(274f / 250f)
             )
 
             Text(
@@ -313,6 +318,7 @@ private fun OnboardingPage(
                 style = MaterialTheme.typography.bodyMedium,
                 color = Grey,
                 textAlign = TextAlign.Center,
+                minLines = 4,
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
