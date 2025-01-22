@@ -21,7 +21,7 @@ android {
     defaultConfig {
         applicationId = "com.nfq.nfqsummit"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 101012
         versionName = "1.2.0"
 
