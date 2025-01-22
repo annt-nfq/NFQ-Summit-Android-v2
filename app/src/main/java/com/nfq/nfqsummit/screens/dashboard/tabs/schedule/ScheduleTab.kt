@@ -396,7 +396,7 @@ fun ScheduleDays(
             } else {
                 val primaryCount =
                     if (eventCount.first < 3) eventCount.first else if (eventCount.second == 0) 3 else 2
-                val secondaryCount = if (eventCount.second != 0) 1 else 0
+                val secondaryCount = if (eventCount.first == 0) 3 else if (eventCount.second != 0) 1 else 0
 
                 repeat(primaryCount) {
                     EventCountIndicator(primaryColor)
