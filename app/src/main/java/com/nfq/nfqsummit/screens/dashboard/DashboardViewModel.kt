@@ -23,7 +23,6 @@ class DashboardViewModel @Inject constructor(
     private val repository: NFQSummitRepository
 ) : ViewModel() {
 
-    val loading = MutableStateFlow(false)
     private val _uiState = MutableStateFlow(DashboardUIState())
     val uiState = combine(
         _uiState,
@@ -32,7 +31,6 @@ class DashboardViewModel @Inject constructor(
         repository.upcomingEvents
     ) { state, isLoggedIn, isEnabledNotification, upcomingEvents ->
         state.copy(
-            loading = loading.value,
             isLoggedIn = isLoggedIn,
             isEnabledNotification = isEnabledNotification && isLoggedIn,
             upcomingEventsWithoutTechRocks = upcomingEvents
