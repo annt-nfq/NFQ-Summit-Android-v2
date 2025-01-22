@@ -84,7 +84,7 @@ fun UpcomingEventCard(
                         .sizeIn(minWidth = 45.dp, minHeight = 45.dp)
                         .clip(RoundedCornerShape(7.dp))
                         .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
-                        .background(color = Color(0xFFB2B2B2))
+                        .background(color = Color(0xFFC8C6C7))
                         .align(Alignment.TopStart)
                         .padding(8.dp)
                 )

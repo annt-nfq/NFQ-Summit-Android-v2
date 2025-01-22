@@ -28,7 +28,7 @@ fun BookmarkItem(
     modifier: Modifier = Modifier,
     isFavorite: Boolean, id: String,
     iconTint: Color = MaterialTheme.colorScheme.primary,
-    backgroundColor: Color = MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
+    backgroundColor: Color = Color(0xFFC8C6C7),
     markAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit
 ) {
     Box(
