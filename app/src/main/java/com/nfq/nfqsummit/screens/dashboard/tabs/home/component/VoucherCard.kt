@@ -51,7 +51,9 @@ fun VoucherCard(
                 .fillMaxWidth()
         ) {
             Row {
-                Column {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Image(
                         painter = painterResource(R.drawable.voucher_logo),
                         contentDescription = "voucher_logo"
@@ -69,17 +71,24 @@ fun VoucherCard(
                     modifier = Modifier.weight(1f)
                 )
 
-                Text(
-                    text = model.price,
-                    style = MaterialTheme.typography.displaySmall,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-                Image(
-                    painter = painterResource(R.drawable.ic_currency),
-                    contentDescription = "ic_currency",
-                    modifier = Modifier.padding(start = 2.dp)
-                )
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = model.price,
+                        style = MaterialTheme.typography.displaySmall,
+                        fontSize = 20.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Image(
+                        painter = painterResource(R.drawable.ic_currency),
+                        contentDescription = "ic_currency",
+                        modifier = Modifier.padding(start = 2.dp)
+                    )
+                }
+
             }
             Image(
                 painter = networkImagePainter(model.imageUrl),
