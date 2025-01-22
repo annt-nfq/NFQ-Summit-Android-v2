@@ -68,9 +68,10 @@ class ExploreViewModel @Inject constructor(
     init {
         fetchAttractions()
         fetchBlogs()
+        configCountry(CountryEnum.VIETNAM)
     }
 
-    fun configCountry(countryEnum: CountryEnum) {
+    private fun configCountry(countryEnum: CountryEnum) {
         viewModelScope.launch(Dispatchers.IO) {
             exploreRepository.configCountry(countryEnum)
         }

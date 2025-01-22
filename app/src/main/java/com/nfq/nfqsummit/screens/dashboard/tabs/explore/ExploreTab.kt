@@ -12,17 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,32 +28,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.nfq.data.domain.model.CountryEnum
 import com.nfq.nfqsummit.components.Loading
-import com.nfq.nfqsummit.components.SegmentedControl
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
-import kotlinx.coroutines.launch
 
 @Composable
 fun ExploreTab(
     goToDestination: (destination: String) -> Unit = {}
 ) {
-    val pagerState = rememberPagerState { 2 }
-    val scope = rememberCoroutineScope()
     val viewModel: ExploreViewModel = hiltViewModel()
-
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage == 0) {
-            viewModel.configCountry(CountryEnum.THAILAND)
-        } else {
-            viewModel.configCountry(CountryEnum.VIETNAM)
-        }
-    }
 
     if (uiState.isLoading) {
         Loading()
@@ -66,43 +49,28 @@ fun ExploreTab(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
-            SegmentedControl(
-                items = listOf(
-                    "Thailand \uD83C\uDDF9\uD83C\uDDED",
-                    "Vietnam \uD83C\uDDFB\uD83C\uDDF3 "
-                ),
-                selectedIndex = pagerState.currentPage,
-                onItemSelection = {
-                    scope.launch { pagerState.animateScrollToPage(it) }
-                },
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(vertical = 16.dp)
+            Text(
+                text = "Explore Vietnam \uD83C\uDDFB\uD83C\uDDF3",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
             )
         }
     ) { innerPadding ->
-        HorizontalPager(
-            state = pagerState
+        LazyColumn(
+            modifier = Modifier.padding(innerPadding),
+            contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            LazyColumn(
-                modifier = Modifier.padding(innerPadding),
-                contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(
-                    items = if (pagerState.currentPage == 0) {
-                        uiState.exploreThailand
-                    } else {
-                        uiState.exploreVietnam
-                    },
-                    key = { it.title },
-                    contentType = { "ExploreItem" }
-                ) { exploreItem ->
-                    ExploreItem(
-                        exploreItem = exploreItem,
-                        goToDestination = goToDestination
-                    )
-                }
+            items(
+                items = uiState.exploreVietnam,
+                key = { it.title },
+                contentType = { "ExploreItem" }
+            ) { exploreItem ->
+                ExploreItem(
+                    exploreItem = exploreItem,
+                    goToDestination = goToDestination
+                )
             }
         }
     }
