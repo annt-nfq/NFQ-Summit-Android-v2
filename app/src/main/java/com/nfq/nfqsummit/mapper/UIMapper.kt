@@ -89,7 +89,7 @@ private fun CategoryResponse?.toCategoryType(genre: GenreResponse?): CategoryTyp
         CategoryEnum.PRODUCT.code -> CategoryType.Product(name)
         CategoryEnum.BUSINESS.code -> CategoryType.Business(name)
         CategoryEnum.TECH.code -> CategoryType.Tech(name)
-        CategoryEnum.TECH_ROCK.code -> CategoryType.TechRock("Scaling Business Day")
+        CategoryEnum.TECH_ROCK.code -> CategoryType.TechRock("Scaling Business")
         else -> CategoryType.Summit("Summit")
     }
 }
