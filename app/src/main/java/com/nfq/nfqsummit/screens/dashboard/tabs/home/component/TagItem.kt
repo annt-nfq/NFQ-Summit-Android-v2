@@ -30,7 +30,6 @@ fun TagItem(
 ) {
     Box(
         modifier = modifier
-            .widthIn(min = 80.dp)
             .background(
                 color = containerColor,
                 shape = RoundedCornerShape(8.dp),
@@ -85,10 +84,7 @@ private fun TagItemPreview() {
             containerColor = Color(0xFFE5EDFF),
             contentColor = Color(0xFF42389D),
             isTechRock = true,
-            modifier = Modifier
-                .padding(16.dp)
-                .widthIn(min = 80.dp)
-                .width(60.dp)
+            modifier = Modifier.padding(16.dp)
         )
     }
 }
