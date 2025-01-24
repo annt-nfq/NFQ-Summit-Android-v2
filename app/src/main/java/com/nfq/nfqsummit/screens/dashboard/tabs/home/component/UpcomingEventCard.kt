@@ -1,14 +1,20 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.nfq.nfqsummit.screens.dashboard.tabs.home.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -27,11 +33,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.nfq.data.domain.model.CategoryEnum
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
-import com.nfq.nfqsummit.ui.theme.Grey
-import com.nfq.nfqsummit.ui.theme.LightGrey
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import java.time.LocalDateTime
 
@@ -100,12 +105,13 @@ fun UpcomingEventCard(
                     .padding(top = 16.dp)
                     .padding(horizontal = 8.dp)
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(8.dp)
+            FlowRow(
+                modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Box(
                     modifier = Modifier
+                        .padding(end = 8.dp)
                         .background(
                             color = MaterialTheme.colorScheme.primary,
                             shape = RoundedCornerShape(8.dp),
@@ -120,8 +126,8 @@ fun UpcomingEventCard(
                     )
                 }
                 TagItem(
-                    modifier = Modifier.padding(start = 16.dp),
                     tag = uiModel.category.tag,
+                    isTechRock = uiModel.category.code == CategoryEnum.TECH_ROCK.code,
                     containerColor = Color(uiModel.category.containerColor),
                     contentColor = Color(uiModel.category.contentColor)
                 )
@@ -149,7 +155,7 @@ private fun UpcomingEventPreview() {
                 goToDetails = { },
                 markAsFavorite = { _, _ -> },
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .width(600.dp)
                     .padding(16.dp)
             )
         }

@@ -407,6 +407,7 @@ fun LazyListScope.upcomingEventsSection(
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalPager(
                 state = pagerState,
+                verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(start = 24.dp, end = 134.dp),
                 pageSpacing = 16.dp,
                 modifier = Modifier.fillMaxWidth()
@@ -418,7 +419,7 @@ fun LazyListScope.upcomingEventsSection(
                     markAsFavorite = { isFavorite, _ ->
                         markAsFavorite(isFavorite, uiModel)
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }
