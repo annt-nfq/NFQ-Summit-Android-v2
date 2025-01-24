@@ -105,7 +105,7 @@ fun UpcomingEventCard(
                     .padding(top = 16.dp)
                     .padding(horizontal = 8.dp)
             )
-            FlowRow(
+            Column (
                 modifier = Modifier.padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
