@@ -97,7 +97,7 @@ fun AttractionBlogsUI(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            if (!blogs.isEmpty()) {
+            if (blogs.isEmpty()) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
