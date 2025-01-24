@@ -7,6 +7,7 @@ import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
 import com.nfq.data.domain.model.Attraction
 import com.nfq.data.domain.model.Blog
+import com.nfq.data.domain.model.CategoryEnum
 import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.remote.model.response.AttendeeResponse
 import com.nfq.data.remote.model.response.AttractionResponse
@@ -44,6 +45,7 @@ fun EventActivityResponse.toEventEntity(): EventEntity {
         images = images.orEmpty(),
         order = order ?: 0,
         category = category,
+        isTechRock = filterTechRock(genre?.code ?: category?.code.orEmpty()),
         genre = genre,
         eventDay = eventDay,
         qrCodeUrl = qrCodeUrl.orEmpty(),
@@ -51,6 +53,13 @@ fun EventActivityResponse.toEventEntity(): EventEntity {
         speaker = speaker,
         updatedAt = 0L
     )
+}
+
+fun filterTechRock(code: String): Boolean {
+    return when {
+        code == CategoryEnum.TECH_ROCK.code || code == CategoryEnum.PRODUCT.code || code == CategoryEnum.BUSINESS.code || code == CategoryEnum.TECH.code -> true
+        else -> false
+    }
 }
 
 fun AttendeeResponse.toUserEntity(): UserEntity {

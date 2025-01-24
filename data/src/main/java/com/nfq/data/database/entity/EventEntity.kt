@@ -32,6 +32,7 @@ data class EventEntity(
     @ColumnInfo("adminNotes") val adminNotes: String,
     @ColumnInfo("images") val images: List<String>,
     @ColumnInfo("order") val order: Int,
+    @ColumnInfo("isTechRock") val isTechRock: Boolean,
     @ColumnInfo("category") val category: CategoryResponse?,
     @ColumnInfo("genre") val genre: GenreResponse?,
     @ColumnInfo("eventDay") val eventDay: EventDayResponse?,

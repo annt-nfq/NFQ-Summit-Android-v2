@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.nfq.data.BuildConfig
 import com.nfq.data.database.dao.AttractionDao
 import com.nfq.data.database.dao.BlogDao
@@ -20,7 +22,7 @@ import net.sqlcipher.database.SupportFactory
 
 @Database(
     entities = [EventEntity::class, UserEntity::class, AttractionBlogEntity::class, AttractionEntity::class, BlogEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 @TypeConverters(EventTypeConverters::class)
@@ -38,7 +40,15 @@ abstract class AppDatabase : RoomDatabase() {
             val factory = SupportFactory(passphrase)
             return Room.databaseBuilder(context, AppDatabase::class.java, "nfq-summit-db")
                 .openHelperFactory(factory)
+                .addMigrations(MIGRATION_1_2)
                 .build()
         }
+    }
+}
+
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Add the new column to the event_entity table
+        db.execSQL("ALTER TABLE event_entity ADD COLUMN isNotTechRock INTEGER DEFAULT 0 NOT NULL")
     }
 }

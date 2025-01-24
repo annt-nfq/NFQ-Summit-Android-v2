@@ -38,7 +38,9 @@ data class CategoryResponse(
     @SerialName("id") val id: Int,
     @SerialName("name") val name: String?,
     @SerialName("code") val code: String?
-)
+){
+    fun isTechRockEvent() = code == "tech_rock"
+}
 
 @Serializable
 data class GenreResponse(
