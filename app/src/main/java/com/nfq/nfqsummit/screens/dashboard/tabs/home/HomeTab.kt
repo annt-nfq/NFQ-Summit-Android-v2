@@ -502,12 +502,13 @@ private fun LazyListScope.savedEventSection(
                     .padding(horizontal = 16.dp)
             ) {
                 Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth()
                 ) {
                     Text(
-                        "No Favorites Yet!",
+                        "No Saved Event!",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold
                         )
@@ -515,16 +516,9 @@ private fun LazyListScope.savedEventSection(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         "You have not marked any favorites",
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onBackground.copy(0.5f)
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("View Attractions",
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            color = NFQOrange, textDecoration = TextDecoration.Underline
-                        ),
-                        modifier = Modifier.clickable {
-                            goToAttractions()
-                        })
                 }
             }
         }
