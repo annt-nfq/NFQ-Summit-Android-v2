@@ -434,11 +434,14 @@ private fun EventDetailsUI(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 24.dp)
                     )
-                    HtmlText(
-                        html = event.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(top = 24.dp)
-                    )
+                    if (event.description.isNotEmpty()) {
+                        HtmlText(
+                            html = event.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(top = 24.dp)
+                        )
+                    }
+
                     Image(
                         painter = networkImagePainter(event.coverPhotoUrl),
                         contentDescription = event.name,
