@@ -49,6 +49,6 @@ abstract class AppDatabase : RoomDatabase() {
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
         // Add the new column to the event_entity table
-        db.execSQL("ALTER TABLE event_entity ADD COLUMN isNotTechRock INTEGER DEFAULT 0 NOT NULL")
+        db.execSQL("ALTER TABLE event_entity ADD COLUMN isTechRock INTEGER DEFAULT 0 NOT NULL")
     }
 }
