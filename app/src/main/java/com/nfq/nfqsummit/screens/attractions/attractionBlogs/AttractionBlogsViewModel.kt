@@ -16,15 +16,19 @@ class AttractionBlogsViewModel @Inject constructor(
     private val exploreRepository: ExploreRepository,
     saveStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val attractionId = saveStateHandle.get<String>("attractionId")!!
+    private val attractionId = saveStateHandle.get<String>("attractionId").orEmpty()
 
-    val blogs = exploreRepository
-        .getBlogsByAttractionId(attractionId = attractionId)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList()
-        )
+    val blogs = exploreRepository.let {
+        if (attractionId != "-1") {
+            it.getBlogsByAttractionId(attractionId = attractionId)
+        } else {
+            it.favouriteBlogs
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = emptyList()
+    )
 
     fun markBlogAsFavorite(favorite: Boolean, blog: Blog) {
         viewModelScope.launch {

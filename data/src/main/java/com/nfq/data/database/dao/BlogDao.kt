@@ -28,6 +28,9 @@ interface BlogDao {
         isFavorite: Boolean
     )
 
+    @Query("SELECT * FROM blog_entity WHERE is_favorite = 1")
+    fun getFavoriteBlogs(): Flow<List<AttractionBlogEntity>>
+
     @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
     suspend fun insertBlogs(blogs: List<BlogEntity>)
 

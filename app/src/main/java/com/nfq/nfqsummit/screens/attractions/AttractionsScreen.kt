@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -71,6 +75,16 @@ fun AttractionsUI(
                 .padding(paddingValues)
                 .navigationBarsPadding()
         ) {
+            item {
+                AttractionListItem(
+                    attraction = Attraction(
+                        id = "-1",
+                        title = "Favorites",
+                        icon = ""
+                    ),
+                    goToAttraction = goToAttraction
+                )
+            }
             items(attractions) { attraction ->
                 AttractionListItem(
                     attraction = attraction,
@@ -102,16 +116,27 @@ fun AttractionListItem(
             text = attraction.title,
             style = MaterialTheme.typography.titleLarge,
             color = Color.White,
+            textAlign = TextAlign.Center,
             fontWeight = FontWeight(600),
+            modifier = Modifier.weight(1f),
         )
-        Spacer(modifier = Modifier.width(24.dp))
-        AsyncImage(
-            model = attraction.icon,
-            contentDescription = null,
-            modifier = Modifier.size(100.dp),
-            contentScale = ContentScale.Fit
-        )
-        Spacer(modifier = Modifier.width(24.dp))
+        if (attraction.title == "Favorites") {
+            Icon(
+                imageVector = Icons.Filled.Favorite,
+                contentDescription = null,
+                modifier = Modifier.size(100.dp),
+               tint = Color.White
+            )
+        } else {
+            AsyncImage(
+                model = attraction.icon,
+                contentDescription = null,
+                modifier = Modifier.size(100.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+
+        Spacer(modifier = Modifier.width(14.dp))
     }
 }
 

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ExploreRepository {
     val attractions: Flow<List<Attraction>>
+    val favouriteBlogs : Flow<List<Blog>>
     fun getBlogsByAttractionId(attractionId: String): Flow<List<Blog>>
     fun getBlogDetails(blogId: String): Flow<Blog>
     fun getTransportationBlogs(parentBlogId: String): Flow<List<Blog>>

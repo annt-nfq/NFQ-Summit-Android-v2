@@ -40,6 +40,9 @@ class ExploreRepositoryImpl @Inject constructor(
         ) { country, attractions ->
             attractions.filter { it.country == country }.toAttractions()
         }
+    override val favouriteBlogs: Flow<List<Blog>>
+        get() = blogDao.getFavoriteBlogs()
+            .map { it.toAttractionBlogs() }
 
     override fun getBlogsByAttractionId(attractionId: String): Flow<List<Blog>> {
         return blogDao

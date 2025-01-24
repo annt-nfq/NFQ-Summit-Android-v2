@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -87,23 +89,41 @@ fun AttractionBlogsUI(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
         ) {
-            items(
-                items = blogs,
-                key = { it.id },
-                contentType = { "BlogListItem" }
-            ) { blog ->
-                BlogListItem(
-                    blog = blog,
-                    goToBlog = goToBlog,
-                    markAsFavorite = markAsFavorite
+            if (blogs.isEmpty()) {
+                Text(
+                    text = "No blogs found",
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
                 )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+
+                    items(
+                        items = blogs,
+                        key = { it.id },
+                        contentType = { "BlogListItem" }
+                    ) { blog ->
+                        BlogListItem(
+                            blog = blog,
+                            goToBlog = goToBlog,
+                            markAsFavorite = markAsFavorite
+                        )
+                    }
+                }
             }
         }
+
     }
 }
 
