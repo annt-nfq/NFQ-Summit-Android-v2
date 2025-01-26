@@ -202,14 +202,14 @@ private fun OnboardingContent(
             ) { page ->
                 when (page) {
                     0 -> OnboardingPage(
-                        modifier = Modifier.fillMaxHeight(0.75f),
+                        modifier = Modifier.fillMaxHeight(0.8f),
                         imageRes = R.drawable.onboarding1,
                         title = "Explore Events",
                         description = "Discover every event and stay informed! Explore the NFQ Summit 2025 calendar to ensure you never miss any exciting sessions, workshops, or networking opportunities."
                     )
 
                     1 -> OnboardingPage(
-                        modifier = Modifier.fillMaxHeight(0.75f),
+                        modifier = Modifier.fillMaxHeight(0.8f),
                         imageRes = R.drawable.onboarding2,
                         title = "Experience Vietnam",
                         description = "Explore these vibrant destinations with expert guides, uncovering landmarks, culture, and local flavors."
@@ -287,6 +287,7 @@ private fun OnboardingPage(
                 .padding(horizontal = 33.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+            Spacer(modifier = Modifier.weight(1f))
             Image(
                 painter = painterResource(id = R.drawable.ic_nfq_text),
                 contentDescription = "ic_nfq_text",
@@ -297,6 +298,7 @@ private fun OnboardingPage(
                 contentDescription = "onboarding_image",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
+                    .padding(horizontal = 20.dp)
                     .padding(top = 48.dp)
                     .aspectRatio(274f / 250f)
             )
