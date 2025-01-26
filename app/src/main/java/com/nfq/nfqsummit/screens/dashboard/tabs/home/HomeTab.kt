@@ -3,10 +3,7 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
 import android.Manifest
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Spring
@@ -51,7 +48,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
@@ -73,10 +69,9 @@ import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.SavedEventCard
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.UpcomingEventCard
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.VouchersDialog
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
-import com.nfq.nfqsummit.screens.eventDetails.rememberAlarmScheduler
+import com.nfq.nfqsummit.screens.eventDetails.HandlePermissionDialogs
 import com.nfq.nfqsummit.screens.eventDetails.setUpScheduler
 import com.nfq.nfqsummit.screens.qrCode.QRCodeBottomSheet
-import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import com.nfq.nfqsummit.ui.theme.boxShadow
 
@@ -90,32 +85,26 @@ fun HomeTab(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
-    val showReminderOptionDialog by viewModel.showReminderOptionDialog.collectAsState()
-
-    var showEventDetailsBottomSheet by remember { mutableStateOf(false) }
-    var eventId by remember { mutableStateOf("") }
-    var showQRCodeBottomSheet by remember { mutableStateOf(false) }
-    var showVoucherDialog by remember { mutableStateOf(false) }
-    val permission =
+    val showReminderDialog by viewModel.showReminderDialog.collectAsState()
+    val notificationPermission =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS
         else Manifest.permission.ACCESS_NOTIFICATION_POLICY
-    val notificationPermissionState = rememberPermissionState(permission = permission)
+    val notificationPermissionState = rememberPermissionState(permission = notificationPermission)
 
-    var showAlarmRequest by remember { mutableStateOf(false) }
-    var showNotificationRequest by remember { mutableStateOf(false) }
+
+    var isEventDetailsBottomSheetVisible by remember { mutableStateOf(false) }
+    var selectedEventId by remember { mutableStateOf("") }
+    var isQRCodeBottomSheetVisible by remember { mutableStateOf(false) }
+    var isVoucherDialogVisible by remember { mutableStateOf(false) }
+    var isAlarmRequestVisible by remember { mutableStateOf(false) }
+    var isNotificationRequestVisible by remember { mutableStateOf(false) }
     var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
 
-    val alarmScheduler = rememberAlarmScheduler(
-        onAlarmSet = {
-            pendingAction?.invoke()
-        },
-        onPermissionDenied = {}
-    )
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            showAlarmRequest = true
+            isAlarmRequestVisible = true
         }
     }
 
@@ -127,29 +116,29 @@ fun HomeTab(
         Loading()
     }
 
-    if (showQRCodeBottomSheet) {
+    if (isQRCodeBottomSheetVisible) {
         QRCodeBottomSheet(
             user = uiState.user!!,
-            onDismissRequest = { showQRCodeBottomSheet = false }
+            onDismissRequest = { isQRCodeBottomSheetVisible = false }
         )
     }
 
-    if (showVoucherDialog) {
+    if (isVoucherDialogVisible) {
         VouchersDialog(
             attendeeName = uiState.user!!.name,
             vouchers = uiState.vouchers,
-            onDismissRequest = { showVoucherDialog = false }
+            onDismissRequest = { isVoucherDialogVisible = false }
         )
     }
 
-    if (showEventDetailsBottomSheet) {
+    if (isEventDetailsBottomSheetVisible) {
         EventDetailsBottomSheet(
-            eventId = eventId,
-            onDismissRequest = { showEventDetailsBottomSheet = false }
+            eventId = selectedEventId,
+            onDismissRequest = { isEventDetailsBottomSheetVisible = false }
         )
     }
 
-    if (showReminderOptionDialog) {
+    if (showReminderDialog) {
         BasicAlertDialog(
             title = "\"NFQ-summit\" Would Like to Send You Notifications",
             body = "Receive reminders 45 minutes and 10 minutes before registered Summit events and saved Tech Rock events start",
@@ -174,9 +163,10 @@ fun HomeTab(
                                 eventName = event.name,
                                 eventId = event.id,
                                 notificationPermissionState = notificationPermissionState,
-                                showNotificationRequest = { showNotificationRequest = it },
+                                showNotificationRequest = { isNotificationRequestVisible = it },
+                                showAlarmRequest = { isAlarmRequestVisible = it },
                                 permissionLauncher = {
-                                    permissionLauncher.launch(permission)
+                                    permissionLauncher.launch(notificationPermission)
                                 },
                                 updateNotificationSetting = {
                                     viewModel.updateNotificationSetting(
@@ -201,40 +191,13 @@ fun HomeTab(
         )
     }
 
-    if (showNotificationRequest) {
-        BasicAlertDialog(
-            title = "Allow notification permission",
-            body = "This app requires notification permission to show you reminders of your saved events",
-            dismissButtonText = "Deny",
-            dismissButton = { showNotificationRequest = false },
-            confirmButtonText = "Allow",
-            confirmButton = {
-                showNotificationRequest = false
-                context.startActivity(
-                    Intent(
-                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                        Uri.parse("package:${context.packageName}")
-                    ).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                )
-            }
-        )
-    }
-
-    if (showAlarmRequest) {
-        BasicAlertDialog(
-            title = "Allow alarm permission",
-            body = "This app requires alarm permission to show you reminders of your saved events",
-            dismissButtonText = "Deny",
-            dismissButton = { showAlarmRequest = false },
-            confirmButtonText = "Allow",
-            confirmButton = {
-                alarmScheduler.scheduleAlarm()
-                showAlarmRequest = false
-            }
-        )
-    }
+    HandlePermissionDialogs(
+        pendingAction = pendingAction,
+        isNotificationRequestVisible = isNotificationRequestVisible,
+        isAlarmRequestVisible = isAlarmRequestVisible,
+        onShowNotificationRequest = { isNotificationRequestVisible = it },
+        onShowAlarmRequest = { isAlarmRequestVisible = it }
+    )
 
     HomeTabUI(
         uiState = uiState,
@@ -249,9 +212,10 @@ fun HomeTab(
                     eventName = event.name,
                     eventId = event.id,
                     notificationPermissionState = notificationPermissionState,
-                    showNotificationRequest = { showNotificationRequest = it },
+                    showNotificationRequest = { isNotificationRequestVisible = it },
+                    showAlarmRequest = { isAlarmRequestVisible = it },
                     markEventAsFavorite = viewModel::markAsFavorite,
-                    permissionLauncher = { permissionLauncher.launch(permission) }
+                    permissionLauncher = { permissionLauncher.launch(notificationPermission) }
                 )
             }
             pendingAction?.invoke()
@@ -259,14 +223,14 @@ fun HomeTab(
         seeAllSavedEvents = seeAllSavedEvents,
         seeAllEvents = seeAllEvents,
         goToDetails = {
-            eventId = it
-            showEventDetailsBottomSheet = true
+            selectedEventId = it
+            isEventDetailsBottomSheetVisible = true
         },
         onShowVoucher = {
-            showVoucherDialog = true
+            isVoucherDialogVisible = true
         },
         onShowQRCode = {
-            showQRCodeBottomSheet = true
+            isQRCodeBottomSheetVisible = true
         }
     )
 }

@@ -81,70 +81,40 @@ fun EventDetailsBottomSheet(
     onDismissRequest: () -> Unit
 ) {
     val skipPartiallyExpanded by remember { mutableStateOf(false) }
-
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    var showAlarmRequest by remember { mutableStateOf(false) }
-    var showNotificationRequest by remember { mutableStateOf(false) }
+    var isAlarmRequestVisible by remember { mutableStateOf(false) }
+    var isNotificationRequestVisible by remember { mutableStateOf(false) }
     var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
-    val alarmScheduler = rememberAlarmScheduler(
-        onAlarmSet = { pendingAction?.invoke() },
-        onPermissionDenied = {}
-    )
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            showAlarmRequest = true
+            isAlarmRequestVisible = true
         }
     }
     val viewModel: EventDetailsBottomSheetViewModel = hiltViewModel()
 
-    LaunchedEffect(key1 = eventId) {
+    LaunchedEffect(eventId) {
         viewModel.getEvent(eventId)
     }
 
-    val permission =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS
-        else Manifest.permission.ACCESS_NOTIFICATION_POLICY
+    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        Manifest.permission.POST_NOTIFICATIONS
+    } else {
+        Manifest.permission.ACCESS_NOTIFICATION_POLICY
+    }
     val notificationPermissionState = rememberPermissionState(permission = permission)
 
-
-    if (showNotificationRequest) {
-        BasicAlertDialog(
-            title = "Allow notification permission",
-            body = "This app requires notification permission to show you reminders of your saved events",
-            dismissButtonText = "Deny",
-            dismissButton = { showNotificationRequest = false },
-            confirmButtonText = "Allow",
-            confirmButton = {
-                showNotificationRequest = false
-                context.startActivity(
-                    Intent(
-                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                        Uri.parse("package:${context.packageName}")
-                    ).apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                )
-            }
-        )
-    }
-
-    if (showAlarmRequest) {
-        BasicAlertDialog(
-            title = "Allow alarm permission",
-            body = "This app requires alarm permission to show you reminders of your saved events",
-            dismissButtonText = "Deny",
-            dismissButton = { showAlarmRequest = false },
-            confirmButtonText = "Allow",
-            confirmButton = {
-                alarmScheduler.scheduleAlarm()
-                showAlarmRequest = false
-            }
-        )
-    }
+    HandlePermissionDialogs(
+        pendingAction = pendingAction,
+        isNotificationRequestVisible = isNotificationRequestVisible,
+        isAlarmRequestVisible = isAlarmRequestVisible,
+        onShowNotificationRequest = { isNotificationRequestVisible = it },
+        onShowAlarmRequest = { isAlarmRequestVisible = it }
+    )
 
     BasicModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -161,9 +131,10 @@ fun EventDetailsBottomSheet(
                                 eventName = event.name,
                                 eventId = event.id,
                                 notificationPermissionState = notificationPermissionState,
-                                showNotificationRequest = { showNotificationRequest = it },
+                                showNotificationRequest = { isNotificationRequestVisible = it },
+                                showAlarmRequest = { isAlarmRequestVisible = it },
                                 markEventAsFavorite = viewModel::markEventAsFavorite,
-                                permissionLauncher = { permissionLauncher.launch(permission) },
+                                permissionLauncher = { permissionLauncher.launch(permission) }
                             )
                         }
                         pendingAction?.invoke()
@@ -185,6 +156,55 @@ fun EventDetailsBottomSheet(
     )
 }
 
+@Composable
+fun HandlePermissionDialogs(
+    isNotificationRequestVisible: Boolean,
+    isAlarmRequestVisible: Boolean,
+    pendingAction: (() -> Unit)? = null,
+    onShowNotificationRequest: (Boolean) -> Unit,
+    onShowAlarmRequest: (Boolean) -> Unit
+) {
+    val context = LocalContext.current
+    val alarmScheduler = rememberAlarmScheduler(
+        onAlarmSet = { pendingAction?.invoke() },
+        onPermissionDenied = {}
+    )
+    if (isNotificationRequestVisible) {
+        BasicAlertDialog(
+            title = "Allow notification permission",
+            body = "This app requires notification permission to show you reminders of your saved events",
+            dismissButtonText = "Deny",
+            dismissButton = { onShowNotificationRequest(false) },
+            confirmButtonText = "Allow",
+            confirmButton = {
+                onShowNotificationRequest(false)
+                context.startActivity(
+                    Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:${context.packageName}")
+                    ).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                )
+            }
+        )
+    }
+
+    if (isAlarmRequestVisible) {
+        BasicAlertDialog(
+            title = "Allow alarm permission",
+            body = "This app requires alarm permission to show you reminders of your saved events",
+            dismissButtonText = "Deny",
+            dismissButton = { onShowAlarmRequest(false) },
+            confirmButtonText = "Allow",
+            confirmButton = {
+                alarmScheduler.scheduleAlarm()
+                onShowAlarmRequest(false)
+            }
+        )
+    }
+}
+
 fun setUpScheduler(
     context: Context,
     setReminder: Boolean,
@@ -193,18 +213,29 @@ fun setUpScheduler(
     eventId: String,
     notificationPermissionState: PermissionState,
     showNotificationRequest: (Boolean) -> Unit,
+    showAlarmRequest: (Boolean) -> Unit,
     markEventAsFavorite: (isFavorite: Boolean, eventId: String) -> Unit = { _, _ -> },
     updateNotificationSetting: () -> Unit = {},
     permissionLauncher: () -> Unit = {}
 ) {
-
-
     if (!notificationPermissionState.status.isGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         if (notificationPermissionState.status.shouldShowRationale) {
             showNotificationRequest(true)
         } else {
-            permissionLauncher.invoke()
+            permissionLauncher()
         }
+        return
+    }
+
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    val hasAlarmPermission = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+        true
+    } else {
+        alarmManager.canScheduleExactAlarms()
+    }
+
+    if (!hasAlarmPermission) {
+        showAlarmRequest(true)
         return
     }
 
@@ -249,7 +280,7 @@ fun rememberAlarmScheduler(
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
+    ) { _ ->
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             when {
                 alarmManager.canScheduleExactAlarms() -> onAlarmSet()

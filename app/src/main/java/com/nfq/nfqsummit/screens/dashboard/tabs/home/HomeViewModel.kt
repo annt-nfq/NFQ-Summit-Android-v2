@@ -29,7 +29,7 @@ class HomeViewModel @Inject constructor(
     private val loadingFlow = MutableStateFlow(false)
     private val vouchersFlow = MutableStateFlow<List<VoucherModel>>(emptyList())
 
-    val showReminderOptionDialog = combine(
+    val showReminderDialog = combine(
         repository.user,
         repository.isShownNotificationPermissionDialog
     ) { user, isShownNotificationPermissionDialog ->
