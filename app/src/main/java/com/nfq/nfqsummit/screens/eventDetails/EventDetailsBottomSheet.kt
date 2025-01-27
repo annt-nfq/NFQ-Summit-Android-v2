@@ -427,8 +427,8 @@ private fun EventDetailsUI(
                             isFavorite = event.isFavorite,
                             id = event.id,
                             markAsFavorite = markAsFavorite,
-                            iconTint = Color.White,
-                            backgroundColor = MaterialTheme.colorScheme.primary
+                            iconTint = if (event.isFavorite) Color.White else MaterialTheme.colorScheme.primary,
+                            backgroundColor = if (event.isFavorite) MaterialTheme.colorScheme.primary else Color.Transparent
                         )
                         Box(
                             contentAlignment = Alignment.Center,

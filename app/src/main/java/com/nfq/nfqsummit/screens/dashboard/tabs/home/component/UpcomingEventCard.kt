@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalLayoutApi::class)
-
 package com.nfq.nfqsummit.screens.dashboard.tabs.home.component
 
 import androidx.compose.foundation.Image
@@ -7,9 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,8 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -34,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.nfq.data.domain.model.CategoryEnum
+import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
@@ -74,26 +70,29 @@ fun UpcomingEventCard(
                     markAsFavorite = markAsFavorite,
                 )
 
-                Text(
-                    text = uiModel.date,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.background,
-                        textAlign = TextAlign.Center,
-                        lineHeight = 1.em,
-                        platformStyle = PlatformTextStyle(
-                            includeFontPadding = false
-                        ),
-                    ),
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .padding(8.dp)
                         .sizeIn(minWidth = 45.dp, minHeight = 45.dp)
-                        .clip(RoundedCornerShape(7.dp))
-                        .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
-                        .background(color = Color(0xFFC8C6C7))
                         .align(Alignment.TopStart)
                         .padding(8.dp)
-                )
-
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.bg_date),
+                        contentDescription = "bg_date",
+                    )
+                    Text(
+                        text = uiModel.date,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.background,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 1.em,
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            ),
+                        )
+                    )
+                }
             }
             Text(
                 text = uiModel.name,
