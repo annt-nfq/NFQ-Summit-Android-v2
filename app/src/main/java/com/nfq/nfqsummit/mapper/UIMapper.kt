@@ -1,5 +1,6 @@
 package com.nfq.nfqsummit.mapper
 
+import android.graphics.Bitmap
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
 import com.nfq.data.domain.model.CategoryEnum
@@ -94,12 +95,13 @@ private fun CategoryResponse?.toCategoryType(genre: GenreResponse?): CategoryTyp
     }
 }
 
-fun UserEntity.toUserUIModel(): UserUIModel {
+fun UserEntity.toUserUIModel(qrCodeBitmap: Bitmap?): UserUIModel {
     return UserUIModel(
         id = id,
         name = "$firstName $lastName",
         email = email,
         qrCodeUrl = qrCodeUrl,
-        attendeeCode = attendeeCode
+        attendeeCode = attendeeCode,
+        qrCodeBitmap = qrCodeBitmap
     )
 }

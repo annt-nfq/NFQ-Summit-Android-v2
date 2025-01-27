@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,10 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
-import com.nfq.nfqsummit.components.CachedNetworkImage
-import com.nfq.nfqsummit.components.ImageCache
 import com.nfq.nfqsummit.components.bounceClick
-import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.model.UserUIModel
 import com.nfq.nfqsummit.openWhatsapp
 import com.nfq.nfqsummit.ui.theme.MainGreen
@@ -106,12 +104,15 @@ private fun QRCodeContent(
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.onPrimary)
                 .padding(6.dp)
+                .size(220.dp)
         ) {
-            CachedNetworkImage(
-                imageUrl = userUIModel.qrCodeUrl,
-                contentDescription = null,
-                modifier = Modifier.size(220.dp)
-            )
+            userUIModel.qrCodeBitmap?.asImageBitmap()?.let {
+                Image(
+                    bitmap = it,
+                    contentDescription = null,
+                    modifier = Modifier.size(220.dp)
+                )
+            }
         }
         Spacer(modifier = Modifier.height(24.dp))
         Text(
@@ -170,7 +171,8 @@ private fun QRCodeContentPreview() {
                 name = "Hermann Hauser",
                 attendeeCode = "255373826",
                 qrCodeUrl = "",
-                email = "wine@nfq.com"
+                email = "wine@nfq.com",
+                qrCodeBitmap = null
             )
         )
     }

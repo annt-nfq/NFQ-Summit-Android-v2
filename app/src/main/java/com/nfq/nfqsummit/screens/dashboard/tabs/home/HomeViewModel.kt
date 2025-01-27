@@ -1,10 +1,12 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.model.VoucherModel
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.data.filterOutTechRock
+import com.nfq.nfqsummit.components.ImageCache
 import com.nfq.nfqsummit.mapper.toSavedEventUIModels
 import com.nfq.nfqsummit.mapper.toUpcomingEventUIModels
 import com.nfq.nfqsummit.mapper.toUserUIModel
@@ -24,8 +26,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repository: NFQSummitRepository
-) : ViewModel() {
+    private val repository: NFQSummitRepository,
+    application: Application
+) : AndroidViewModel(application) {
     private val loadingFlow = MutableStateFlow(false)
     private val vouchersFlow = MutableStateFlow<List<VoucherModel>>(emptyList())
 
@@ -48,9 +51,12 @@ class HomeViewModel @Inject constructor(
         vouchersFlow
     ) { user, events, savedEvents, isLoading,vouchers ->
         val upcomingEvents = events.toUpcomingEventUIModels()
+        val qrCodeBitmap = user?.qrCodeUrl?.let {
+            ImageCache(context = application.applicationContext).getImage(it)
+        }
         HomeUIState(
             isLoading = isLoading,
-            user = user?.toUserUIModel(),
+            user = user?.toUserUIModel(qrCodeBitmap),
             upcomingEvents = upcomingEvents,
             upcomingEventsWithoutTechRocks = upcomingEvents.filter { it.category.code.filterOutTechRock() },
             savedEvents = savedEvents.toSavedEventUIModels(),
