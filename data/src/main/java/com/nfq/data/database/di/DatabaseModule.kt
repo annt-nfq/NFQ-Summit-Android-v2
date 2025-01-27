@@ -6,6 +6,7 @@ import com.nfq.data.database.dao.AttractionDao
 import com.nfq.data.database.dao.BlogDao
 import com.nfq.data.database.dao.EventDao
 import com.nfq.data.database.dao.UserDao
+import com.nfq.data.database.dao.VouchersDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,6 +54,12 @@ abstract class DatabaseModule {
         @Singleton
         fun provideBlogDao(appDatabase: AppDatabase): BlogDao {
             return appDatabase.blogDao()
+        }
+
+        @Provides
+        @Singleton
+        fun provideVouchersDao(appDatabase: AppDatabase): VouchersDao {
+            return appDatabase.vouchersDao()
         }
     }
 }

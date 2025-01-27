@@ -3,13 +3,14 @@ package com.nfq.data.domain.repository
 import arrow.core.Either
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
+import com.nfq.data.database.entity.VoucherEntity
 import com.nfq.data.domain.model.EventDetailsModel
-import com.nfq.data.domain.model.VoucherModel
 import com.nfq.data.network.exception.DataException
 import kotlinx.coroutines.flow.Flow
 
 interface NFQSummitRepository {
     val events: Flow<List<EventEntity>>
+    val vouchers: Flow<List<VoucherEntity>>
     val upcomingEvents: Flow<List<EventEntity>>
     val savedEvents: Flow<List<EventEntity>>
     val user: Flow<UserEntity?>
@@ -26,5 +27,6 @@ interface NFQSummitRepository {
         isShownNotificationPermissionDialog: Boolean,
         isEnabledNotification: Boolean
     )
-    suspend fun getMealVouchers(): Either<DataException, List<VoucherModel>>
+
+    suspend fun getMealVouchers(): Either<DataException, Unit>
 }

@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -39,7 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.nfq.data.domain.model.VoucherModel
+import com.nfq.nfqsummit.model.VoucherUIModel
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -47,7 +46,7 @@ import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 @Composable
 fun VouchersDialog(
     attendeeName: String,
-    vouchers: Map<String, List<VoucherModel>> = emptyMap(),
+    vouchers: Map<String, List<VoucherUIModel>> = emptyMap(),
     onDismissRequest: () -> Unit
 ) {
     Dialog(
@@ -68,7 +67,7 @@ fun VouchersDialog(
 @Composable
 private fun VouchersContent(
     attendeeName: String,
-    vouchers: Map<String, List<VoucherModel>>,
+    vouchers: Map<String, List<VoucherUIModel>>,
     onDismissRequest: () -> Unit = {}
 ) {
     Column(
@@ -178,7 +177,7 @@ fun Modifier.simpleVerticalScrollbar(
 
 
 val previewVouchers = listOf(
-    VoucherModel(
+    VoucherUIModel(
         type = "Lunch",
         date = "26th Feb 2025",
         location = "The Sentry",
@@ -186,7 +185,7 @@ val previewVouchers = listOf(
         imageUrl = "https://picsum.photos/200",
         sponsorLogoUrls = listOf("https://picsum.photos/200")
     ),
-    VoucherModel(
+    VoucherUIModel(
         type = "Snack",
         date = "27th Feb 2025",
         location = "The Sentry",

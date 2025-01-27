@@ -3,13 +3,14 @@ package com.nfq.nfqsummit.screens.dashboard.tabs.home
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.nfq.data.domain.model.VoucherModel
+import com.nfq.nfqsummit.model.VoucherUIModel
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.data.filterOutTechRock
 import com.nfq.nfqsummit.components.ImageCache
 import com.nfq.nfqsummit.mapper.toSavedEventUIModels
 import com.nfq.nfqsummit.mapper.toUpcomingEventUIModels
 import com.nfq.nfqsummit.mapper.toUserUIModel
+import com.nfq.nfqsummit.mapper.toVoucherUIModels
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.model.UserUIModel
@@ -30,7 +31,7 @@ class HomeViewModel @Inject constructor(
     application: Application
 ) : AndroidViewModel(application) {
     private val loadingFlow = MutableStateFlow(false)
-    private val vouchersFlow = MutableStateFlow<List<VoucherModel>>(emptyList())
+    private val vouchersFlow = MutableStateFlow<List<VoucherUIModel>>(emptyList())
 
     val showReminderDialog = combine(
         repository.user,
@@ -48,8 +49,8 @@ class HomeViewModel @Inject constructor(
         repository.upcomingEvents,
         repository.savedEvents,
         loadingFlow,
-        vouchersFlow
-    ) { user, events, savedEvents, isLoading,vouchers ->
+        repository.vouchers
+    ) { user, events, savedEvents, isLoading, vouchers ->
         val upcomingEvents = events.toUpcomingEventUIModels()
         val qrCodeBitmap = user?.qrCodeUrl?.let {
             ImageCache(context = application.applicationContext).getImage(it)
@@ -60,7 +61,7 @@ class HomeViewModel @Inject constructor(
             upcomingEvents = upcomingEvents,
             upcomingEventsWithoutTechRocks = upcomingEvents.filter { it.category.code.filterOutTechRock() },
             savedEvents = savedEvents.toSavedEventUIModels(),
-            vouchers = vouchers.groupBy { it.date }
+            vouchers = vouchers.toVoucherUIModels(application.applicationContext)
         )
     }.stateIn(
         scope = viewModelScope,
@@ -78,7 +79,6 @@ class HomeViewModel @Inject constructor(
             repository
                 .getMealVouchers()
                 .onLeft { e -> UserMessageManager.showMessage(e) }
-                .onRight { vouchersFlow.value = it }
         }
     }
 
@@ -124,7 +124,7 @@ class HomeViewModel @Inject constructor(
 
 data class HomeUIState(
     val user: UserUIModel? = null,
-    val vouchers: Map<String, List<VoucherModel>> = emptyMap(),
+    val vouchers: Map<String, List<VoucherUIModel>> = emptyMap(),
     val upcomingEvents: List<UpcomingEventUIModel> = emptyList(),
     val upcomingEventsWithoutTechRocks: List<UpcomingEventUIModel> = emptyList(),
     val savedEvents: List<SavedEventUIModel> = emptyList(),

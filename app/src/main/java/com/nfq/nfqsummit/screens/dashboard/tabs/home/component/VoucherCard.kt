@@ -3,6 +3,7 @@ package com.nfq.nfqsummit.screens.dashboard.tabs.home.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -21,24 +22,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nfq.data.domain.model.VoucherModel
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicCard
-import com.nfq.nfqsummit.components.CachedNetworkImage
 import com.nfq.nfqsummit.components.networkImagePainter
+import com.nfq.nfqsummit.model.VoucherUIModel
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VoucherCard(
     attendeeName: String,
-    model: VoucherModel
+    model: VoucherUIModel
 ) {
     BasicCard(
         modifier = Modifier.fillMaxWidth(),
@@ -91,24 +92,21 @@ fun VoucherCard(
                 }
 
             }
-            CachedNetworkImage(
-                imageUrl = model.imageUrl,
-                contentDescription = "voucher_image",
-                contentScale = ContentScale.Crop,
+
+            Box(
                 modifier = Modifier
                     .padding(32.dp)
                     .clip(CircleShape)
                     .aspectRatio(230f / 230f)
-            )
-            /*Image(
-                painter = networkImagePainter(model.imageUrl),
-                contentDescription = "voucher_image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .padding(32.dp)
-                    .clip(CircleShape)
-                    .aspectRatio(230f / 230f)
-            )*/
+            ) {
+                model.imageBitmap?.asImageBitmap()?.let {
+                    Image(
+                        bitmap = it,
+                        contentDescription = "voucher_image",
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
 
             Text(
                 text = model.date,
@@ -174,12 +172,13 @@ private fun VoucherCardPreview() {
     NFQSnapshotTestThemeForPreview {
         VoucherCard(
             attendeeName = "Pattarawit Gochgornkamud",
-            model = VoucherModel(
+            model = VoucherUIModel(
                 type = "Lunch",
                 date = "26th Feb 2025",
                 location = "The Sentry",
                 price = "350.000",
                 imageUrl = "https://picsum.photos/200",
+                imageBitmap = null,
                 sponsorLogoUrls = listOf("https://picsum.photos/200")
             )
         )

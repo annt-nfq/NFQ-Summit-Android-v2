@@ -3,11 +3,12 @@ package com.nfq.data.remote.repository
 import arrow.core.Either
 import com.nfq.data.database.dao.EventDao
 import com.nfq.data.database.dao.UserDao
+import com.nfq.data.database.dao.VouchersDao
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
+import com.nfq.data.database.entity.VoucherEntity
 import com.nfq.data.datastore.PreferencesDataSource
 import com.nfq.data.domain.model.EventDetailsModel
-import com.nfq.data.domain.model.VoucherModel
 import com.nfq.data.domain.repository.NFQSummitRepository
 import com.nfq.data.mapper.toEventDetailsModel
 import com.nfq.data.mapper.toEventEntity
@@ -26,10 +27,13 @@ class NFQSummitRepositoryImpl @Inject constructor(
     private val dataSource: NFQSummitDataSource,
     private val preferencesDataSource: PreferencesDataSource,
     private val eventDao: EventDao,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val vouchersDao: VouchersDao
 ) : NFQSummitRepository {
     override val events: Flow<List<EventEntity>>
         get() = eventDao.getAllEvents()
+    override val vouchers: Flow<List<VoucherEntity>>
+        get() = vouchersDao.getVouchers()
     override val upcomingEvents: Flow<List<EventEntity>>
         get() = eventDao.getUpcomingEvents(currentTime = System.currentTimeMillis())
     override val savedEvents: Flow<List<EventEntity>>
@@ -137,18 +141,20 @@ class NFQSummitRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getMealVouchers(): Either<DataException, List<VoucherModel>> {
+    override suspend fun getMealVouchers(): Either<DataException, Unit> {
         return dataSource
             .getMealVouchers()
             .map { response ->
-                response.map {
+                val voucherEntities = response.map {
                     val vietnamPriceFormatter = DecimalFormat("#,###").apply {
                         decimalFormatSymbols = DecimalFormatSymbols().apply {
                             groupingSeparator = '.'
                             decimalSeparator = ','
                         }
                     }
-                    VoucherModel(
+
+                    VoucherEntity(
+                        id = it.id.toString(),
                         type = it.type,
                         date = it.date,
                         location = it.locations.joinToString(", ") { location -> location.name },
@@ -157,6 +163,7 @@ class NFQSummitRepositoryImpl @Inject constructor(
                         sponsorLogoUrls = it.sponsorLogoUrls
                     )
                 }
+                vouchersDao.insertVouchers(voucherEntities)
             }
     }
 }

@@ -1,8 +1,10 @@
 package com.nfq.nfqsummit.mapper
 
+import android.content.Context
 import android.graphics.Bitmap
 import com.nfq.data.database.entity.EventEntity
 import com.nfq.data.database.entity.UserEntity
+import com.nfq.data.database.entity.VoucherEntity
 import com.nfq.data.domain.model.CategoryEnum
 import com.nfq.data.domain.model.CategoryType
 import com.nfq.data.domain.model.SummitEvent
@@ -10,12 +12,29 @@ import com.nfq.data.remote.model.response.CategoryResponse
 import com.nfq.data.remote.model.response.GenreResponse
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTime
+import com.nfq.nfqsummit.components.ImageCache
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.model.UserUIModel
+import com.nfq.nfqsummit.model.VoucherUIModel
 
 fun List<EventEntity>.toSavedEventUIModels(): List<SavedEventUIModel> {
     return this.map { it.toSavedEventUIModel() }
+}
+
+suspend fun List<VoucherEntity>.toVoucherUIModels(context: Context): Map<String,List<VoucherUIModel>> {
+    val imageCache =  ImageCache(context = context)
+    return this.map {
+        VoucherUIModel(
+            type = it.type,
+            date = it.date,
+            location = it.location,
+            price = it.price,
+            imageUrl = it.imageUrl,
+            imageBitmap = imageCache.getImage(it.imageUrl),
+            sponsorLogoUrls = it.sponsorLogoUrls
+        )
+    }.groupBy { it.date }
 }
 
 private fun EventEntity.toSavedEventUIModel(): SavedEventUIModel {
