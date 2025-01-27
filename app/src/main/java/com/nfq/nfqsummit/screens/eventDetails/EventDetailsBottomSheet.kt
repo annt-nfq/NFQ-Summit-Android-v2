@@ -392,8 +392,6 @@ private fun EventDetailsUI(
                     modifier = Modifier
                         .padding(vertical = 32.dp)
                         .padding(horizontal = 24.dp)
-                        .verticalScroll(rememberScrollState())
-
                 ) {
                     Text(
                         text = event.name,
@@ -458,30 +456,35 @@ private fun EventDetailsUI(
                             )
                         }
                     }
-
                     Text(
                         text = "Please show your QR code to our staff\nfor check-in",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 24.dp)
                     )
-                    if (event.description.isNotEmpty()) {
-                        HtmlText(
-                            html = event.description,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(top = 24.dp)
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 24.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+
+                        if (event.description.isNotEmpty()) {
+                            HtmlText(
+                                html = event.description,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+
+                        Image(
+                            painter = networkImagePainter(event.coverPhotoUrl),
+                            contentDescription = event.name,
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 24.dp)
+                                .clip(MaterialTheme.shapes.small)
                         )
                     }
-
-                    Image(
-                        painter = networkImagePainter(event.coverPhotoUrl),
-                        contentDescription = event.name,
-                        contentScale = ContentScale.FillWidth,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 24.dp)
-                            .clip(MaterialTheme.shapes.small)
-                    )
                 }
             }
         }
