@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.nfq.data.domain.model.VoucherModel
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicCard
+import com.nfq.nfqsummit.components.CachedNetworkImage
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
@@ -90,8 +91,8 @@ fun VoucherCard(
                 }
 
             }
-            Image(
-                painter = networkImagePainter(model.imageUrl),
+            CachedNetworkImage(
+                imageUrl = model.imageUrl,
                 contentDescription = "voucher_image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -99,6 +100,15 @@ fun VoucherCard(
                     .clip(CircleShape)
                     .aspectRatio(230f / 230f)
             )
+            /*Image(
+                painter = networkImagePainter(model.imageUrl),
+                contentDescription = "voucher_image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .padding(32.dp)
+                    .clip(CircleShape)
+                    .aspectRatio(230f / 230f)
+            )*/
 
             Text(
                 text = model.date,

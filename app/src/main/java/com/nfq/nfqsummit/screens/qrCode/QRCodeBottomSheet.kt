@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
+import com.nfq.nfqsummit.components.CachedNetworkImage
+import com.nfq.nfqsummit.components.ImageCache
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.model.UserUIModel
@@ -105,8 +107,8 @@ private fun QRCodeContent(
                 .background(MaterialTheme.colorScheme.onPrimary)
                 .padding(6.dp)
         ) {
-            Image(
-                painter = networkImagePainter(userUIModel.qrCodeUrl),
+            CachedNetworkImage(
+                imageUrl = userUIModel.qrCodeUrl,
                 contentDescription = null,
                 modifier = Modifier.size(220.dp)
             )
