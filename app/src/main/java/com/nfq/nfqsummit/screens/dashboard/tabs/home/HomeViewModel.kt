@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,7 +32,6 @@ class HomeViewModel @Inject constructor(
     application: Application
 ) : AndroidViewModel(application) {
     private val loadingFlow = MutableStateFlow(false)
-    private val vouchersFlow = MutableStateFlow<List<VoucherUIModel>>(emptyList())
 
     val showReminderDialog = combine(
         repository.user,
@@ -44,24 +44,39 @@ class HomeViewModel @Inject constructor(
         initialValue = false
     )
 
-    val uiState = combine(
-        repository.user,
-        repository.upcomingEvents,
-        repository.savedEvents,
-        loadingFlow,
-        repository.vouchers
-    ) { user, events, savedEvents, isLoading, vouchers ->
-        val upcomingEvents = events.toUpcomingEventUIModels()
-        val qrCodeBitmap = user?.qrCodeUrl?.let {
-            ImageCache(context = application.applicationContext).getImage(it)
+    private val userFlow = repository.user.map {
+        val qrCodeBitmap = it
+            ?.qrCodeUrl
+            ?.let { url -> ImageCache(context = application.applicationContext).getImage(url) }
+        it?.toUserUIModel(qrCodeBitmap)
+    }
+
+    private val upcomingEventsFlow = repository
+        .upcomingEvents
+        .map { events ->
+            events
+                .toUpcomingEventUIModels()
+                .filter { it.category.code.filterOutTechRock() }
         }
+
+    private val savedEventsFlow = repository
+        .savedEvents
+        .map { it.toSavedEventUIModels() }
+
+    val uiState = combine(
+        userFlow,
+        upcomingEventsFlow,
+        savedEventsFlow,
+        loadingFlow,
+        repository.vouchers.map { it.toVoucherUIModels(application.applicationContext) }
+    ) { user, upcomingEvents, savedEvents, isLoading, vouchers ->
         HomeUIState(
             isLoading = isLoading,
-            user = user?.toUserUIModel(qrCodeBitmap),
+            user = user,
             upcomingEvents = upcomingEvents,
-            upcomingEventsWithoutTechRocks = upcomingEvents.filter { it.category.code.filterOutTechRock() },
-            savedEvents = savedEvents.toSavedEventUIModels(),
-            vouchers = vouchers.toVoucherUIModels(application.applicationContext)
+            upcomingEventsWithoutTechRocks = upcomingEvents,
+            savedEvents = savedEvents,
+            vouchers = vouchers
         )
     }.stateIn(
         scope = viewModelScope,
