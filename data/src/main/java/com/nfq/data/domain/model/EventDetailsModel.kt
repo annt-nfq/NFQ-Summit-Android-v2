@@ -13,4 +13,6 @@ data class EventDetailsModel(
     val longitude: Double?,
     val coverPhotoUrl: String,
     val isFavorite: Boolean,
+    val speakerName: String,
+    val speakerAvatar: String
 )

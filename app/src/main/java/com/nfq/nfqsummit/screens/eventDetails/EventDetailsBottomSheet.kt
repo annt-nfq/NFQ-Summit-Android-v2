@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -456,6 +458,29 @@ private fun EventDetailsUI(
                             )
                         }
                     }
+
+                    if (event.speakerName.isNotBlank()) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            Image(
+                                painter = networkImagePainter(event.speakerAvatar),
+                                contentDescription = event.speakerName,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                            )
+                            Text(
+                                text = event.speakerName,
+                                style = MaterialTheme.typography.displaySmall,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+
                     Text(
                         text = "Please show your QR code to our staff\nfor check-in",
                         style = MaterialTheme.typography.bodyMedium,
@@ -508,7 +533,9 @@ private fun EventDetailsPreview() {
                 startDateTime = LocalDateTime.now(),
                 startTime = LocalDateTime.now().format(
                     DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")
-                )
+                ),
+                speakerName = "Speaker Name",
+                speakerAvatar = "https://www.example.com/avatar.jpg"
             ),
 
             markAsFavorite = { _, _ -> },

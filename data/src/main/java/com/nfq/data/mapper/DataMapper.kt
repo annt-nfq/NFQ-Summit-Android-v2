@@ -88,7 +88,9 @@ fun EventEntity.toEventDetailsModel(): EventDetailsModel {
         latitude = latitude,
         longitude = longitude,
         isFavorite = isFavorite,
-        coverPhotoUrl = images.find { image -> image.isNotBlank() }.orEmpty()
+        coverPhotoUrl = images.find { image -> image.isNotBlank() }.orEmpty(),
+        speakerName = speaker?.name.orEmpty(),
+        speakerAvatar = speaker?.avatar.orEmpty()
     )
 }
 
