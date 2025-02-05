@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +41,7 @@ import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.model.UserUIModel
+import com.nfq.nfqsummit.openWhatsAppGroupInvite
 import com.nfq.nfqsummit.openWhatsapp
 import com.nfq.nfqsummit.ui.theme.MainGreen
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -67,7 +69,8 @@ private fun QRCodeContent(
     userUIModel: UserUIModel
 ) {
     val context = LocalContext.current
-    val phoneNumber = "+76 333 2145"
+    val phoneNumber = "+84935398381"
+    val inviteLink = "https://chat.whatsapp.com/ILhBY3rbIgcBzXK8NEVznv?omnisendContactID=67933c55d43ef2126b[…]3b4c5bcdefa31082b27d%29&utm_medium=email&utm_source=omnisend"
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -122,9 +125,9 @@ private fun QRCodeContent(
             color = MaterialTheme.colorScheme.onPrimary,
             textAlign = TextAlign.Center,
         )
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "Please ensure you’ve reserved a seat for each event. For assistance, contact Tris on WhatsApp.",
+            text = "Please ensure you’ve reserved a seat for each event. For assistance, join our Summit guests' WhatsApp group or contact Tris.",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Normal,
             color = MaterialTheme.colorScheme.onPrimary,
@@ -136,9 +139,34 @@ private fun QRCodeContent(
                 .bounceClick()
                 .clip(RoundedCornerShape(100.dp))
                 .background(MainGreen)
-                .clickable { context.openWhatsapp(phoneNumber) }
+                .clickable { context.openWhatsAppGroupInvite(inviteLink) }
                 .padding(horizontal = 16.dp, vertical = 8.dp)
 
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_whatsapp),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "NFQ Summit 2025 Chat",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.background
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .bounceClick()
+                .clip(RoundedCornerShape(100.dp))
+                .clickable { context.openWhatsapp(phoneNumber) }
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -153,7 +181,8 @@ private fun QRCodeContent(
                     text = phoneNumber,
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.background,
+                    textDecoration = TextDecoration.Underline
                 )
             }
         }

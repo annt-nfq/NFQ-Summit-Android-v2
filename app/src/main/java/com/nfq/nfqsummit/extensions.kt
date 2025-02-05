@@ -32,3 +32,17 @@ fun Context.openWhatsapp(phoneNumber: String) {
     intent.data = Uri.parse("https://wa.me/$phoneNumber")
     startActivity(intent)
 }
+
+fun Context.openWhatsAppGroupInvite(inviteLink: String) {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(inviteLink)
+            `package` = "com.whatsapp"  // Specify WhatsApp package
+        }
+        startActivity(intent)
+    } catch (e: Exception) {
+        // WhatsApp is not installed, open in browser instead
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(inviteLink))
+        startActivity(browserIntent)
+    }
+}
