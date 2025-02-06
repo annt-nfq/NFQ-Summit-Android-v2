@@ -473,14 +473,14 @@ private fun LazyListScope.savedEventSection(
                         .fillMaxWidth()
                 ) {
                     Text(
-                        "No Saved Event!",
+                        "No Saved Events",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold
                         )
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "You have not marked any favorites",
+                        "Bookmark your must-attend sessions for easy access!",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onBackground.copy(0.5f)
                     )
