@@ -466,7 +466,9 @@ private fun EventDetailsUI(
                             modifier = Modifier.padding(top = 8.dp)
                         ) {
                             Image(
-                                painter = networkImagePainter(event.speakerAvatar),
+                                painter = if (event.speakerAvatar.isNotBlank())
+                                    networkImagePainter(event.speakerAvatar) else
+                                    painterResource(id = R.drawable.ic_user),
                                 contentDescription = event.speakerName,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
@@ -535,7 +537,7 @@ private fun EventDetailsPreview() {
                     DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")
                 ),
                 speakerName = "Speaker Name",
-                speakerAvatar = "https://www.example.com/avatar.jpg"
+                speakerAvatar = ""
             ),
 
             markAsFavorite = { _, _ -> },

@@ -1,5 +1,6 @@
 package com.nfq.nfqsummit.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nfq.data.domain.model.SummitEvent
+import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.model.EventSize
 import com.nfq.nfqsummit.model.PositionedEvent
 import com.nfq.nfqsummit.model.SplitType
@@ -172,32 +175,36 @@ fun BasicEvent(
                 modifier = Modifier.padding(end = end)
             )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.padding(top = if (eventSize == EventSize.Small) 2.dp else 6.dp)
-            ) {
-                if (event.speakerAvatar.isNotBlank())
-                    AsyncImage(
+            if (event.speakerName.isNotBlank()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.padding(top = if (eventSize == EventSize.Small) 2.dp else 6.dp)
+                ) {
+                    Image(
+                        painter = if (event.speakerAvatar.isNotBlank())
+                            networkImagePainter(event.speakerAvatar) else
+                            painterResource(id = R.drawable.ic_user),
+                        contentDescription = event.speakerName,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(21.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFE6E6E6)),
-                        model = event.speakerAvatar,
-                        contentDescription = "speaker profile",
-                        contentScale = ContentScale.Crop
+                            .background(Color(0xFFE6E6E6))
                     )
-                if (event.speakerName.isNotBlank())
-                    Text(
-                        text = event.speakerName,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontSize = 10.sp,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Start,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
+
+                    if (event.speakerName.isNotBlank())
+                        Text(
+                            text = event.speakerName,
+                            style = MaterialTheme.typography.bodySmall,
+                            fontSize = 10.sp,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Start,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                }
             }
         }
     }
