@@ -483,22 +483,22 @@ private fun EventDetailsUI(
                         }
                     }
 
-                    Text(
-                        text = "Please show your QR code to our staff\nfor check-in",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 24.dp)
-                    )
                     Column(
                         modifier = Modifier
                             .padding(top = 24.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
+                        Text(
+                            text = "Please show your QR code to our staff\nfor check-in",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
 
                         if (event.description.isNotEmpty()) {
                             HtmlText(
                                 html = event.description,
                                 style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(top = 24.dp)
                             )
                         }
 
