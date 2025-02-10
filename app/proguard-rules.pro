@@ -107,3 +107,35 @@
 
 # Keep custom exceptions
 -keep public class * extends java.lang.Exception
+
+##--------------- OKHTTP3 ------------
+#Source : https://github.com/square/okhttp/
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+# A resource is loaded with a relative path so the package of this class must be preserved.
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
+##--------------- OKHTTP3 ------------
+
+
+##--------------- Retrofit2 ------------
+#Source : https://github.com/square/retrofit#proguard
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-keep class com.squareup.okhttp.** { *; }
+-keep interface com.squareup.okhttp.** { *; }
+
+# Keep generic signature of Call, Response (R8 full mode strips signatures from non-kept items).
+ -keep,allowobfuscation,allowshrinking interface retrofit2.Call
+ -keep,allowobfuscation,allowshrinking class retrofit2.Response
+
+ # With R8 full mode generic signatures are stripped for classes that are not
+ # kept. Suspend functions are wrapped in continuations where the type argument
+ # is used.
+ -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+##--------------- Retrofit2 ------------
+
+##--------------- sqlcipher ------------
+-keep class net.sqlcipher.** {
+    *;
+}

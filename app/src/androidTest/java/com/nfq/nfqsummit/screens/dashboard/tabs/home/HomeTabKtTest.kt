@@ -1,76 +1,200 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.home
 
-import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import com.nfq.data.domain.repository.BlogRepository
-import com.nfq.data.domain.repository.EventRepository
-import com.nfq.nfqsummit.MainActivity
+import com.nfq.data.network.di.RetrofitServiceModule
 import com.nfq.nfqsummit.di.DataSourceModule
-import com.nfq.nfqsummit.di.FakeBlogRepository
-import com.nfq.nfqsummit.di.FakeEventRepository
+import com.nfq.nfqsummit.di.FakeNFQSummitRepository
 import com.nfq.nfqsummit.di.NetworkModule
 import com.nfq.nfqsummit.di.RepositoryModule
+import com.nfq.nfqsummit.mocks.mockSavedEvents
+import com.nfq.nfqsummit.mocks.mockUpcomingEvents
+import com.nfq.nfqsummit.model.UserUIModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
-import kotlinx.coroutines.test.runTest
+import io.mockk.every
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-@UninstallModules(RepositoryModule::class, DataSourceModule::class, NetworkModule::class)
-class HomeTabKtTest {
+@UninstallModules(
+    RepositoryModule::class, DataSourceModule::class, NetworkModule::class,
+    RetrofitServiceModule::class
+)
+class HomeTabTest {
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
+    val composeTestRule = createComposeRule()
 
-    private lateinit var viewModel: HomeViewModel
-
-    private lateinit var eventRepository: EventRepository
-
-    private lateinit var blogRepository: BlogRepository
+    private lateinit var mockViewModel: HomeViewModel
 
     @Before
     fun setup() {
         hiltRule.inject()
 
-        eventRepository = FakeEventRepository()
-        blogRepository = FakeBlogRepository()
-        viewModel = HomeViewModel(eventRepository, blogRepository)
+        mockViewModel = HomeViewModel(FakeNFQSummitRepository())
 
-        composeTestRule.activity.runOnUiThread {
-            composeTestRule.activity.setContent {
+        composeTestRule.runOnUiThread {
+            composeTestRule.setContent {
                 HomeTab(
-                    viewModel = viewModel,
-                    goToEventDetails = {},
+                    viewModel = mockViewModel,
                     goToAttractions = {},
-                    goToBlog = {}
+                    goToSignIn = {}
                 )
             }
         }
     }
 
     @Test
-    fun showsOnlyFirstEventWhenCollapsed() = runTest {
-        composeTestRule.onNodeWithText("Event 1").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Event 2").assertIsNotDisplayed()
-        composeTestRule.onNodeWithText("Event 3").assertIsNotDisplayed()
+    fun homeTab_displaysUpcomingEvents() {
+        // Arrange
+        val uiState = MutableStateFlow(
+            HomeUIState(
+                upcomingEvents = mockUpcomingEvents,
+                savedEvents = mockSavedEvents,
+                isLoading = false
+            )
+        )
+        every { mockViewModel.uiState } returns uiState
+
+        // Act
+        composeTestRule.setContent {
+            HomeTab(
+                viewModel = mockViewModel,
+                goToAttractions = {},
+                seeAllEvents = {},
+                seeAllSavedEvents = {},
+                goToSignIn = {}
+            )
+        }
+
+        // Assert
+        mockUpcomingEvents.forEach { event ->
+            composeTestRule.onNodeWithText(event.name).assertIsDisplayed()
+        }
     }
 
     @Test
-    fun showsThreeEventsWhenExpanded() = runTest {
-        composeTestRule.onNodeWithContentDescription("Expand/Collapse", ignoreCase = true)
-            .performClick()
-        composeTestRule.onNodeWithText("Event 1").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Event 2").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Event 3").assertIsDisplayed()
+    fun homeTab_displaysSavedEvents() {
+        // Arrange
+        val uiState = MutableStateFlow(
+            HomeUIState(
+                upcomingEvents = mockUpcomingEvents,
+                savedEvents = mockSavedEvents,
+                isLoading = false
+            )
+        )
+        every { mockViewModel.uiState } returns uiState
+
+        // Act
+        composeTestRule.setContent {
+            HomeTab(
+                viewModel = mockViewModel,
+                goToAttractions = {},
+                seeAllEvents = {},
+                seeAllSavedEvents = {},
+                goToSignIn = {}
+            )
+        }
+
+        // Assert
+        mockSavedEvents.forEach { event ->
+            composeTestRule.onNodeWithText(event.name).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun homeTab_showsQRCodeSection_whenUserLoggedIn() {
+        // Arrange
+        val mockUser = UserUIModel(
+            id = "1",
+            name = "Test User",
+            email = "test@example.com",
+            qrCodeUrl = "https://example.com/qr",
+            attendeeCode = "1234"
+        )
+        val uiState = MutableStateFlow(
+            HomeUIState(
+                user = mockUser,
+                upcomingEvents = mockUpcomingEvents,
+                savedEvents = mockSavedEvents,
+                isLoading = false
+            )
+        )
+        every { mockViewModel.uiState } returns uiState
+
+        // Act
+        composeTestRule.setContent {
+            HomeTab(
+                viewModel = mockViewModel,
+                goToAttractions = {},
+                seeAllEvents = {},
+                seeAllSavedEvents = {},
+                goToSignIn = {}
+            )
+        }
+
+        // Assert
+        composeTestRule.onNodeWithText("Tap to show my QR Code").assertIsDisplayed()
+    }
+
+
+    @Test
+    fun homeTab_noSavedEvents_showsEmptyState() {
+        // Arrange
+        val uiState = MutableStateFlow(
+            HomeUIState(
+                upcomingEvents = mockUpcomingEvents,
+                savedEvents = emptyList(),
+                isLoading = false
+            )
+        )
+        every { mockViewModel.uiState } returns uiState
+
+        // Act
+        composeTestRule.setContent {
+            HomeTab(
+                viewModel = mockViewModel,
+                goToAttractions = {},
+                seeAllEvents = {},
+                seeAllSavedEvents = {},
+                goToSignIn = {}
+            )
+        }
+
+        // Assert
+        composeTestRule.onNodeWithText("No Favorites Yet!").assertIsDisplayed()
+        composeTestRule.onNodeWithText("View Attractions").assertIsDisplayed()
+    }
+
+    @Test
+    fun homeTab_loading_displaysLoadingIndicator() {
+        // Arrange
+        val uiState = MutableStateFlow(
+            HomeUIState(
+                isLoading = true
+            )
+        )
+        every { mockViewModel.uiState } returns uiState
+
+        // Act
+        composeTestRule.setContent {
+            HomeTab(
+                viewModel = mockViewModel,
+                goToAttractions = {},
+                seeAllEvents = {},
+                seeAllSavedEvents = {},
+                goToSignIn = {}
+            )
+        }
+
+        // Assert
+        composeTestRule.onNodeWithText("Loading").assertIsDisplayed()
     }
 }

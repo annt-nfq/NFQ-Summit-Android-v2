@@ -15,7 +15,9 @@ CREATE TABLE Event (
     speaker_name TEXT,
     speaker_position TEXT,
     speaker_bio TEXT,
-    icon TEXT
+    icon TEXT,
+    is_favorite INTEGER AS Boolean DEFAULT 0,
+    tag TEXT
 );
 
 CREATE TABLE FavoriteEvent(
@@ -51,9 +53,15 @@ DELETE FROM FavoriteEvent WHERE id = ?;
 getFavoriteEvent:
 SELECT FavoriteEvent.* FROM FavoriteEvent WHERE id = ?;
 
+getSavedEvents:
+SELECT Event.* FROM Event WHERE is_favorite = 1;
+
+markEventAsFavorite:
+UPDATE Event SET is_favorite = ? WHERE id = ?;
+
 insertEvent:
-INSERT INTO Event (id, created_at, title, description, event_start_time, event_end_time, event_type, cover_photo_url, location_name, is_conference, ordering, speaker_name, speaker_position, speaker_bio, icon)
-VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+INSERT INTO Event (id, created_at, title, description, event_start_time, event_end_time, event_type, cover_photo_url, location_name, is_conference, ordering, speaker_name, speaker_position, speaker_bio, icon,is_favorite, tag)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 
 removeAllEvents:
 DELETE FROM Event;

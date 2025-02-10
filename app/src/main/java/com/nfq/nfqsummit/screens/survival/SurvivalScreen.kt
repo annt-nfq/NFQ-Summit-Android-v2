@@ -4,7 +4,6 @@ package com.nfq.nfqsummit.screens.survival
 
 import android.content.Context
 import android.media.MediaPlayer
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,24 +15,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -43,7 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.Translation
 import com.nfq.data.domain.model.TranslationAudio
+import com.nfq.data.network.utils.networkConnectivity.ConnectivityObserver
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.BasicTopAppBar
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.mocks.mockTranslation
 import com.nfq.nfqsummit.mocks.mockTranslationAudio
 import com.nfq.nfqsummit.ui.theme.NFQOrange
@@ -54,17 +56,22 @@ fun SurvivalScreen(
     goBack: () -> Unit,
     viewModel: SurvivalViewModel = hiltViewModel()
 ) {
+
+    val networkStatus by viewModel.networkStatus.collectAsState()
     LaunchedEffect(viewModel) {
         viewModel.getTranslations()
     }
 
     SurvivalScreenUI(
         goBack = goBack,
+        status = networkStatus,
         translations = viewModel.translations
     )
 }
 
-class AudioPlayer(private val context: Context) {
+class AudioPlayer(
+    private val context: Context,
+) {
     private var mediaPlayer: MediaPlayer? = null
 
     fun play(url: String) {
@@ -74,6 +81,7 @@ class AudioPlayer(private val context: Context) {
             prepare()
             start()
         }
+
     }
 
     fun pause() {
@@ -90,6 +98,7 @@ class AudioPlayer(private val context: Context) {
 @Composable
 fun SurvivalScreenUI(
     goBack: () -> Unit,
+    status: ConnectivityObserver.Status = ConnectivityObserver.Status.Unavailable,
     translations: List<Translation>?
 ) {
     val context = LocalContext.current
@@ -98,22 +107,9 @@ fun SurvivalScreenUI(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "Survival Guide",
-                        style = MaterialTheme.typography.headlineLarge
-                    )
-                },
-                navigationIcon = {
-                    // Back button
-                    IconButton(onClick = goBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
+            BasicTopAppBar(
+                title = "Survival Guide",
+                navigationUp = goBack
             )
         }
     ) { paddingValues ->
@@ -128,7 +124,9 @@ fun SurvivalScreenUI(
                     TranslationListItem(
                         translation,
                         playAudio = {
-                            audioPlayer.play(it)
+                            if (status == ConnectivityObserver.Status.Available) {
+                                audioPlayer.play(it)
+                            }
                         }
                     )
                 }
@@ -181,7 +179,9 @@ fun AudioListItem(
         )
         IconButton(
             modifier = Modifier
-                .background(color = NFQOrange, shape = CircleShape),
+                .bounceClick()
+                .clip(CircleShape),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = NFQOrange),
             onClick = {
                 playAudio(audio.audioUrl)
             }
@@ -232,7 +232,7 @@ fun TranslationListItemPreview() {
     NFQSnapshotTestThemeForPreview {
         TranslationListItem(
             translation = Translation(
-                id = 1,
+                id = "1",
                 title = "Title",
                 audios = listOf(
                     mockTranslationAudio,

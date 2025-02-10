@@ -1,8 +1,17 @@
 package com.nfq.nfqsummit.navigation
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,13 +20,11 @@ import com.nfq.nfqsummit.screens.attractions.attractionBlogs.AttractionBlogsScre
 import com.nfq.nfqsummit.screens.blog.BlogScreen
 import com.nfq.nfqsummit.screens.bookingNumber.BookingNumberScreen
 import com.nfq.nfqsummit.screens.dashboard.DashboardScreen
-import com.nfq.nfqsummit.screens.dashboard.tabs.explore.ExploreTab
-import com.nfq.nfqsummit.screens.dashboard.tabs.home.HomeTab
-import com.nfq.nfqsummit.screens.dashboard.tabs.schedule.ScheduleTab
-import com.nfq.nfqsummit.screens.dashboard.tabs.techRocks.TechRocksTab
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsScreen
 import com.nfq.nfqsummit.screens.onboarding.OnboardingScreen
 import com.nfq.nfqsummit.screens.payment.PaymentScreen
+import com.nfq.nfqsummit.screens.qrCode.QRScannerScreen
+import com.nfq.nfqsummit.screens.signIn.SignInScreen
 import com.nfq.nfqsummit.screens.splash.SplashScreen
 import com.nfq.nfqsummit.screens.survival.SurvivalScreen
 import com.nfq.nfqsummit.screens.transportation.TransportationScreen
@@ -25,35 +32,53 @@ import com.nfq.nfqsummit.screens.transportation.TransportationScreen
 @SuppressLint("NewApi")
 @Composable
 fun AppNavHost(
+    startDestination: String,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    NavHost(navController = navController, startDestination = AppDestination.Dashboard.route) {
+    NavHost(
+        modifier = modifier,
+        navController = navController,
+        startDestination = startDestination,
+        enterTransition = SlideTransition.enterTransition,
+        exitTransition = SlideTransition.exitTransition,
+        popEnterTransition = SlideTransition.popEnterTransition,
+        popExitTransition = SlideTransition.popExitTransition
+    ) {
         composable(AppDestination.Splash.route) {
-            SplashScreen(
-                navigateToHome = {
+            SplashScreen()
+        }
+        composable(
+            route = AppDestination.Onboarding.route,
+            enterTransition = MainTransition.enterTransition,
+            exitTransition = MainTransition.exitTransition,
+            popEnterTransition = MainTransition.enterTransition,
+            popExitTransition = MainTransition.exitTransition
+        ) {
+            OnboardingScreen()
+        }
+        composable(
+            route = AppDestination.SignIn.route,
+            enterTransition = MainTransition.enterTransition,
+            exitTransition = MainTransition.exitTransition,
+            popEnterTransition = MainTransition.enterTransition,
+            popExitTransition = MainTransition.exitTransition
+        ) {
+            SignInScreen(
+                continueAsGuest = {
                     navController.navigate(AppDestination.Dashboard.route) {
-                        popUpTo(AppDestination.Splash.route) { inclusive = true }
+                        popUpTo(AppDestination.SignIn.route) { inclusive = true }
                     }
                 },
-                navigateToOnboarding = {
-                    navController.navigate(AppDestination.Onboarding.route) {
-                        popUpTo(AppDestination.Splash.route) { inclusive = true }
-                    }
-                },
+                navigateToScanner = {
+                    navController.navigate(AppDestination.QRCodeScanner.route)
+                }
             )
         }
-        composable(AppDestination.Onboarding.route) {
-            OnboardingScreen(
-                navigateToHome = {
-                    navController.navigate(AppDestination.Dashboard.route) {
-                        popUpTo(AppDestination.Onboarding.route) { inclusive = true }
-                    }
-                },
-                navigateToBooking = {
-                    navController.navigate(AppDestination.BookingNumber.route) {
-                        popUpTo(AppDestination.Onboarding.route) { inclusive = true }
-                    }
+        composable(AppDestination.QRCodeScanner.route) {
+            QRScannerScreen(
+                navigateUp = {
+                    navController.navigateUp()
                 }
             )
         }
@@ -66,7 +91,13 @@ fun AppNavHost(
                 }
             )
         }
-        composable(AppDestination.Dashboard.route) {
+        composable(
+            route = AppDestination.Dashboard.route,
+            enterTransition = MainTransition.enterTransition,
+            exitTransition = MainTransition.exitTransition,
+            popEnterTransition = MainTransition.enterTransition,
+            popExitTransition = MainTransition.exitTransition
+        ) {
             DashboardScreen(
                 goToEventDetails = {
                     navController.navigate(
@@ -74,10 +105,12 @@ fun AppNavHost(
                     )
                 },
                 goToDestination = {
-                    navController.navigate(it.route)
+                    navController.navigate(it)
                 },
-                goToBlog = {
-                    navController.navigate("${AppDestination.Blogs.route}/$it")
+                goToSignIn = {
+                    navController.navigate(AppDestination.SignIn.route) {
+                        popUpTo(AppDestination.Dashboard.route) { inclusive = true }
+                    }
                 },
                 goToAttractions = {
                     navController.navigate(AppDestination.Attractions.route)
@@ -91,11 +124,17 @@ fun AppNavHost(
             )
         }
 
-        composable(AppDestination.Transportations.route) {
+        composable(
+            route = AppDestination.Transportations.routeWithArgs,
+            arguments = AppDestination.Transportations.arguments,
+            deepLinks = AppDestination.Transportations.deeplinks
+        ) {
+            val parentBlogId = it.arguments?.getString(AppDestination.Transportations.parentBlogId)
             TransportationScreen(
+                parentBlogId = parentBlogId!!,
                 goBack = { navController.navigateUp() },
-                goToBlog = {
-                    navController.navigate("${AppDestination.Blogs.route}/$it")
+                goToBlog = { blogId ->
+                    navController.navigate("${AppDestination.Blogs.route}/$blogId")
                 }
             )
         }
@@ -109,8 +148,8 @@ fun AppNavHost(
         composable(AppDestination.Attractions.route) {
             AttractionsScreen(
                 goBack = { navController.navigateUp() },
-                goToAttraction = {
-                    navController.navigate("${AppDestination.Attractions.route}/${it}")
+                goToAttraction = { attractionId, attractionTitle ->
+                    navController.navigate("${AppDestination.Attractions.route}/${attractionId}/${attractionTitle}")
                 }
             )
         }
@@ -120,12 +159,15 @@ fun AppNavHost(
             arguments = AppDestination.Attractions.arguments,
             deepLinks = AppDestination.Attractions.deeplinks
         ) {
-            val attractionId = it.arguments?.getInt(AppDestination.Attractions.attractionIdArg)
+            val attractionId = it.arguments?.getString(AppDestination.Attractions.attractionIdArg)
+            val attractionTitle =
+                it.arguments?.getString(AppDestination.Attractions.attractionTitleArg)
             AttractionBlogsScreen(
-                attractionId = attractionId ?: 0,
+                attractionId = attractionId!!,
+                attractionTitle = attractionTitle.orEmpty(),
                 goBack = { navController.navigateUp() },
-                goToBlog = {
-                    navController.navigate("${AppDestination.Blogs.route}/$it")
+                goToBlog = { blogId ->
+                    navController.navigate("${AppDestination.Blogs.route}/$blogId")
                 }
             )
         }
@@ -135,9 +177,9 @@ fun AppNavHost(
             arguments = AppDestination.Blogs.arguments,
             deepLinks = AppDestination.Blogs.deeplinks
         ) {
-            val blogId = it.arguments?.getInt(AppDestination.Blogs.blogIdArg)
+            val blogId = it.arguments?.getString(AppDestination.Blogs.blogIdArg)
             BlogScreen(
-                blogId = blogId ?: 0,
+                blogId = blogId!!,
                 goBack = { navController.navigateUp() }
             )
         }
@@ -154,37 +196,47 @@ fun AppNavHost(
     }
 }
 
-@Composable
-fun DashboardNavHost(
-    goToEventDetails: (eventId: String) -> Unit,
-    goToDestination: (destination: AppDestination) -> Unit,
-    goToBlog: (blogId: Int) -> Unit,
-    goToAttractions: () -> Unit,
-    navController: NavHostController,
-    modifier: Modifier = Modifier
-) {
-    NavHost(navController = navController, startDestination = AppDestination.Home.route) {
-        composable(AppDestination.Home.route) {
-            HomeTab(
-                goToEventDetails = goToEventDetails,
-                goToBlog = goToBlog,
-                goToAttractions = goToAttractions
+const val durationMillis = 100
+const val slideDurationMillis = 400
+
+object MainTransition {
+
+    val enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
+        { fadeIn(tween(durationMillis)) }
+    val exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+        { fadeOut(tween(durationMillis)) }
+}
+
+object SlideTransition {
+    val enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
+        {
+            slideInHorizontally(
+                initialOffsetX = { 1500 },
+                animationSpec = tween(slideDurationMillis)
             )
         }
-        composable(AppDestination.Schedule.route) {
-            ScheduleTab(
-                goToEventDetails = goToEventDetails
+    val exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+        {
+            slideOutHorizontally(
+                targetOffsetX = { -300 },
+                animationSpec = tween(slideDurationMillis)
             )
         }
-        composable(AppDestination.TechRocks.route) {
-            TechRocksTab(
-                goToEventDetails = goToEventDetails
+
+
+    val popEnterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) =
+        {
+            slideInHorizontally(
+                initialOffsetX = { -300 },
+                animationSpec = tween(slideDurationMillis)
+            )
+
+        }
+    val popExitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) =
+        {
+            slideOutHorizontally(
+                targetOffsetX = { 1500 },
+                animationSpec = tween(slideDurationMillis)
             )
         }
-        composable(AppDestination.Explore.route) {
-            ExploreTab(
-                goToDestination = goToDestination
-            )
-        }
-    }
 }

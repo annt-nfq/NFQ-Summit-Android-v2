@@ -29,9 +29,96 @@ data class SummitEvent(
     val isConference: Boolean = false,
     val eventType: String? = null,
     val ordering: Int = 0,
-    val speakerName: String? = null,
+    val speakerAvatar: String = "",
+    val speakerName: String = "",
     val speakerPosition: String? = null,
+    val isFavorite: Boolean = false,
+    val category: CategoryType = CategoryType.Summit("Summit")
 )
+
+
+enum class CategoryEnum(val code: String) {
+    SUMMIT("summit"),
+    K5("k5"),
+    TECH_ROCK("tech_rock"),
+    TECH("tech"),
+    PRODUCT("product"),
+    BUSINESS("business")
+}
+
+
+@Serializable
+sealed class CategoryType(
+    val code: String,
+    val containerColor: Int,
+    val contentColor: Int,
+    val tag: String
+) {
+    data class Summit(val name: String = "Summit") :
+        CategoryType(
+            CategoryEnum.SUMMIT.code,
+            0xFFFFE1CC.toInt(),
+            0xFFFF6B00.toInt(),
+            "\uD83D\uDCBC $name"
+        )
+
+    data class K5(val name: String) :
+        CategoryType(
+            CategoryEnum.K5.code,
+            0xFFB4EAFF.toInt(),
+            0xFF02A5E6.toInt(),
+            "\uD83C\uDDE9\uD83C\uDDEA $name"
+        )
+
+    data class TechRock(val name: String) :
+        CategoryType(
+            CategoryEnum.TECH_ROCK.code,
+            0xFFE5EDFF.toInt(),
+            0xFF42389D.toInt(),
+            "\uD83D\uDCC8 $name"
+        )
+
+    data class Tech(val name: String) :
+        CategoryType(
+            CategoryEnum.TECH.code,
+            0xFFE8F5E9.toInt(),
+            0xFF43A047.toInt(),
+            "\uD83D\uDCBB $name"
+        )
+
+    data class Product(val name: String) :
+        CategoryType(
+            CategoryEnum.PRODUCT.code,
+            0xFFFFF3F0.toInt(),
+            0xFFFF6B6B.toInt(),
+            "\uD83D\uDE80 $name"
+        )
+
+    data class Business(val name: String) :
+        CategoryType(
+            CategoryEnum.BUSINESS.code,
+            0xFFE5EDFF.toInt(),
+            0xFF42389D.toInt(),
+            "\uD83D\uDCC8 $name"
+        )
+
+    companion object {
+        fun filterTechRock(code: String): Boolean {
+            return when {
+                code == CategoryEnum.TECH_ROCK.code || code == CategoryEnum.PRODUCT.code || code == CategoryEnum.BUSINESS.code || code == CategoryEnum.TECH.code -> true
+                else -> false
+            }
+        }
+
+        fun filterSummitOrK5(code: String): Boolean {
+            return when {
+                code == CategoryEnum.SUMMIT.code || code == CategoryEnum.K5.code -> true
+                else -> false
+            }
+        }
+    }
+}
+
 
 object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
     override val descriptor: SerialDescriptor =
@@ -47,6 +134,7 @@ object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
         return LocalDateTime.parse(string)
     }
 }
+
 
 fun SummitEventRemoteModel.toSummitEvent(): SummitEvent {
     return SummitEvent(
@@ -64,6 +152,8 @@ fun SummitEventRemoteModel.toSummitEvent(): SummitEvent {
         eventType = eventType ?: "",
         ordering = ordering ?: 0,
         speakerName = speakerName ?: "",
+        speakerAvatar = "",
         speakerPosition = speakerPosition,
+        isFavorite = isFavorite ?: false
     )
 }

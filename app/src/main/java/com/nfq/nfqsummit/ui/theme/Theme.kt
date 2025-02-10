@@ -1,18 +1,20 @@
 package com.nfq.nfqsummit.ui.theme
 
 import android.app.Activity
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
+import android.content.res.Configuration
+import android.os.Build
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 
 private val DarkColorPalette = darkColorScheme(
@@ -67,21 +69,24 @@ private val LightColorPalette = lightColorScheme(
 
 @Composable
 fun NFQSnapshotTestTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        darkTheme -> DarkColorPalette
-        else -> LightColorPalette
-    }
+    val colorScheme = LightColorPalette
+
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                window.isNavigationBarContrastEnforced = false
+            }
+            window.statusBarColor = Color.Transparent.toArgb()
+            window.navigationBarColor = Color.Transparent.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
         }
     }
 
@@ -93,22 +98,20 @@ fun NFQSnapshotTestTheme(
 }
 
 @Composable
-fun NFQSnapshotTestThemeForPreview(darkTheme: Boolean = false, content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = if(darkTheme) DarkColorPalette else LightColorPalette,
-        typography = Typography,
-        content = content
-    )
-}
-
-@Composable
-fun Surface(
-    color: Color = MaterialTheme.colorScheme.surface,
-    content: @Composable () -> Unit
+fun NFQSnapshotTestThemeForPreview(
+    darkTheme: Boolean = false,
+    content: @Composable BoxWithConstraintsScope.() -> Unit,
 ) {
-    Box(
-        modifier = Modifier.background(color)
-    ) {
-        content()
+    NFQSnapshotTestTheme(darkTheme = darkTheme) {
+        Surface {
+            BoxWithConstraints {
+                content()
+            }
+        }
     }
 }
+
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light theme")
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark theme")
+annotation class ThemePreviews

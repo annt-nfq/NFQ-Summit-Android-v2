@@ -1,96 +1,141 @@
 package com.nfq.nfqsummit.screens.dashboard.tabs.explore
 
-import android.annotation.SuppressLint
-import android.app.Activity
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nfq.nfqsummit.R
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.nfq.nfqsummit.components.Loading
+import com.nfq.nfqsummit.components.bounceClick
+import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ExploreTab(
-    goToDestination: (destination: AppDestination) -> Unit = {}
+    goToDestination: (destination: String) -> Unit = {}
 ) {
-    val window = (LocalView.current.context as Activity).window
-    window.statusBarColor = Color.Transparent.toArgb()
+    val viewModel: ExploreViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
 
-    val exploreItems = listOf(
-        ExploreItem(R.drawable.explore_attractions, AppDestination.Attractions),
-//        ExploreItem(R.drawable.explore_activities, AppDestination.Attractions),
-//        ExploreItem(R.drawable.explore_gifts, AppDestination.Attractions),
-        ExploreItem(R.drawable.explore_payment, AppDestination.Payment),
-        ExploreItem(R.drawable.explore_survival, AppDestination.Survival),
-        ExploreItem(R.drawable.explore_transport, AppDestination.Transportations)
-    )
-    Scaffold {
-        Column(modifier = Modifier.statusBarsPadding()) {
+
+    if (uiState.isLoading) {
+        Loading()
+    }
+
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
+        topBar = {
             Text(
-                text = "Explore BKK",
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(16.dp)
+                text = "Explore Vietnam \uD83C\uDDFB\uD83C\uDDF3",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
             )
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(150.dp),
-            ) {
-                items(exploreItems) { item ->
-                    ExploreGridItem(
-                        exploreItem = item,
-                        goToDestination = goToDestination
-                    )
-                }
-                item {
-                    Spacer(modifier = Modifier.height(120.dp))
-                }
+        }
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier.padding(innerPadding),
+            contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(
+                items = uiState.exploreVietnam,
+                key = { it.title },
+                contentType = { "ExploreItem" }
+            ) { exploreItem ->
+                ExploreItem(
+                    exploreItem = exploreItem,
+                    goToDestination = goToDestination
+                )
             }
         }
     }
 }
 
 data class ExploreItem(
-    @DrawableRes val drawable: Int,
-    val destination: AppDestination
+    val imageUrl: String,
+    val title: String,
+    val destination: String
 )
 
 @Composable
-fun ExploreGridItem(
+fun ExploreItem(
     exploreItem: ExploreItem,
-    goToDestination: (destination: AppDestination) -> Unit
+    goToDestination: (destination: String) -> Unit
 ) {
-    Image(
-        painter = painterResource(id = exploreItem.drawable),
-        contentDescription = "Event Image",
+    Box(
+        contentAlignment = Alignment.BottomStart,
         modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
+            .bounceClick()
+            .clip(RoundedCornerShape(12.dp))
             .clickable {
                 goToDestination(exploreItem.destination)
-            },
-        contentScale = ContentScale.FillWidth
-    )
+            }
+    ) {
+        Image(
+            painter = networkImagePainter(exploreItem.imageUrl),
+            contentDescription = "Event Image",
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(343f / 116f)
+                .background(Color(0xFFE6E6E6)),
+            contentScale = ContentScale.FillWidth
+        )
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            GuidelineTag()
+            Text(
+                text = exploreItem.title,
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun GuidelineTag() {
+    Box(
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(8.dp),
+            )
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = "Guideline",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontWeight = FontWeight.Bold
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -98,5 +143,20 @@ fun ExploreGridItem(
 fun ExploreTabPreview() {
     NFQSnapshotTestThemeForPreview {
         ExploreTab()
+    }
+}
+
+@Preview
+@Composable
+private fun ExploreItemPreview() {
+    NFQSnapshotTestThemeForPreview {
+        ExploreItem(
+            exploreItem = ExploreItem(
+                imageUrl = "",
+                title = "Transportation \uD83D\uDE90",
+                destination = AppDestination.Attractions.route
+            ),
+            goToDestination = {}
+        )
     }
 }

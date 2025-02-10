@@ -21,9 +21,9 @@ android {
     defaultConfig {
         applicationId = "com.nfq.nfqsummit"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 101000
-        versionName = "1.1.0"
+        targetSdk = 35
+        versionCode = 101027
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "com.nfq.nfqsummit.HiltTestRunner"
         vectorDrawables {
@@ -83,11 +83,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "21"
     }
     buildFeatures {
         compose = true
@@ -133,7 +133,12 @@ val jacocoTestReport = tasks.register<JacocoReport>("jacocoTestReport") {
         )
     }
 
-    sourceDirectories.setFrom(files("${project.projectDir}/src/main/java", "${project.projectDir}/src/main/kotlin"))
+    sourceDirectories.setFrom(
+        files(
+            "${project.projectDir}/src/main/java",
+            "${project.projectDir}/src/main/kotlin"
+        )
+    )
     classDirectories.setFrom(files(kotlinTree, javaTree))
     executionData.setFrom(fileTree(project.buildDir) {
         include("jacoco/testDebugUnitTest.exec")
@@ -154,6 +159,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.splash)
     implementation(libs.navigation)
@@ -165,6 +171,10 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
+    // Firebase App Check
+    implementation(libs.firebase.appcheck.playintegrity)
+    // Optional: Debug provider for development
+    implementation(libs.firebase.appcheck.debug)
 
     implementation(libs.google.code.scanner)
     implementation(libs.security.crypto)
@@ -182,6 +192,7 @@ dependencies {
     implementation(libs.supabase.gotrue)
 
     implementation(libs.compose.markdown)
+    implementation(libs.arrow)
 
     implementation(project(":data"))
 
@@ -196,6 +207,17 @@ dependencies {
     testImplementation(libs.androidx.arch.core.testing)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.ui.test.junit4)
+
+    implementation(libs.zxing.android.embedded)
+    implementation(libs.zxing.core)
+    implementation (libs.androidx.camera.camera2)
+    implementation( libs.androidx.camera.lifecycle)
+    implementation (libs.androidx.camera.view)
+    implementation (libs.barcode.scanning)
+
+    implementation(libs.timber)
+
+    implementation(libs.kotlinx.collections.immutable)
 
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.androidx.junit)

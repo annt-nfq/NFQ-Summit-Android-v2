@@ -1,30 +1,19 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.nfq.nfqsummit.screens.blog
 
-import android.app.Activity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.Blog
+import com.nfq.data.network.utils.networkConnectivity.ConnectivityObserver
+import com.nfq.nfqsummit.components.BasicTopAppBar
 import com.nfq.nfqsummit.components.MarkdownDisplay
 import com.nfq.nfqsummit.mocks.mockBlog
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -32,44 +21,32 @@ import java.net.URL
 
 @Composable
 fun BlogScreen(
-    blogId: Int,
+    blogId: String,
     goBack: () -> Unit,
     viewModel: BlogViewModel = hiltViewModel()
 ) {
-    val window = (LocalView.current.context as Activity).window
-    window.statusBarColor = Color.Transparent.toArgb()
 
-    LaunchedEffect(viewModel) {
-        viewModel.getBlogById(blogId)
-    }
+    val blog by viewModel.blog.collectAsState()
+    val networkStatus by viewModel.networkStatus.collectAsState()
 
-    BlogUI(blog = viewModel.blog, goBack = goBack)
+    BlogUI(
+        blog = blog,
+        status = networkStatus,
+        goBack = goBack
+    )
 }
 
 @Composable
 fun BlogUI(
     blog: Blog?,
+    status: ConnectivityObserver.Status,
     goBack: () -> Unit
 ) {
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    blog?.let {
-                        Text(
-                            text = it.title,
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = goBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
+            BasicTopAppBar(
+                title = blog?.title.orEmpty(),
+                navigationUp = goBack
             )
         }
     ) { paddingValues ->
@@ -78,7 +55,7 @@ fun BlogUI(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            if (blog != null)
+            if (blog != null && status == ConnectivityObserver.Status.Available)
                 MarkdownDisplay(
                     URL(blog.contentUrl)
                 )
@@ -92,6 +69,7 @@ fun BlogUIPreview() {
     NFQSnapshotTestThemeForPreview {
         BlogUI(
             blog = mockBlog,
+            status = ConnectivityObserver.Status.Available,
             goBack = {}
         )
     }

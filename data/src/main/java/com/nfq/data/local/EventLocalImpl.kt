@@ -1,13 +1,32 @@
 package com.nfq.data.local
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import com.nfq.data.cache.SummitDatabase
 import com.nfq.data.remote.model.SummitEventRemoteModel
 import com.nfq.data.remote.model.toSummitEventRemoteModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class EventLocalImpl @Inject constructor(
     private val database: SummitDatabase
 ) : EventLocal {
+    override val events: Flow<List<SummitEventRemoteModel>>
+        get() = database.summitDatabaseQueries
+            .selectAllEvents()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { it.map { event -> event.toSummitEventRemoteModel() } }
+
+    override val savedEvents: Flow<List<SummitEventRemoteModel>>
+        get() = database.summitDatabaseQueries
+            .getSavedEvents()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { it.map { event -> event.toSummitEventRemoteModel() } }
+
     override suspend fun clearAllEvents() {
         database.summitDatabaseQueries.removeAllEvents()
     }
@@ -43,6 +62,8 @@ class EventLocalImpl @Inject constructor(
                     it.speakerPosition,
                     null,
                     it.iconUrl,
+                    it.isFavorite,
+                    it.tag
                 )
             }
         }
@@ -65,5 +86,9 @@ class EventLocalImpl @Inject constructor(
 
     override suspend fun removeFavoriteEvent(eventId: String) {
         database.summitDatabaseQueries.removeFavoriteEvent(eventId)
+    }
+
+    override suspend fun markEventAsFavorite(isFavorite: Boolean, eventId: String) {
+        database.summitDatabaseQueries.markEventAsFavorite(isFavorite, eventId)
     }
 }

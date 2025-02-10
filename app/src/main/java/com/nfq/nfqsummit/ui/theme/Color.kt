@@ -14,6 +14,8 @@ val LabelGrey = Color(0x80231F20)
 val NFQOrange = Color(0xFFFF6B00)
 val MainNeutral = Color(0xFFF2EEE7)
 val MainGreen = Color(0xFF3AB34A)
+val Grey = Color(0xFF919199)
+val LightGrey = Color(0xFFCECED9)
 
 val PrimaryLight = NFQOrange
 val OnPrimaryLight = Color(0xFFFFFFFF)
@@ -37,7 +39,7 @@ val OnErrorContainerLight = Color(0xFF410002)
 
 val BackgroundLight = Color(0xFFFFFFFF)
 val OnBackgroundLight = Color(0xFF1a1c1e)
-val SurfaceLight = Color(0xFFfdfcff)
+val SurfaceLight = Color(0xFFFFFFFF)
 
 val OutlineLight = Color(0xFF73777f)
 val SurfaceVariantLight = Color(0xFFdfe2eb)

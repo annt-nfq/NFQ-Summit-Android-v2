@@ -51,6 +51,7 @@ import com.nfq.nfqsummit.mocks.mockSpeakerEvent
 import com.nfq.nfqsummit.mocks.mockSpeakerEvent2
 import com.nfq.nfqsummit.ui.theme.NFQOrange
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
+import kotlinx.collections.immutable.toPersistentList
 import java.time.LocalTime
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -171,7 +172,7 @@ fun ConferenceSchedule(
                 Surface(color = MaterialTheme.colorScheme.background) {
                     Schedule(
                         hourSize = ScheduleSize.FixedSize(220.dp),
-                        events = events.filter { it.ordering == selectedIndex + 1 },
+                        events = events.filter { it.ordering == selectedIndex + 1 }.toPersistentList(),
                         currentTime = currentTime,
                         minTime = LocalTime.of(10, 0, 0, 0),
                         maxTime = LocalTime.of(18, 0, 0, 0),

@@ -9,6 +9,7 @@ import com.nfq.data.domain.model.Response
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.domain.repository.EventRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -53,6 +54,13 @@ class EventDetailsViewModel @Inject constructor(
     fun getSavedEvent(eventId: String) {
         viewModelScope.launch {
             isBookmarked = eventRepository.isEventFavorite(eventId)
+        }
+    }
+
+    fun markEventAsFavorite(isFavorite: Boolean, eventId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            eventRepository.markEventAsFavorite(isFavorite, eventId)
+            event = event?.copy(isFavorite = isFavorite)
         }
     }
 }

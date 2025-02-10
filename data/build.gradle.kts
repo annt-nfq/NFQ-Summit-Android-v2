@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -5,6 +7,9 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.sqldelight)
 }
+
+val p = Properties()
+p.load(project.rootProject.file("local.properties").reader())
 
 android {
     namespace = "com.nfq.data"
@@ -15,23 +20,31 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        buildConfigField("String", "PASS_PHRASE", "\"${p.getProperty("PASS_PHRASE")}\"")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            buildConfigField("String", "BASIC_TOKEN", "\"${p.getProperty("BASIC_TOKEN")}\"")
+            buildConfigField("String", "BASE_URL", "\"${p.getProperty("BASE_URL")}\"")
+        }
+        debug {
+            isMinifyEnabled = false
+            buildConfigField("String", "BASIC_TOKEN", "\"${p.getProperty("DEV_BASIC_TOKEN")}\"")
+            buildConfigField("String", "BASE_URL", "\"${p.getProperty("DEV_BASE_URL")}\"")
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "21"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -53,9 +66,28 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.dagger.hilt.android.compiler)
 
+    implementation(libs.kotlinx.serialization)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.kotlin.serialization)
+    implementation(libs.okhttp.logging)
+    implementation(libs.arrow)
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    implementation(libs.sqlcipher)
+
+    //Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+
+    implementation(libs.androidx.dataStore.core)
+    implementation(libs.androidx.dataStore.pref)
+
+    testImplementation(libs.mockk)
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
 }
 
 sqldelight {

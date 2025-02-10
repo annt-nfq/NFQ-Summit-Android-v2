@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import java.time.LocalTime
@@ -16,23 +16,23 @@ import java.time.temporal.ChronoUnit
 
 @Composable
 fun ScheduleSidebar(
-    hourHeight: Dp,
     modifier: Modifier = Modifier,
     minTime: LocalTime = LocalTime.MIN,
     maxTime: LocalTime = LocalTime.MAX,
+    hourlySegments: List<HourlySegment> = emptyList(),
     label: @Composable (time: LocalTime) -> Unit = { BasicSidebarLabel(time = it) },
 ) {
-    val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
-    val numHours = numMinutes / 60
-    val firstHour = minTime.truncatedTo(ChronoUnit.HOURS)
-    val firstHourOffsetMinutes = if (firstHour == minTime) 0 else ChronoUnit.MINUTES.between(minTime, firstHour.plusHours(1))
-    val firstHourOffset = hourHeight * (firstHourOffsetMinutes / 60f)
-    val startTime = if (firstHour == minTime) firstHour else firstHour.plusHours(1)
-    Column(modifier = modifier) {
-        Spacer(modifier = Modifier.height(firstHourOffset))
-        repeat(numHours) { i ->
-            Box(modifier = Modifier.height(hourHeight)) {
-                label(startTime.plusHours(i.toLong()))
+    val startTime = hourlySegments.first().startTime.truncatedTo(ChronoUnit.HOURS)
+    val firstHourOffsetInMinutes = if (startTime == minTime) 0 else startTime.minute
+    val firstHourOffsetDp = 130.dp * (firstHourOffsetInMinutes / 60f)
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.End
+    ) {
+        Spacer(modifier = Modifier.height(firstHourOffsetDp))
+        hourlySegments.forEach {
+            Box(modifier = Modifier.height(it.height.dp)) {
+                label(it.startTime)
             }
         }
     }
@@ -42,6 +42,6 @@ fun ScheduleSidebar(
 @Composable
 fun ScheduleSidebarPreview() {
     NFQSnapshotTestThemeForPreview {
-        ScheduleSidebar(hourHeight = 64.dp)
+        ScheduleSidebar()
     }
 }

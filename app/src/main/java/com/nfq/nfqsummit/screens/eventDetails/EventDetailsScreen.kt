@@ -110,7 +110,8 @@ fun scheduleNotification(
     dateTime: LocalDateTime,
     title: String,
     body: String,
-    eventId: String
+    eventId: String,
+    notiId: String = ""
 ) {
     val intent = Intent(context, AlarmReceiver::class.java).apply {
         putExtra("title", title)
@@ -119,7 +120,7 @@ fun scheduleNotification(
     }
 
 
-    val id = BigInteger(eventId.encodeToByteArray()).toInt()
+    val id = BigInteger(eventId.plus(notiId).encodeToByteArray()).toInt()
 
     val pendingIntent = PendingIntent.getBroadcast(
         context, id, intent,
@@ -135,9 +136,9 @@ fun scheduleNotification(
     )
 }
 
-fun cancelNotification(context: Context, eventId: String) {
+fun cancelNotification(context: Context, eventId: String, notiId: String = "") {
     val intent = Intent(context, AlarmReceiver::class.java)
-    val id = BigInteger(eventId.encodeToByteArray()).toInt()
+    val id = BigInteger(eventId.plus(notiId).encodeToByteArray()).toInt()
     val pendingIntent = PendingIntent.getBroadcast(
         context, id, intent,
         PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE

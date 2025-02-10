@@ -1,12 +1,13 @@
 package com.nfq.nfqsummit.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -25,6 +26,8 @@ import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.model.PositionedEvent
 import com.nfq.nfqsummit.model.SplitType
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
@@ -78,7 +81,7 @@ private fun PositionedEvent.overlapsWith(other: PositionedEvent): Boolean {
     return date == other.date &&
             start < other.end &&
             end > other.start &&
-            ChronoUnit.MINUTES.between(start, other.start) < 70
+            ChronoUnit.MINUTES.between(start, other.start) < 30
 }
 
 private fun List<PositionedEvent>.timesOverlapWith(event: PositionedEvent): Boolean {
@@ -147,40 +150,38 @@ fun CurrentTimeIndicator(
     minTime: LocalTime = LocalTime.MIN.plusHours(5),
     maxTime: LocalTime = LocalTime.MAX.minusHours(5),
     dayWidth: Dp,
-    hourHeight: Dp,
     modifier: Modifier,
+    hourlySegments: List<HourlySegment> = emptyList(),
 ) {
-    val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
-    val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     Layout(
         content = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(12.dp)
+                    .height(15.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(12.dp)
+                        .size(15.dp)
                         .clip(CircleShape)
-                        .background(Color.Red)
+                        .background(MaterialTheme.colorScheme.primary)
                         .align(Alignment.CenterStart)
                 )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Color.Red)
+                        .height(2.dp)
+                        .background(MaterialTheme.colorScheme.primary)
                         .align(Alignment.Center)
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier.padding(start = 40.dp)
     ) { measureables, constraints ->
-        val height = (hourHeight.toPx() * (numMinutes / 60f)).roundToInt()
-        val width = dayWidth.roundToPx() * numDays
-        layout(width, height) {
-            val placeables = measureables.map { measurable ->
+        val layoutHeight = hourlySegments.sumOf { it.height }.dp.roundToPx()
+        val layoutWidth = dayWidth.roundToPx()
+        layout(layoutWidth, layoutHeight) {
+            val measuredPlaceables = measureables.map { measurable ->
                 measurable.measure(
                     constraints.copy(
                         minWidth = dayWidth.toPx().roundToInt(),
@@ -190,15 +191,12 @@ fun CurrentTimeIndicator(
                     )
                 )
             }
-            val eventOffsetMinutes =
-                if (currentTime > minTime) ChronoUnit.MINUTES.between(
-                    minTime,
-                    currentTime
-                ) else 0
-            val eventY = ((eventOffsetMinutes / 60f) * hourHeight.toPx()).roundToInt()
-            placeables.first().place(0, eventY)
-        }
 
+            val currentYPosition =
+                calculateYPosition(hourlySegments, currentTime).plus(2).dp.toPx().roundToInt()
+
+            measuredPlaceables.first().place(0, currentYPosition)
+        }
     }
 }
 
@@ -207,33 +205,33 @@ fun CurrentTimeIndicator(
 fun BasicSchedulePreview() {
     NFQSnapshotTestThemeForPreview {
         BasicSchedule(
-            events = listOf(
+            events = persistentListOf(
                 SummitEvent(
-                    "1",
-                    "Event 1",
-                    LocalDate.now().atTime(9, 0),
-                    LocalDate.now().atTime(10, 0)
+                    id = "1",
+                    name = "Event 1",
+                    start = LocalDate.now().atTime(9, 0),
+                    end = LocalDate.now().atTime(10, 30),
                 ),
                 SummitEvent(
-                    "2",
-                    "Event 2",
-                    LocalDate.now().atTime(10, 0),
-                    LocalDate.now().atTime(11, 0)
+                    id = "2",
+                    name = "Event 2",
+                    start = LocalDate.now().atTime(10, 0),
+                    end = LocalDate.now().atTime(11, 0),
                 ),
                 SummitEvent(
-                    "3",
-                    "Event 3",
-                    LocalDate.now().atTime(10, 0),
-                    LocalDate.now().atTime(12, 0)
+                    id = "3",
+                    name = "Event 3",
+                    start = LocalDate.now().atTime(10, 0),
+                    end = LocalDate.now().atTime(12, 0),
                 ),
-            ), dayWidth = 300.dp, hourHeight = 100.dp
+            ), dayWidth = 300.dp
         )
     }
 }
 
 @Composable
 fun BasicSchedule(
-    events: List<SummitEvent>,
+    events: PersistentList<SummitEvent>,
     modifier: Modifier = Modifier,
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
         BasicEvent(
@@ -247,51 +245,56 @@ fun BasicSchedule(
     minTime: LocalTime = LocalTime.MIN.plusHours(5),
     maxTime: LocalTime = LocalTime.MAX.minusHours(5),
     dayWidth: Dp,
-    hourHeight: Dp,
+    hourlySegments: List<HourlySegment> = emptyList(),
 ) {
-    val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
+    val numDays = ChronoUnit.DAYS.between(minDate, minOf(minDate, maxDate)).toInt() + 1
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes / 60
     val dividerColor = Color.LightGray
-    val positionedEvents =
-        remember(events) { arrangeEvents(splitEvents(events.sortedBy(SummitEvent::start))).filter { it.end > minTime && it.start < maxTime } }
+    val positionedEvents = remember(events) {
+        arrangeEvents(splitEvents(events.sortedBy(SummitEvent::start))).filter { it.end > minTime && it.start < maxTime }
+    }
     Layout(
         content = {
             positionedEvents.forEach { positionedEvent ->
-                Box(modifier = Modifier.eventData(positionedEvent)) {
+                Box(
+                    modifier = Modifier.eventData(positionedEvent)
+                ) {
                     eventContent(positionedEvent)
                 }
             }
         },
         modifier = modifier
             .drawBehind {
-                val firstHour = minTime.truncatedTo(ChronoUnit.HOURS)
-                val firstHourOffsetMinutes =
-                    if (firstHour == minTime) 0 else ChronoUnit.MINUTES.between(
-                        minTime,
-                        firstHour.plusHours(1)
-                    )
-                val firstHourOffset = (firstHourOffsetMinutes / 60f) * hourHeight.toPx()
-                repeat(numHours) {
+                val startTime = hourlySegments.first().startTime.truncatedTo(ChronoUnit.HOURS)
+                val firstHourOffsetMinutes = if (startTime == minTime) 0 else startTime.minute
+                val firstHourOffsetPx = (firstHourOffsetMinutes / 60f) * 130.dp.toPx()
+                var accumulatedHeight = 0.dp
+                repeat(numHours + 1) {
+                    val hourHeight =
+                        hourlySegments.find { hourHeight -> hourHeight.hour == it }!!.height
                     drawLine(
-                        dividerColor,
-                        start = Offset(0f, it * hourHeight.toPx() + firstHourOffset),
-                        end = Offset(size.width, it * hourHeight.toPx() + firstHourOffset),
+                        color = dividerColor,
+                        start = Offset(0f, accumulatedHeight.toPx() + firstHourOffsetPx),
+                        end = Offset(size.width, accumulatedHeight.toPx() + firstHourOffsetPx),
                         strokeWidth = 1.dp.toPx()
                     )
+                    accumulatedHeight += hourHeight.dp
                 }
             }
     ) { measureables, constraints ->
-        val height = (hourHeight.toPx() * (numMinutes / 60f)).roundToInt()
-        val width = dayWidth.roundToPx() * numDays
+        val layoutHeight = hourlySegments.sumOf { it.height }.dp.toPx().roundToInt()
+        val layoutWidth = dayWidth.roundToPx() * numDays
         val placeablesWithEvents = measureables.map { measurable ->
 
             val splitEvent = measurable.parentData as PositionedEvent
-            val eventDurationMinutes =
-                ChronoUnit.MINUTES.between(splitEvent.start, minOf(splitEvent.end, maxTime))
-            val eventHeight = ((eventDurationMinutes / 60f) * hourHeight.toPx()).roundToInt()
+
+            val eventHeight =
+                calculateEventHeight(hourlySegments, splitEvent).dp.toPx().roundToInt()
+
             val eventWidth =
                 ((splitEvent.colSpan.toFloat() / splitEvent.colTotal.toFloat()) * dayWidth.toPx()).roundToInt()
+
             val placeable = measurable.measure(
                 constraints.copy(
                     minWidth = eventWidth,
@@ -302,19 +305,83 @@ fun BasicSchedule(
             )
             Pair(placeable, splitEvent)
         }
-        layout(width, height) {
-            placeablesWithEvents.forEach { (placeable, splitEvent) ->
-                val eventOffsetMinutes =
-                    if (splitEvent.start > minTime) ChronoUnit.MINUTES.between(
-                        minTime,
-                        splitEvent.start
-                    ) else 0
-                val eventY = ((eventOffsetMinutes / 60f) * hourHeight.toPx()).roundToInt()
-                val eventOffsetDays = ChronoUnit.DAYS.between(minDate, splitEvent.date).toInt()
-                val eventX =
-                    eventOffsetDays * dayWidth.roundToPx() + (splitEvent.col * (dayWidth.toPx() / splitEvent.colTotal.toFloat())).roundToInt()
-                placeable.place(eventX, eventY)
+        layout(layoutWidth, layoutHeight) {
+            placeablesWithEvents.forEach { (placeable, positionedEvent) ->
+
+                val eventYPosition =
+                    calculateYPosition(hourlySegments, positionedEvent.start).dp.toPx().roundToInt()
+
+                val eventDayOffset =
+                    ChronoUnit.DAYS.between(minDate, positionedEvent.date).toInt()
+
+                val eventXPosition =
+                    (eventDayOffset * dayWidth.toPx() + positionedEvent.col * (dayWidth.toPx() / positionedEvent.colTotal)).roundToInt()
+
+                placeable.place(eventXPosition, eventYPosition)
             }
         }
     }
+}
+
+private fun calculateEventHeight(
+    hourlySegments: List<HourlySegment>,
+    event: PositionedEvent,
+): Int {
+
+    // Filter relevant hour segments that overlap with the event
+    val relevantSegments = hourlySegments.filter { segment ->
+        val segmentStart = segment.startTime
+        val segmentEnd = segment.endTime
+
+        // Check if segment overlaps with event
+        !(event.end.isBefore(segmentStart) || event.start.isAfter(segmentEnd))
+    }
+
+    if (relevantSegments.isEmpty()) return 0
+
+    var totalHeight = 0
+
+    relevantSegments.forEach { segment ->
+        val segmentStart = segment.startTime
+        val segmentEnd = segment.endTime
+
+        // Calculate the overlap duration in minutes
+        val overlapStart = maxOf(event.start, segmentStart)
+        val overlapEnd = minOf(event.end, segmentEnd)
+        val overlapDuration = ChronoUnit.MINUTES.between(overlapStart, overlapEnd).toInt()
+
+        // Calculate the height proportion based on overlap duration
+        val heightProportion = overlapDuration / 60f
+        totalHeight += (heightProportion * segment.height).roundToInt()
+    }
+
+    return totalHeight
+}
+
+private fun calculateYPosition(
+    hourlySegments: List<HourlySegment>,
+    startTime: LocalTime,
+): Int {
+    if (hourlySegments.isEmpty()) return 0
+
+    // Find the segment containing the start time
+    val targetSegment = hourlySegments.find { segment ->
+        startTime >= segment.startTime && startTime < segment.endTime
+    }
+
+    // Calculate height of all complete segments before the target time
+    val precedingHeight = hourlySegments
+        .takeWhile { it.endTime <= startTime }
+        .sumOf { it.height }
+
+    // Calculate additional offset within the target segment
+    val withinSegmentOffset = targetSegment?.let { segment ->
+        val minutesFromSegmentStart = ChronoUnit.MINUTES.between(
+            segment.startTime,
+            startTime
+        ).toInt()
+        ((minutesFromSegmentStart / 60f) * segment.height).roundToInt()
+    } ?: 0
+
+    return precedingHeight + withinSegmentOffset
 }
