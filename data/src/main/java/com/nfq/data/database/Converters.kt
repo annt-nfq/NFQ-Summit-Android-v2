@@ -51,12 +51,12 @@ class EventTypeConverters {
     }
 
     @TypeConverter
-    fun fromSpeakerResponse(value: SpeakerResponse?): String? {
+    fun fromSpeakerResponseList(value: List<SpeakerResponse>?): String? {
         return value?.let { Json.encodeToString(it) }
     }
 
     @TypeConverter
-    fun toSpeakerResponse(value: String?): SpeakerResponse? {
+    fun toSpeakerResponseList(value: String?): List<SpeakerResponse>? {
         return value?.let { Json.decodeFromString(it) }
     }
 }

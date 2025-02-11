@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,6 +64,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.nfq.data.domain.model.EventDetailsModel
+import com.nfq.data.domain.model.SpeakerModel
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
@@ -409,7 +412,6 @@ private fun EventDetailsUI(
                             painter = painterResource(id = R.drawable.ic_loaction),
                             contentDescription = null,
                             modifier = Modifier
-                                .padding(start = 8.dp)
                                 .padding(top = 8.dp)
                         )
                         Text(
@@ -459,29 +461,7 @@ private fun EventDetailsUI(
                         }
                     }
 
-                    if (event.speakerName.isNotBlank()) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.padding(top = 8.dp)
-                        ) {
-                            Image(
-                                painter = if (event.speakerAvatar.isNotBlank())
-                                    networkImagePainter(event.speakerAvatar) else
-                                    painterResource(id = R.drawable.ic_user),
-                                contentDescription = event.speakerName,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                            )
-                            Text(
-                                text = event.speakerName,
-                                style = MaterialTheme.typography.displaySmall,
-                                fontSize = 10.sp
-                            )
-                        }
-                    }
+                    SpeakersSection(event.speakers)
 
                     Column(
                         modifier = Modifier
@@ -518,6 +498,41 @@ private fun EventDetailsUI(
     }
 }
 
+@Composable
+private fun SpeakersSection(
+    speakers: List<SpeakerModel>
+) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.padding(top = 8.dp)
+    ) {
+        items(speakers) { speaker ->
+            if (speaker.name.isNotBlank()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Image(
+                        painter = if (speaker.avatar.isNotBlank())
+                            networkImagePainter(speaker.avatar) else
+                            painterResource(id = R.drawable.ic_user),
+                        contentDescription = speaker.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                    )
+                    Text(
+                        text = speaker.name,
+                        style = MaterialTheme.typography.displaySmall,
+                        fontSize = 10.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun EventDetailsPreview() {
@@ -536,8 +551,18 @@ private fun EventDetailsPreview() {
                 startTime = LocalDateTime.now().format(
                     DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")
                 ),
-                speakerName = "Speaker Name",
-                speakerAvatar = ""
+                speakers = listOf(
+                    SpeakerModel(
+                        id = 1,
+                        name = "John Doe",
+                        avatar = ""
+                    ),
+                    SpeakerModel(
+                        id = 2,
+                        name = "Jane Doe",
+                        avatar = ""
+                    )
+                )
             ),
 
             markAsFavorite = { _, _ -> },

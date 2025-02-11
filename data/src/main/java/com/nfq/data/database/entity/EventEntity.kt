@@ -38,6 +38,6 @@ data class EventEntity(
     @ColumnInfo("eventDay") val eventDay: EventDayResponse?,
     @ColumnInfo("qrCodeUrl") val qrCodeUrl: String,
     @ColumnInfo("isFavorite") val isFavorite: Boolean,
-    @ColumnInfo("speaker") val speaker: SpeakerResponse?,
+    @ColumnInfo("speaker") val speakers: List<SpeakerResponse>?,
     @ColumnInfo("updatedAt") val updatedAt: Long
 )

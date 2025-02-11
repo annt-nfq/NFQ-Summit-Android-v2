@@ -29,8 +29,7 @@ data class SummitEvent(
     val isConference: Boolean = false,
     val eventType: String? = null,
     val ordering: Int = 0,
-    val speakerAvatar: String = "",
-    val speakerName: String = "",
+    val speakers: List<SpeakerModel> = emptyList(),
     val speakerPosition: String? = null,
     val isFavorite: Boolean = false,
     val category: CategoryType = CategoryType.Summit("Summit")
@@ -46,6 +45,12 @@ enum class CategoryEnum(val code: String) {
     BUSINESS("business")
 }
 
+@Serializable
+data class SpeakerModel(
+    val id: Int,
+    val name: String,
+    val avatar: String
+)
 
 @Serializable
 sealed class CategoryType(
@@ -151,8 +156,7 @@ fun SummitEventRemoteModel.toSummitEvent(): SummitEvent {
         isConference = isConference ?: false,
         eventType = eventType ?: "",
         ordering = ordering ?: 0,
-        speakerName = speakerName ?: "",
-        speakerAvatar = "",
+        speakers = emptyList(),
         speakerPosition = speakerPosition,
         isFavorite = isFavorite ?: false
     )

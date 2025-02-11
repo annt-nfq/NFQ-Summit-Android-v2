@@ -7,6 +7,7 @@ import com.nfq.data.database.entity.UserEntity
 import com.nfq.data.database.entity.VoucherEntity
 import com.nfq.data.domain.model.CategoryEnum
 import com.nfq.data.domain.model.CategoryType
+import com.nfq.data.domain.model.SpeakerModel
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.data.remote.model.response.CategoryResponse
 import com.nfq.data.remote.model.response.GenreResponse
@@ -89,8 +90,13 @@ private fun EventEntity.toSubmitEvent(): SummitEvent {
         isConference = isMain,
         eventType = category?.name,
         ordering = order,
-        speakerName = speaker?.name.orEmpty(),
-        speakerAvatar = speaker?.avatar.orEmpty(),
+        speakers = speakers?.map {
+            SpeakerModel(
+                id = it.id,
+                name = it.name,
+                avatar = it.avatar
+            )
+        }.orEmpty(),
         speakerPosition = gatherTime,
         isFavorite = isFavorite,
         category = categoryType

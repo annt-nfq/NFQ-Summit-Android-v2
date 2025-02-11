@@ -32,6 +32,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -315,49 +317,54 @@ fun Body(
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
-        if (!event.speakerName.isNullOrEmpty() && !event.speakerPosition.isNullOrEmpty())
-            Text(
-                modifier = Modifier
-                    .background(NFQOrange, shape = RoundedCornerShape(8.dp))
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                text = if (event.ordering == 1) "Business" else if (event.ordering == 2) "Product Development" else "Tech",
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = FontWeight.Bold
-                ),
-                color = Color.White
-            )
-        Spacer(modifier = Modifier.height(16.dp))
-        if (!event.speakerName.isNullOrEmpty() && !event.speakerPosition.isNullOrEmpty()) {
-            Text(
-                text = "Speaker",
-                style = MaterialTheme.typography.displaySmall,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape),
-                    model = event.iconUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
+        LazyRow {
+            items(event.speakers){ speaker->
+                if (speaker.name.isNotEmpty() && !event.speakerPosition.isNullOrEmpty())
                     Text(
-                        text = event.speakerName!!,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold
+                        modifier = Modifier
+                            .background(NFQOrange, shape = RoundedCornerShape(8.dp))
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        text = if (event.ordering == 1) "Business" else if (event.ordering == 2) "Product Development" else "Tech",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color.White
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+                if (speaker.name.isNotEmpty() && !event.speakerPosition.isNullOrEmpty()) {
                     Text(
-                        text = event.speakerPosition!!,
-                        style = MaterialTheme.typography.labelLarge,
+                        text = "Speaker",
+                        style = MaterialTheme.typography.displaySmall,
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        AsyncImage(
+                            modifier = Modifier
+                                .size(60.dp)
+                                .clip(CircleShape),
+                            model = event.iconUrl,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(
+                                text = speaker.name,
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = event.speakerPosition!!,
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
         }
+
         Text(
             text = event.description ?: "",
             style = MaterialTheme.typography.bodyLarge,

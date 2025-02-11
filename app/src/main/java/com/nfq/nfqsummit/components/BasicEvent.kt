@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +46,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.nfq.data.domain.model.SpeakerModel
 import com.nfq.data.domain.model.SummitEvent
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.model.EventSize
@@ -175,37 +178,48 @@ fun BasicEvent(
                 modifier = Modifier.padding(end = end)
             )
 
-            if (event.speakerName.isNotBlank()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.padding(top = if (eventSize == EventSize.Small) 2.dp else 6.dp)
-                ) {
-                    Image(
-                        painter = if (event.speakerAvatar.isNotBlank())
-                            networkImagePainter(event.speakerAvatar) else
-                            painterResource(id = R.drawable.ic_user),
-                        contentDescription = event.speakerName,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(21.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFE6E6E6))
-                    )
+            SpeakerSection(speakers = event.speakers, eventSize = eventSize)
+        }
+    }
+}
 
-                    if (event.speakerName.isNotBlank())
-                        Text(
-                            text = event.speakerName,
-                            style = MaterialTheme.typography.bodySmall,
-                            fontSize = 10.sp,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Start,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                }
+@Composable
+private fun SpeakerSection(speakers: List<SpeakerModel>, eventSize: EventSize) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        modifier = Modifier.padding(top = if (eventSize == EventSize.Small) 2.dp else 6.dp)
+    ) {
+        Box {
+            var paddingStart = speakers.size * 12
+            speakers.reversed().forEach { speaker ->
+                paddingStart -= 12
+                Image(
+                    painter = if (speaker.avatar.isNotBlank())
+                        networkImagePainter(speaker.avatar) else
+                        painterResource(id = R.drawable.ic_user),
+                    contentDescription = speaker.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(start = paddingStart.dp)
+                        .size(21.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFE6E6E6))
+                )
             }
+        }
+        val speakerNames = speakers.joinToString(separator = ", ") { it.name }
+        if (speakerNames.isNotBlank()) {
+            Text(
+                text = speakerNames,
+                style = MaterialTheme.typography.bodySmall,
+                fontSize = 10.sp,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
         }
     }
 }
@@ -229,8 +243,7 @@ private fun BasicEventPreview(
                 event = SummitEvent(
                     name = "How to migrate from an Android codebase to KMMHow to migrate from an Android codebase to KMM",
                     iconUrl = "https://www.example.com/image.jpg",
-                    speakerName = "Speaker Name",
-                    speakerAvatar = "https://www.example.com/speaker.jpg",
+                    speakers = speakersPreview,
                     ordering = 4,
                     id = "1",
                     start = java.time.LocalDateTime.now(),
@@ -257,8 +270,7 @@ private fun BasicEventPreview() {
                 event = SummitEvent(
                     name = "How to migrate from an Android codebase to KMMHow to migrate from an Android codebase to KMM",
                     iconUrl = "https://www.example.com/image.jpg",
-                    speakerName = "Speaker Name",
-                    speakerAvatar = "https://www.example.com/speaker.jpg",
+                    speakers = speakersPreview.take(1),
                     ordering = 4,
                     id = "1",
                     start = java.time.LocalDateTime.now(),
@@ -275,3 +287,16 @@ private fun BasicEventPreview() {
         )
     }
 }
+
+private val speakersPreview = listOf(
+    SpeakerModel(
+        id = 1,
+        name = "Speaker Name",
+        avatar = "https://www.example.com/speaker.jpg"
+    ),
+    SpeakerModel(
+        id = 2,
+        name = "Speaker Name",
+        avatar = "https://www.example.com/speaker.jpg"
+    ),
+)

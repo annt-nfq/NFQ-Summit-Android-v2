@@ -30,7 +30,7 @@ data class EventActivityResponse(
     @SerialName("eventDay") val eventDay: EventDayResponse?,
     @SerialName("qrCodeUrl") val qrCodeUrl: String?,
     @SerialName("isFavorite") val isFavorite: Boolean?,
-    @SerialName("speaker") val speaker: SpeakerResponse?
+    @SerialName("speakers") val speakers: List<SpeakerResponse>?
 )
 
 @Serializable
