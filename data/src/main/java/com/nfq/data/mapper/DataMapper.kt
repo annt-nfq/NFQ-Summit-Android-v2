@@ -9,6 +9,7 @@ import com.nfq.data.domain.model.Attraction
 import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.CategoryEnum
 import com.nfq.data.domain.model.EventDetailsModel
+import com.nfq.data.domain.model.SpeakerModel
 import com.nfq.data.remote.model.response.AttendeeResponse
 import com.nfq.data.remote.model.response.AttractionResponse
 import com.nfq.data.remote.model.response.AttractionBlogResponse
@@ -50,7 +51,7 @@ fun EventActivityResponse.toEventEntity(): EventEntity {
         eventDay = eventDay,
         qrCodeUrl = qrCodeUrl.orEmpty(),
         isFavorite = isFavorite ?: false,
-        speaker = speaker,
+        speakers = speakers,
         updatedAt = 0L
     )
 }
@@ -89,8 +90,13 @@ fun EventEntity.toEventDetailsModel(): EventDetailsModel {
         longitude = longitude,
         isFavorite = isFavorite,
         coverPhotoUrl = images.find { image -> image.isNotBlank() }.orEmpty(),
-        speakerName = speaker?.name.orEmpty(),
-        speakerAvatar = speaker?.avatar.orEmpty()
+        speakers = speakers?.map {
+            SpeakerModel(
+                id = it.id,
+                name = it.name,
+                avatar = it.avatar
+            )
+        }.orEmpty()
     )
 }
 

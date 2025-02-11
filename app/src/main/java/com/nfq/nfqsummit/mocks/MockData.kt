@@ -68,7 +68,7 @@ val mockEventDay1 = SummitEvent(
     "",
     "Bangkok, Thailand",
     iconUrl = "",
-    speakerName = "Speaker Name",
+    speakers = emptyList(),
     speakerPosition = "Speaker Position",
 )
 val mockEventDay1H1 = SummitEvent(
@@ -81,7 +81,7 @@ val mockEventDay1H1 = SummitEvent(
     "",
     "Bangkok, Thailand",
     iconUrl = "",
-    speakerName = "Speaker Name",
+    speakers = emptyList(),
     speakerPosition = "Speaker Position",
 )
 val mockEventDay1H12 = SummitEvent(
@@ -94,7 +94,7 @@ val mockEventDay1H12 = SummitEvent(
     "",
     "Bangkok, Thailand",
     iconUrl = "",
-    speakerName = "Speaker Name",
+    speakers = emptyList(),
     speakerPosition = "Speaker Position",
 )
 val mockEventDay1H13 = SummitEvent(
@@ -107,7 +107,7 @@ val mockEventDay1H13 = SummitEvent(
     "",
     "Bangkok, Thailand",
     iconUrl = "",
-    speakerName = "Speaker Name",
+    speakers = emptyList(),
     speakerPosition = "Speaker Position",
 )
 
@@ -132,7 +132,7 @@ val mockSpeakerEvent = SummitEvent(
     LocalDate.of(2024, 1, 1).atTime(11, 0),
     iconUrl = "",
     ordering = 1,
-    speakerName = "Speaker One",
+    speakers = emptyList(),
 )
 
 val mockSpeakerEvent2 = SummitEvent(
@@ -142,7 +142,7 @@ val mockSpeakerEvent2 = SummitEvent(
     LocalDate.of(2024, 1, 1).atTime(12, 30),
     iconUrl = "",
     ordering = 1,
-    speakerName = "Speaker Two",
+    speakers = emptyList(),
 )
 
 val mockAttraction = Attraction(
