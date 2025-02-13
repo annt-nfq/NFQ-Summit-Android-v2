@@ -49,6 +49,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -247,6 +248,10 @@ private fun HomeTabUI(
     onShowVoucher: () -> Unit,
     markAsFavorite: (favorite: Boolean, event: UpcomingEventUIModel) -> Unit
 ) {
+    val containerColor = if (uiState.user != null) MaterialTheme.colorScheme.surface
+    else MaterialTheme.colorScheme.primary
+    val contentColor = MaterialTheme.colorScheme.onPrimary
+
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -254,26 +259,38 @@ private fun HomeTabUI(
             contentPadding = PaddingValues(bottom = 24.dp),
             modifier = Modifier.navigationBarsPadding()
         ) {
+            if (uiState.user == null) {
+                tapToShowSection(
+                    modifier = Modifier.padding(top = 12.dp),
+                    iconRes = R.drawable.ic_face_id_solid,
+                    iconSize = 75.dp,
+                    title = "Please sign-in",
+                    description = "Sign in with your QR or attendee code to see your registered events.",
+                    containerColor = containerColor,
+                    contentColor = contentColor,
+                    onTap = { }
+                )
+            }
+            if (uiState.user != null) {
+                tapToShowSection(
+                    modifier = Modifier.padding(top = 12.dp),
+                    iconRes = R.drawable.ic_logo_qrcode,
+                    iconSize = 75.dp,
+                    title = "Tap to show my QR Code",
+                    description = "You'll need to show this at NFQ Summit registration \uD83D\uDCCB",
+                    containerColor = containerColor,
+                    onTap = { onShowQRCode() }
+                )
+            }
 
-            tapToShowSection(
-                modifier = Modifier.padding(top = 12.dp),
-                iconRes = R.drawable.ic_logo_qrcode,
-                title = "Tap to show my QR Code",
-                description = "You'll need to show this at NFQ Summit registration \uD83D\uDCCB",
-                onTap = {
-                    if (uiState.user == null) {
-                        goToSignIn()
-                    } else {
-                        onShowQRCode()
-                    }
-                }
-            )
             if (uiState.user != null && uiState.vouchers.isNotEmpty()) {
                 tapToShowSection(
                     modifier = Modifier.padding(top = 8.dp),
                     iconRes = R.drawable.ic_voucher,
+                    iconSize = 82.dp,
                     title = "Tap to show my vouchers",
                     description = "Quick access to your vouchers at a tap! \uD83C\uDFAB",
+                    containerColor = containerColor,
                     onTap = onShowVoucher
                 )
             }
@@ -298,8 +315,11 @@ private fun HomeTabUI(
 private fun LazyListScope.tapToShowSection(
     onTap: () -> Unit,
     iconRes: Int,
+    iconSize: Dp,
     title: String,
     description: String,
+    containerColor: Color,
+    contentColor: Color? = null,
     modifier: Modifier = Modifier
 ) {
     item {
@@ -319,7 +339,8 @@ private fun LazyListScope.tapToShowSection(
                     )
                     .clip(RoundedCornerShape(32.dp))
                     .clickable { onTap() }
-                    .background(MaterialTheme.colorScheme.surface)) {
+                    .background(containerColor)
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
@@ -329,7 +350,7 @@ private fun LazyListScope.tapToShowSection(
                     Image(
                         painter = painterResource(id = iconRes),
                         contentDescription = null,
-                        modifier = Modifier.size(75.dp)
+                        modifier = Modifier.size(iconSize)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(
@@ -339,15 +360,15 @@ private fun LazyListScope.tapToShowSection(
                             text = title,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = contentColor ?: MaterialTheme.colorScheme.primary
                             )
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = description,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onBackground.copy(0.5f)
-                            )
+                            style = MaterialTheme.typography.bodySmall,
+                            color = contentColor
+                                ?: MaterialTheme.colorScheme.onBackground.copy(0.5f)
                         )
                     }
                 }
