@@ -73,6 +73,7 @@ import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.screens.eventDetails.HandlePermissionDialogs
 import com.nfq.nfqsummit.screens.eventDetails.setUpScheduler
 import com.nfq.nfqsummit.screens.qrCode.QRCodeBottomSheet
+import com.nfq.nfqsummit.screens.signIn.SignInBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import com.nfq.nfqsummit.ui.theme.boxShadow
 
@@ -94,6 +95,7 @@ fun HomeTab(
 
 
     var isEventDetailsBottomSheetVisible by remember { mutableStateOf(false) }
+    var isSignInBottomSheetVisible by remember { mutableStateOf(false) }
     var selectedEventId by remember { mutableStateOf("") }
     var isQRCodeBottomSheetVisible by remember { mutableStateOf(false) }
     var isVoucherDialogVisible by remember { mutableStateOf(false) }
@@ -136,6 +138,13 @@ fun HomeTab(
         EventDetailsBottomSheet(
             eventId = selectedEventId,
             onDismissRequest = { isEventDetailsBottomSheetVisible = false }
+        )
+    }
+
+    if (isSignInBottomSheetVisible){
+        SignInBottomSheet(
+            onDismissRequest = { isSignInBottomSheetVisible = false },
+            goToSignIn = goToSignIn
         )
     }
 
@@ -203,7 +212,7 @@ fun HomeTab(
     HomeTabUI(
         uiState = uiState,
         goToAttractions = goToAttractions,
-        goToSignIn = goToSignIn,
+        onShowSignInBS = { isSignInBottomSheetVisible = true },
         markAsFavorite = { isFavorite, event ->
             pendingAction = {
                 setUpScheduler(
@@ -240,7 +249,7 @@ fun HomeTab(
 private fun HomeTabUI(
     uiState: HomeUIState,
     goToDetails: (String) -> Unit,
-    goToSignIn: () -> Unit,
+    onShowSignInBS: () -> Unit,
     goToAttractions: () -> Unit,
     seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
@@ -268,7 +277,7 @@ private fun HomeTabUI(
                     description = "Sign in with your QR or attendee code to see your registered events.",
                     containerColor = containerColor,
                     contentColor = contentColor,
-                    onTap = { }
+                    onTap = { onShowSignInBS() }
                 )
             }
             if (uiState.user != null) {
@@ -518,7 +527,7 @@ fun HomeTabUIPreview() {
         HomeTabUI(
             goToDetails = {},
             goToAttractions = {},
-            goToSignIn = {},
+            onShowSignInBS = {},
             markAsFavorite = { _, _ -> },
             uiState = HomeUIState(
                 upcomingEvents = mockUpcomingEvents,
@@ -537,7 +546,7 @@ fun HomeTabUIDarkPreview() {
         HomeTabUI(
             goToDetails = {},
             goToAttractions = {},
-            goToSignIn = {},
+            onShowSignInBS = {},
             markAsFavorite = { _, _ -> },
             uiState = HomeUIState(
                 upcomingEvents = mockUpcomingEvents,

@@ -176,7 +176,7 @@ fun DashboardScreen(
                     )
                 }
                 composable(AppDestination.Schedule.route) {
-                    ScheduleTab()
+                    ScheduleTab(goToSignIn = goToSignIn)
                 }
                 composable(AppDestination.Explore.route) {
                     ExploreTab(

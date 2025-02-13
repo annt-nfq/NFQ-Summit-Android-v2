@@ -188,7 +188,11 @@ private fun SignInUI(
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    SignInButton(text, focusManager, onEvent)
+                    SignInButton(
+                        enabled = text.isNotBlank(),
+                        focusManager = focusManager,
+                        onClickAction = { onEvent(SignInEvent.SignIn(text)) }
+                    )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
                         text = "Please check your email for your booking number or upload your booking QR code here to sign in.",
@@ -216,10 +220,13 @@ private fun SignInUI(
 }
 
 @Composable
-private fun SignInButton(
-    text: String,
+fun SignInButton(
     focusManager: FocusManager,
-    onEvent: (SignInEvent) -> Unit
+    onClickAction: () -> Unit,
+    enabled: Boolean = true,
+    hideNextIcon: Boolean = false,
+    containerColor: Color = MaterialTheme.colorScheme.primary,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary
 ) {
     Box(
         modifier = Modifier
@@ -234,35 +241,37 @@ private fun SignInButton(
             )
             .clip(RoundedCornerShape(16.dp))
             .clickable {
-                if (text.isBlank()) return@clickable
+                if (!enabled) return@clickable
                 focusManager.clearFocus()
-                onEvent(SignInEvent.SignIn(text))
+                onClickAction()
             }
-            .background(MaterialTheme.colorScheme.primary)
+            .background(containerColor)
     ) {
         Text(
             text = "Sign In",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = contentColor,
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.sp,
             modifier = Modifier.align(Alignment.Center)
         )
-        Row(modifier = Modifier.align(Alignment.CenterEnd)) {
-            Box(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f))
-                    .padding(8.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_big_arrow_right),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.background),
-                    modifier = Modifier.size(13.dp)
-                )
+        if (!hideNextIcon) {
+            Row(modifier = Modifier.align(Alignment.CenterEnd)) {
+                Box(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(contentColor.copy(alpha = 0.3f))
+                        .padding(8.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_big_arrow_right),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.background),
+                        modifier = Modifier.size(13.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
             }
-            Spacer(modifier = Modifier.width(16.dp))
         }
     }
 }
