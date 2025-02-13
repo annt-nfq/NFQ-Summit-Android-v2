@@ -157,7 +157,7 @@ class NFQSummitRepositoryImpl @Inject constructor(
                         id = it.id.toString(),
                         type = it.type,
                         date = it.date,
-                        location = it.locations.joinToString(", ") { location -> location.name },
+                        locations = it.locations,
                         price = vietnamPriceFormatter.format(it.price),
                         imageUrl = it.imageUrl,
                         sponsorLogoUrls = it.sponsorLogoUrls

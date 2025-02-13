@@ -33,8 +33,10 @@ android {
         }
         debug {
             isMinifyEnabled = false
-            buildConfigField("String", "BASIC_TOKEN", "\"${p.getProperty("DEV_BASIC_TOKEN")}\"")
-            buildConfigField("String", "BASE_URL", "\"${p.getProperty("DEV_BASE_URL")}\"")
+            /*buildConfigField("String", "BASIC_TOKEN", "\"${p.getProperty("DEV_BASIC_TOKEN")}\"")
+            buildConfigField("String", "BASE_URL", "\"${p.getProperty("DEV_BASE_URL")}\"")*/
+            buildConfigField("String", "BASIC_TOKEN", "\"${p.getProperty("BASIC_TOKEN")}\"")
+            buildConfigField("String", "BASE_URL", "\"${p.getProperty("BASE_URL")}\"")
         }
     }
     compileOptions {

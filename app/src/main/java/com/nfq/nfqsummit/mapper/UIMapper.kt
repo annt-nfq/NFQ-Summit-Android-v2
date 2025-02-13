@@ -14,6 +14,7 @@ import com.nfq.data.remote.model.response.GenreResponse
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTime
 import com.nfq.nfqsummit.components.ImageCache
+import com.nfq.nfqsummit.model.LocationUIModel
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.model.UpcomingEventUIModel
 import com.nfq.nfqsummit.model.UserUIModel
@@ -23,13 +24,19 @@ fun List<EventEntity>.toSavedEventUIModels(): List<SavedEventUIModel> {
     return this.map { it.toSavedEventUIModel() }
 }
 
-suspend fun List<VoucherEntity>.toVoucherUIModels(context: Context): Map<String,List<VoucherUIModel>> {
-    val imageCache =  ImageCache(context = context)
+suspend fun List<VoucherEntity>.toVoucherUIModels(context: Context): Map<String, List<VoucherUIModel>> {
+    val imageCache = ImageCache(context = context)
     return this.map {
         VoucherUIModel(
             type = it.type,
             date = it.date,
-            location = it.location,
+            locations = it.locations.map { location ->
+                LocationUIModel(
+                    id = location.id,
+                    name = location.name,
+                    address = location.address
+                )
+            },
             price = it.price,
             imageUrl = it.imageUrl,
             imageBitmap = imageCache.getImage(it.imageUrl),

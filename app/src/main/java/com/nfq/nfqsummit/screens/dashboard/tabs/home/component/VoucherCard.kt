@@ -5,13 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -32,10 +30,10 @@ import androidx.compose.ui.unit.sp
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.networkImagePainter
+import com.nfq.nfqsummit.model.LocationUIModel
 import com.nfq.nfqsummit.model.VoucherUIModel
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VoucherCard(
     attendeeName: String,
@@ -82,7 +80,8 @@ fun VoucherCard(
                         text = model.price,
                         style = MaterialTheme.typography.displaySmall,
                         fontSize = 20.sp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        letterSpacing = (-0.5).sp,
                     )
                     Image(
                         painter = painterResource(R.drawable.ic_currency),
@@ -95,9 +94,10 @@ fun VoucherCard(
 
             Box(
                 modifier = Modifier
-                    .padding(32.dp)
+                    .padding(top = 16.dp)
+                    .padding(bottom = 24.dp)
                     .clip(CircleShape)
-                    .aspectRatio(230f / 230f)
+                    .size(150.dp)
             ) {
                 model.imageBitmap?.asImageBitmap()?.let {
                     Image(
@@ -110,41 +110,30 @@ fun VoucherCard(
 
             Text(
                 text = model.date,
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onPrimary
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.5).sp,
             )
 
             Text(
                 text = attendeeName,
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.5).sp,
+                modifier = Modifier.padding(top = 6.dp)
             )
 
-            FlowRow(
-                modifier = Modifier.padding(top = 24.dp)
+            Column(
+                modifier = Modifier.padding(top = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_location_16_filled),
-                    contentDescription = "ic_location_16_filled"
-                )
-
-                Text(
-                    text = model.location,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.W700,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-
-                Text(
-                    text = "Please Show This to the Restaurant Staff",
-                    style = MaterialTheme.typography.labelSmall,
-                    fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+                model.locations.map { model ->
+                    LocationItem(
+                        model = model
+                    )
+                }
             }
 
             LazyRow(
@@ -166,6 +155,40 @@ fun VoucherCard(
     }
 }
 
+@Composable
+private fun LocationItem(model: LocationUIModel) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_location_16_filled),
+                contentDescription = "ic_location_16_filled"
+            )
+
+            Text(
+                text = model.name,
+                style = MaterialTheme.typography.labelSmall,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
+        Text(
+            text = model.address,
+            style = MaterialTheme.typography.labelSmall,
+            fontSize = 10.sp,
+            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
+            modifier = Modifier.padding(top = 3.dp)
+        )
+    }
+
+}
+
 @Preview
 @Composable
 private fun VoucherCardPreview() {
@@ -175,7 +198,13 @@ private fun VoucherCardPreview() {
             model = VoucherUIModel(
                 type = "Lunch",
                 date = "26th Feb 2025",
-                location = "The Sentry",
+                locations = listOf(
+                    LocationUIModel(
+                        id = 1,
+                        name = "NFQ Technologies",
+                        address = "Bangkok, Thailand"
+                    )
+                ),
                 price = "350.000",
                 imageUrl = "https://picsum.photos/200",
                 imageBitmap = null,
