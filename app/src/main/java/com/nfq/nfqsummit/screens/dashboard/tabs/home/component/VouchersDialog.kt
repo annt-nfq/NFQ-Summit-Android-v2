@@ -120,7 +120,7 @@ private fun VouchersContent(
                                 .height(38.dp)
                         ) {
                             Text(
-                                text = date,
+                                text = "${list.firstOrNull()?.type ?: ""}, $date",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
