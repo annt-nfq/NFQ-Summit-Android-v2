@@ -76,7 +76,7 @@ fun ExploreTab(
         }
     }
 
-    TrackScreenViewEvent(screenName = "Explore")
+    TrackScreenViewEvent(screenName = "explore")
 }
 
 data class ExploreItem(

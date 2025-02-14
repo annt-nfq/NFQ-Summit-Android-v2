@@ -124,7 +124,7 @@ fun SignInScreen(
         }
     )
 
-    TrackScreenViewEvent(screenName = "SignIn")
+    TrackScreenViewEvent(screenName = "sign_in")
 }
 
 @Composable

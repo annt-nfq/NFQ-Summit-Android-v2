@@ -110,10 +110,10 @@ fun AppNavHost(
                 },
                 goToDestination = {
                     val screen = when (it) {
-                        AppDestination.Survival.route -> "SurvivalKit"
-                        AppDestination.Transportations.route -> "Transportation"
-                        AppDestination.Payment.route -> "Payment"
-                        AppDestination.Attractions.route -> "Attractions"
+                        AppDestination.Survival.route -> "survival_kit"
+                        AppDestination.Transportations.route -> "transportation"
+                        AppDestination.Payment.route -> "payment"
+                        AppDestination.Attractions.route -> "attractions"
                         else -> ""
                     }
                     if (screen.isNotEmpty()) {

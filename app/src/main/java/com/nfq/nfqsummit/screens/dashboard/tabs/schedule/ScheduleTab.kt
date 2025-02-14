@@ -109,7 +109,7 @@ fun ScheduleTab(
         }
     )
 
-    TrackScreenViewEvent(screenName = "Calendar")
+    TrackScreenViewEvent(screenName = "calendar")
 }
 
 @Composable

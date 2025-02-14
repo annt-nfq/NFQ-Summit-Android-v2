@@ -252,7 +252,7 @@ fun HomeTab(
         }
     )
 
-    TrackScreenViewEvent(screenName = "Home")
+    TrackScreenViewEvent(screenName = "home")
 }
 
 @Composable

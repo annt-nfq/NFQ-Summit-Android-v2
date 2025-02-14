@@ -63,7 +63,7 @@ fun QRCodeBottomSheet(
         }
     )
 
-    TrackScreenViewEvent(screenName = "QRCode")
+    TrackScreenViewEvent(screenName = "qr_code")
 }
 
 @Composable

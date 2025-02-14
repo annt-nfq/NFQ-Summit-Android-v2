@@ -57,7 +57,7 @@ fun SavedEventTab(
         }
     )
 
-    TrackScreenViewEvent(screenName = "SavedEvent")
+    TrackScreenViewEvent(screenName = "saved_event")
 }
 
 @Composable

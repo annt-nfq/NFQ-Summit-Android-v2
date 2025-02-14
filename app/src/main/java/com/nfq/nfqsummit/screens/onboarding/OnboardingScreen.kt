@@ -91,7 +91,7 @@ fun OnboardingScreen(
             viewModel.updateOnboardingStatus(true)
         }
     )
-    TrackScreenViewEvent(screenName = "Onboarding")
+    TrackScreenViewEvent(screenName = "onboarding")
 }
 
 

@@ -173,7 +173,7 @@ fun EventDetailsBottomSheet(
             }
         }
     )
-    TrackScreenViewEvent(screenName = "EventDetail")
+    TrackScreenViewEvent(screenName = "event_detail")
 }
 
 @Composable
