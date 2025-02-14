@@ -9,6 +9,7 @@ import com.nfq.data.domain.model.Attraction
 import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.CategoryEnum
 import com.nfq.data.domain.model.EventDetailsModel
+import com.nfq.data.domain.model.EventLocationsModel
 import com.nfq.data.domain.model.SpeakerModel
 import com.nfq.data.remote.model.response.AttendeeResponse
 import com.nfq.data.remote.model.response.AttractionResponse
@@ -38,6 +39,7 @@ fun EventActivityResponse.toEventEntity(): EventEntity {
         location = location.orEmpty(),
         latitude = latitude ?: 0.0,
         longitude = longitude ?: 0.0,
+        locations = locations.orEmpty(),
         gatherTime = gatherTime.orEmpty(),
         gatherLocation = gatherLocation.orEmpty(),
         leavingTime = leavingTime.orEmpty(),
@@ -88,6 +90,15 @@ fun EventEntity.toEventDetailsModel(): EventDetailsModel {
         locationName = location,
         latitude = latitude,
         longitude = longitude,
+        locations = locations.map {
+            EventLocationsModel(
+                id = it.id,
+                name = it.name,
+                address = it.address,
+                latitude = it.latitude,
+                longitude = it.longitude
+            )
+        },
         isFavorite = isFavorite,
         coverPhotoUrl = images.find { image -> image.isNotBlank() }.orEmpty(),
         speakers = speakers?.map {

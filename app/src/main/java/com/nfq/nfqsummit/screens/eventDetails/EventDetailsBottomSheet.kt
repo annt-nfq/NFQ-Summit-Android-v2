@@ -18,6 +18,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -64,9 +65,11 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.nfq.data.domain.model.EventDetailsModel
+import com.nfq.data.domain.model.EventLocationsModel
 import com.nfq.data.domain.model.SpeakerModel
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicAlertDialog
+import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
 import com.nfq.nfqsummit.components.HtmlText
 import com.nfq.nfqsummit.components.bounceClick
@@ -389,76 +392,41 @@ private fun EventDetailsUI(
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.bottomSheetMedium)
                     .fillMaxHeight(0.92f)
-
-
             ) {
 
                 Column(
-                    modifier = Modifier
-                        .padding(vertical = 32.dp)
-                        .padding(horizontal = 24.dp)
+                    modifier = Modifier.padding(vertical = 32.dp)
                 ) {
                     Text(
                         text = event.name,
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(horizontal = 24.dp)
                     )
 
-                    Row(
-                        modifier = Modifier.padding(top = 16.dp),
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_loaction),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                        )
-                        Text(
-                            text = event.locationName,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 10.sp,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 6.dp)
-                                .padding(top = 8.dp)
-                                .padding(end = 8.dp)
-                        )
+                    if (event.locations.size > 1) {
                         BookmarkItem(
                             isFavorite = event.isFavorite,
                             id = event.id,
                             markAsFavorite = markAsFavorite,
                             iconTint = if (event.isFavorite) Color.White else MaterialTheme.colorScheme.primary,
-                            backgroundColor = if (event.isFavorite) MaterialTheme.colorScheme.primary else Color.Transparent
-                        )
-                        Box(
-                            contentAlignment = Alignment.Center,
+                            backgroundColor = if (event.isFavorite) MaterialTheme.colorScheme.primary else Color.Transparent,
                             modifier = Modifier
-                                .padding(start = 8.dp)
-                                .size(116.dp, 30.dp)
-                                .bounceClick()
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable {
-                                    onViewLocation(
-                                        event.latitude,
-                                        event.longitude,
-                                        event.locationName
-                                    )
-                                }
-                                .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
-                                .background(color = MaterialTheme.colorScheme.primary)
-
-
-                        ) {
-                            Text(
-                                text = "View Location",
-                                style = MaterialTheme.typography.bodySmall,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
+                                .padding(top = 8.dp)
+                                .padding(start = 24.dp)
+                        )
+                        MultipleLocationSection(
+                            locations = event.locations,
+                            onViewLocation = onViewLocation,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+                    } else {
+                        SingleLocationSection(
+                            event = event,
+                            markAsFavorite = markAsFavorite,
+                            onViewLocation = onViewLocation,
+                            modifier = Modifier.padding(horizontal = 24.dp)
+                        )
                     }
 
                     SpeakersSection(event.speakers)
@@ -466,6 +434,7 @@ private fun EventDetailsUI(
                     Column(
                         modifier = Modifier
                             .padding(top = 24.dp)
+                            .padding(horizontal = 24.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
                         Text(
@@ -499,12 +468,163 @@ private fun EventDetailsUI(
 }
 
 @Composable
+private fun SingleLocationSection(
+    modifier: Modifier = Modifier,
+    event: EventDetailsModel,
+    markAsFavorite: (isFavorite: Boolean, event: String) -> Unit,
+    onViewLocation: (latitude: Double?, longitude: Double?, locationName: String) -> Unit
+) {
+    Row(
+        modifier = modifier.padding(top = 16.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_loaction),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(top = 6.dp)
+        )
+        Text(
+            text = event.locationName,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Medium,
+            fontSize = 10.sp,
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 6.dp)
+                .padding(top = 8.dp)
+                .padding(end = 8.dp)
+        )
+        BookmarkItem(
+            isFavorite = event.isFavorite,
+            id = event.id,
+            markAsFavorite = markAsFavorite,
+            iconTint = if (event.isFavorite) Color.White else MaterialTheme.colorScheme.primary,
+            backgroundColor = if (event.isFavorite) MaterialTheme.colorScheme.primary else Color.Transparent
+        )
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .size(116.dp, 30.dp)
+                .bounceClick()
+                .clip(RoundedCornerShape(8.dp))
+                .clickable {
+                    onViewLocation(
+                        event.latitude,
+                        event.longitude,
+                        event.locationName
+                    )
+                }
+                .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
+                .background(color = MaterialTheme.colorScheme.primary)
+
+
+        ) {
+            Text(
+                text = "View Location",
+                style = MaterialTheme.typography.bodySmall,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    }
+}
+
+@Composable
+private fun MultipleLocationSection(
+    modifier: Modifier = Modifier,
+    locations: List<EventLocationsModel>,
+    onViewLocation: (latitude: Double?, longitude: Double?, locationName: String) -> Unit
+) {
+
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Row {
+            Text(
+                text = "Available Locations",
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .padding(start = 24.dp)
+            )
+            Image(
+                painter = painterResource(id = R.drawable.ic_loaction),
+                contentDescription = null
+            )
+        }
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp)
+        ) {
+            items(locations) { location ->
+                BasicCard(
+                    blurRadius = 10.dp
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            text = location.name,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 10.sp,
+                            modifier = Modifier
+                                .padding(start = 6.dp)
+                                .padding(top = 24.dp)
+                                .padding(end = 8.dp)
+                                .padding(bottom = 16.dp)
+                        )
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .padding(horizontal = 24.dp)
+                                .padding(bottom = 16.dp)
+                                .size(116.dp, 30.dp)
+                                .bounceClick()
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    onViewLocation(
+                                        location.latitude,
+                                        location.longitude,
+                                        location.name
+                                    )
+                                }
+                                .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
+                                .background(color = MaterialTheme.colorScheme.primary)
+
+
+                        ) {
+                            Text(
+                                text = "View Location",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun SpeakersSection(
     speakers: List<SpeakerModel>
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(top = 8.dp)
+        modifier = Modifier
+            .padding(top = 8.dp)
+            .padding(horizontal = 24.dp)
     ) {
         items(speakers) { speaker ->
             if (speaker.name.isNotBlank()) {
@@ -551,6 +671,7 @@ private fun EventDetailsPreview() {
                 startTime = LocalDateTime.now().format(
                     DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")
                 ),
+                locations = emptyList(),
                 speakers = listOf(
                     SpeakerModel(
                         id = 1,
@@ -567,6 +688,87 @@ private fun EventDetailsPreview() {
 
             markAsFavorite = { _, _ -> },
             onViewLocation = { _, _, _ -> },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun EventDetailsWithMultipleLocationsPreview() {
+    NFQSnapshotTestThemeForPreview {
+        EventDetailsUI(
+            event = EventDetailsModel(
+                id = "1",
+                name = "Pre-Summit Check in @Vietnam Saigon Office",
+                description = "<p>Kicking off your morning at 8 AM with an hour of Muay Thai with our professional trainer . It's your personal dose of adrenaline, focus, and sweat. Let&rsquo;s learn the art of Thai boxing and get stronger together! I know, 8am is hard especially with Jet Lag. As we pay the trainer only for you - if you sign up you must be there! Otherwise I will personally send the Muay Thai Trainer to kick you out of the bed.<\\/p>",
+                latitude = 0.0,
+                longitude = 0.0,
+                coverPhotoUrl = "",
+                locationName = "Saigon, Vietnam Office ",
+                isFavorite = false,
+                startDateTime = LocalDateTime.now(),
+                startTime = LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")
+                ),
+                locations = listOf(
+                    EventLocationsModel(
+                        id = 1,
+                        name = "Location 1",
+                        address = "Address 1",
+                        latitude = 0.0,
+                        longitude = 0.0
+                    ),
+                    EventLocationsModel(
+                        id = 2,
+                        name = "Location 2",
+                        address = "Address 2",
+                        latitude = 0.0,
+                        longitude = 0.0
+                    )
+                ),
+                speakers = listOf(
+                    SpeakerModel(
+                        id = 1,
+                        name = "John Doe",
+                        avatar = ""
+                    ),
+                    SpeakerModel(
+                        id = 2,
+                        name = "Jane Doe",
+                        avatar = ""
+                    )
+                )
+            ),
+
+            markAsFavorite = { _, _ -> },
+            onViewLocation = { _, _, _ -> },
+        )
+    }
+}
+
+
+@Preview
+@Composable
+private fun MultipleLocationSectionPreview() {
+    NFQSnapshotTestThemeForPreview {
+        MultipleLocationSection(
+            locations = listOf(
+                EventLocationsModel(
+                    id = 1,
+                    name = "Location 1",
+                    address = "Address 1",
+                    latitude = 0.0,
+                    longitude = 0.0
+                ),
+                EventLocationsModel(
+                    id = 2,
+                    name = "Location 2",
+                    address = "Address 2",
+                    latitude = 0.0,
+                    longitude = 0.0
+                )
+            ),
+            onViewLocation = { _, _, _ -> }
         )
     }
 }

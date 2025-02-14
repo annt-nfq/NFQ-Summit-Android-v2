@@ -11,7 +11,16 @@ data class EventDetailsModel(
     val locationName: String,
     val latitude: Double?,
     val longitude: Double?,
+    val locations: List<EventLocationsModel>,
     val coverPhotoUrl: String,
     val isFavorite: Boolean,
     val speakers: List<SpeakerModel>
+)
+
+data class EventLocationsModel(
+    val id: Int,
+    val name: String,
+    val address: String,
+    val latitude: Double,
+    val longitude: Double
 )

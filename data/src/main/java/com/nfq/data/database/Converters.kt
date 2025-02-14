@@ -3,6 +3,7 @@ package com.nfq.data.database
 import androidx.room.TypeConverter
 import com.nfq.data.remote.model.response.CategoryResponse
 import com.nfq.data.remote.model.response.EventDayResponse
+import com.nfq.data.remote.model.response.EventLocationResponse
 import com.nfq.data.remote.model.response.GenreResponse
 import com.nfq.data.remote.model.response.LocationResponse
 import com.nfq.data.remote.model.response.SpeakerResponse
@@ -68,6 +69,16 @@ class EventTypeConverters {
 
     @TypeConverter
     fun toLocationResponseList(value: String?): List<LocationResponse>? {
+        return value?.let { Json.decodeFromString(it) }
+    }
+
+    @TypeConverter
+    fun fromEventLocationResponseList(value: List<EventLocationResponse>?): String? {
+        return value?.let { Json.encodeToString(it) }
+    }
+
+    @TypeConverter
+    fun toEventLocationResponseList(value: String?): List<EventLocationResponse>? {
         return value?.let { Json.decodeFromString(it) }
     }
 }
