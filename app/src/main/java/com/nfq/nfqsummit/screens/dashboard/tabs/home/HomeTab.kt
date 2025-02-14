@@ -59,6 +59,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
+import com.nfq.nfqsummit.analytics.helper.LocalAnalyticsHelper
+import com.nfq.nfqsummit.analytics.logTapToShowQrCode
 import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.Loading
@@ -86,6 +88,7 @@ fun HomeTab(
     seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
 ) {
+    val analyticsHelper = LocalAnalyticsHelper.current
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val showReminderDialog by viewModel.showReminderDialog.collectAsState()
@@ -241,6 +244,10 @@ fun HomeTab(
             isVoucherDialogVisible = true
         },
         onShowQRCode = {
+            uiState.user?.attendeeCode?.let {
+                analyticsHelper.logTapToShowQrCode(it)
+            }
+
             isQRCodeBottomSheetVisible = true
         }
     )

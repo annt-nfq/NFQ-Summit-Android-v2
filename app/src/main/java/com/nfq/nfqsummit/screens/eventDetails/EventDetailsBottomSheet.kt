@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,6 +70,8 @@ import com.nfq.data.domain.model.EventLocationsModel
 import com.nfq.data.domain.model.SpeakerModel
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
+import com.nfq.nfqsummit.analytics.helper.LocalAnalyticsHelper
+import com.nfq.nfqsummit.analytics.logViewLocation
 import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
@@ -89,6 +92,7 @@ fun EventDetailsBottomSheet(
     eventId: String,
     onDismissRequest: () -> Unit
 ) {
+    val analyticsHelper = LocalAnalyticsHelper.current
     val skipPartiallyExpanded by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded)
     val scope = rememberCoroutineScope()
@@ -105,6 +109,7 @@ fun EventDetailsBottomSheet(
         }
     }
     val viewModel: EventDetailsBottomSheetViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(eventId) {
         viewModel.getEvent(eventId)
@@ -128,7 +133,7 @@ fun EventDetailsBottomSheet(
     BasicModalBottomSheet(
         onDismissRequest = onDismissRequest,
         content = {
-            viewModel.event?.let { event ->
+            uiState.event?.let { event ->
                 EventDetailsUI(
                     event = event,
                     markAsFavorite = { isFavorite, _ ->
@@ -151,6 +156,11 @@ fun EventDetailsBottomSheet(
                     onViewLocation = { latitude, longitude, locationName ->
                         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
                             if (!bottomSheetState.isVisible) {
+                                analyticsHelper.logViewLocation(
+                                    attendeeCode = uiState.attendeeCode,
+                                    eventId = event.id,
+                                    eventTitle = event.name
+                                )
                                 context.openMapView(
                                     latitude = latitude,
                                     longitude = longitude,

@@ -22,6 +22,102 @@ fun AnalyticsHelper.logScreenView(screenName: String) {
     )
 }
 
+fun AnalyticsHelper.logLoginWithQrCodeSuccess(attendeeCode: String) {
+    logEvent(
+        AnalyticsEvent(
+            type = Types.LOGIN_WITH_QR_CODE_SUCCESS,
+            extras = listOf(
+                Param(ParamKeys.QR_CODE, attendeeCode)
+            )
+        )
+    )
+}
+
+fun AnalyticsHelper.logLoginWithQrCodeFail(attendeeCode: String, error: String) {
+    logEvent(
+        AnalyticsEvent(
+            type = Types.LOGIN_WITH_QR_CODE_FAIL,
+            extras = listOf(
+                Param(ParamKeys.QR_CODE, attendeeCode),
+                Param(ParamKeys.ERROR, error)
+            )
+        )
+    )
+}
+
+fun AnalyticsHelper.logTapToShowQrCode(attendeeCode: String) {
+    logEvent(
+        AnalyticsEvent(
+            type = Types.TAP_TO_SHOW_QR_CODE,
+            extras = listOf(
+                Param(ParamKeys.QR_CODE, attendeeCode)
+            )
+        )
+    )
+}
+
+fun AnalyticsHelper.logViewLocation(
+    attendeeCode: String,
+    eventId: String,
+    eventTitle: String
+) {
+    logEvent(
+        AnalyticsEvent(
+            type = Types.VIEW_LOCATION,
+            extras = listOf(
+                Param(ParamKeys.QR_CODE, attendeeCode),
+                Param(ParamKeys.EVENT_ID, eventId),
+                Param(ParamKeys.EVENT_TITLE, eventTitle)
+            )
+        )
+    )
+}
+
+fun AnalyticsHelper.logSaveEvent(
+    attendeeCode: String,
+    eventId: String,
+    eventTitle: String
+) {
+    logEvent(
+        AnalyticsEvent(
+            type = Types.SAVE_EVENT,
+            extras = listOf(
+                Param(ParamKeys.QR_CODE, attendeeCode),
+                Param(ParamKeys.EVENT_ID, eventId),
+                Param(ParamKeys.EVENT_TITLE, eventTitle)
+            )
+        )
+    )
+}
+
+fun AnalyticsHelper.logSaveAttraction(
+    attendeeCode: String,
+    attractionId: String,
+    attractionTitle: String
+) {
+    logEvent(
+        AnalyticsEvent(
+            type = Types.SAVE_ATTRACTION,
+            extras = listOf(
+                Param(ParamKeys.QR_CODE, attendeeCode),
+                Param(ParamKeys.ATTRACTION_ID, attractionId),
+                Param(ParamKeys.ATTRACTION_TITLE, attractionTitle)
+            )
+        )
+    )
+}
+
+fun AnalyticsHelper.logSignOut(attendeeCode: String) {
+    logEvent(
+        AnalyticsEvent(
+            type = Types.SIGN_OUT,
+            extras = listOf(
+                Param(ParamKeys.QR_CODE, attendeeCode)
+            )
+        )
+    )
+}
+
 /**
  * A side-effect which records a screen view event.
  */
