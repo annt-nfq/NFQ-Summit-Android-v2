@@ -139,7 +139,9 @@ fun ScheduleTabUI(
         },
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
-            SignInButton(onClickAction = { isSignInBottomSheetVisible = true })
+            if (uiState.isLoggedIn.not()) {
+                SignInButton(onClickAction = { isSignInBottomSheetVisible = true })
+            }
         }
     ) { innerPadding ->
         HorizontalPager(
