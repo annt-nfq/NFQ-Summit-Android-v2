@@ -22,6 +22,23 @@ fun AnalyticsHelper.logScreenView(screenName: String) {
     )
 }
 
+fun AnalyticsHelper.logEventDetailScreenView(
+    screenName: String,
+    eventId: String,
+    eventTitle: String
+) {
+    logEvent(
+        AnalyticsEvent(
+            type = Types.SCREEN_VIEW,
+            extras = listOf(
+                Param(ParamKeys.SCREEN_NAME, screenName),
+                Param(ParamKeys.EVENT_ID, eventId),
+                Param(ParamKeys.EVENT_TITLE, eventTitle)
+            )
+        )
+    )
+}
+
 fun AnalyticsHelper.logLoginWithQrCodeSuccess(attendeeCode: String) {
     logEvent(
         AnalyticsEvent(
@@ -127,5 +144,20 @@ fun TrackScreenViewEvent(
     analyticsHelper: AnalyticsHelper = LocalAnalyticsHelper.current,
 ) = DisposableEffect(Unit) {
     analyticsHelper.logScreenView(screenName)
+    onDispose {}
+}
+
+@Composable
+fun TrackEventDetailScreenViewEvent(
+    screenName: String,
+    eventId: String,
+    eventTitle: String,
+    analyticsHelper: AnalyticsHelper = LocalAnalyticsHelper.current,
+) = DisposableEffect(Unit) {
+    analyticsHelper.logEventDetailScreenView(
+        screenName = screenName,
+        eventId = eventId,
+        eventTitle = eventTitle
+    )
     onDispose {}
 }
