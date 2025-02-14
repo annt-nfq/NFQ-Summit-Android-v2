@@ -577,11 +577,10 @@ private fun MultipleLocationSection(
             contentPadding = PaddingValues(horizontal = 24.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp)
+                .padding(top = 10.dp)
         ) {
             items(locations) { location ->
                 BasicCard(
-                    blurRadius = 10.dp
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -636,33 +635,35 @@ private fun MultipleLocationSection(
 private fun SpeakersSection(
     speakers: List<SpeakerModel>
 ) {
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
-            .padding(top = 8.dp)
-            .padding(horizontal = 24.dp)
-    ) {
-        items(speakers) { speaker ->
-            if (speaker.name.isNotBlank()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Image(
-                        painter = if (speaker.avatar.isNotBlank())
-                            networkImagePainter(speaker.avatar) else
-                            painterResource(id = R.drawable.ic_user),
-                        contentDescription = speaker.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(CircleShape)
-                    )
-                    Text(
-                        text = speaker.name,
-                        style = MaterialTheme.typography.displaySmall,
-                        fontSize = 10.sp
-                    )
+    if (speakers.isNotEmpty()) {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .padding(horizontal = 24.dp)
+        ) {
+            items(speakers) { speaker ->
+                if (speaker.name.isNotBlank()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Image(
+                            painter = if (speaker.avatar.isNotBlank())
+                                networkImagePainter(speaker.avatar) else
+                                painterResource(id = R.drawable.ic_user),
+                            contentDescription = speaker.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                        )
+                        Text(
+                            text = speaker.name,
+                            style = MaterialTheme.typography.displaySmall,
+                            fontSize = 10.sp
+                        )
+                    }
                 }
             }
         }
