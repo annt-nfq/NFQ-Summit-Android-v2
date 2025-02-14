@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.model.UserUIModel
@@ -61,6 +62,8 @@ fun QRCodeBottomSheet(
             QRCodeContent(userUIModel = user)
         }
     )
+
+    TrackScreenViewEvent(screenName = "QRCode")
 }
 
 @Composable

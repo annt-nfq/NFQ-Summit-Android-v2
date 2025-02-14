@@ -68,6 +68,7 @@ import com.nfq.data.domain.model.EventDetailsModel
 import com.nfq.data.domain.model.EventLocationsModel
 import com.nfq.data.domain.model.SpeakerModel
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
 import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
@@ -162,6 +163,7 @@ fun EventDetailsBottomSheet(
             }
         }
     )
+    TrackScreenViewEvent(screenName = "EventDetail")
 }
 
 @Composable

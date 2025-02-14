@@ -1,6 +1,5 @@
 package com.nfq.nfqsummit.screens.signIn
 
-import QRCodeScanner
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -59,6 +58,7 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
 import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
@@ -123,6 +123,8 @@ fun SignInScreen(
             }
         }
     )
+
+    TrackScreenViewEvent(screenName = "SignIn")
 }
 
 @Composable

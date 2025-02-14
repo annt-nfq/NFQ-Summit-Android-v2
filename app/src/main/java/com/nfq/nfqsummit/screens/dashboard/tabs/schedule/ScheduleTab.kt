@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.SummitEvent
+import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicEvent
 import com.nfq.nfqsummit.components.Schedule
@@ -107,6 +108,8 @@ fun ScheduleTab(
             showEventDetailsBottomSheet = true
         }
     )
+
+    TrackScreenViewEvent(screenName = "Calendar")
 }
 
 @Composable

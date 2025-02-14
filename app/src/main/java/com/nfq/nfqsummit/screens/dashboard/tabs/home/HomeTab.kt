@@ -58,6 +58,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
 import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.Loading
@@ -141,7 +142,7 @@ fun HomeTab(
         )
     }
 
-    if (isSignInBottomSheetVisible){
+    if (isSignInBottomSheetVisible) {
         SignInBottomSheet(
             onDismissRequest = { isSignInBottomSheetVisible = false },
             goToSignIn = goToSignIn
@@ -243,6 +244,8 @@ fun HomeTab(
             isQRCodeBottomSheetVisible = true
         }
     )
+
+    TrackScreenViewEvent(screenName = "Home")
 }
 
 @Composable

@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -26,6 +27,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.nfq.nfqsummit.analytics.helper.AnalyticsHelper
+import com.nfq.nfqsummit.analytics.helper.LocalAnalyticsHelper
 import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.navigation.AppDestination
 import com.nfq.nfqsummit.navigation.AppNavHost
@@ -35,10 +38,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
+    @Inject
+    lateinit var analyticsHelper: AnalyticsHelper
     private lateinit var navController: NavHostController
     private val viewModel: MainViewModel by viewModels()
     private var keepSplashScreen = true
@@ -100,27 +105,29 @@ class MainActivity : ComponentActivity() {
             }
 
             val darkTheme by remember { derivedStateOf { darkThemeMutableState } }
-
-            NFQSnapshotTestTheme(
-                darkTheme = darkTheme
+            CompositionLocalProvider(
+                LocalAnalyticsHelper provides analyticsHelper
             ) {
-                if (showEventDetailsBottomSheet) {
-                    EventDetailsBottomSheet(
-                        eventId = eventId,
-                        onDismissRequest = { showEventDetailsBottomSheet = false }
-                    )
-                }
-                Surface(
-                    modifier = Modifier.fillMaxSize()
+                NFQSnapshotTestTheme(
+                    darkTheme = darkTheme
                 ) {
-                    AppNavHost(
-                        navController = navController,
-                        startDestination = startDestination
-                    )
-                    HandleUserMessage(viewModel)
+                    if (showEventDetailsBottomSheet) {
+                        EventDetailsBottomSheet(
+                            eventId = eventId,
+                            onDismissRequest = { showEventDetailsBottomSheet = false }
+                        )
+                    }
+                    Surface(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        AppNavHost(
+                            navController = navController,
+                            startDestination = startDestination
+                        )
+                        HandleUserMessage(viewModel)
+                    }
                 }
             }
-
         }
     }
 
@@ -150,7 +157,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun checkNotificationExtras(){
+    private fun checkNotificationExtras() {
         intent.extras?.let {
             val eventId = it.getString("eventId")
             eventId?.let {
