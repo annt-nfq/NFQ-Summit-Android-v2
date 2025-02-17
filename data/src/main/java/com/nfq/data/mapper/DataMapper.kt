@@ -100,24 +100,24 @@ fun EventEntity.toEventDetailsModel(): EventDetailsModel {
 
 private fun EventEntity.getLocationName(): String {
     return when {
+        locations.isNotEmpty() -> locations.first().address
         location.isNotBlank() -> location
-        locations.isNotEmpty() -> locations.first().name
         else -> ""
     }
 }
 
 private fun EventEntity.getLatitude(): Double {
     return when {
-        latitude != 0.0 -> latitude
         locations.isNotEmpty() -> locations.first().latitude
+        latitude != 0.0 -> latitude
         else -> 0.0
     }
 }
 
 private fun EventEntity.getLongitude(): Double {
     return when {
-        longitude != 0.0 -> longitude
         locations.isNotEmpty() -> locations.first().longitude
+        longitude != 0.0 -> longitude
         else -> 0.0
     }
 }
