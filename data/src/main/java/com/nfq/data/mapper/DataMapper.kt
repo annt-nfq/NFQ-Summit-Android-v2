@@ -16,6 +16,8 @@ import com.nfq.data.remote.model.response.AttractionResponse
 import com.nfq.data.remote.model.response.AttractionBlogResponse
 import com.nfq.data.remote.model.response.BlogResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
+import com.nfq.data.remote.model.response.EventLocationResponse
+import com.nfq.data.remote.model.response.SpeakerResponse
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTime
 import com.nfq.data.toLocalDateTimeInMillis
@@ -77,37 +79,68 @@ fun AttendeeResponse.toUserEntity(): UserEntity {
     )
 }
 
+private const val DATE_TIME_PATTERN = "EEE, MMM d • HH:mm"
+
 fun EventEntity.toEventDetailsModel(): EventDetailsModel {
-    val startTime = this
-        .timeStart
-        .toFormattedDateTimeString(targetPattern = "EEE, MMM d • HH:mm")
     return EventDetailsModel(
         id = id,
         startDateTime = timeStart.toLocalDateTime(),
-        startTime = startTime,
+        startTime = timeStart.toFormattedDateTimeString(DATE_TIME_PATTERN),
         name = name,
         description = description,
-        locationName = location,
-        latitude = latitude,
-        longitude = longitude,
-        locations = locations.map {
-            EventLocationsModel(
-                id = it.id,
-                name = it.name,
-                address = it.address,
-                latitude = it.latitude,
-                longitude = it.longitude
-            )
-        },
+        locationName = getLocationName(),
+        latitude = getLatitude(),
+        longitude = getLongitude(),
+        locations = locations.map { it.toLocationModel() },
         isFavorite = isFavorite,
-        coverPhotoUrl = images.find { image -> image.isNotBlank() }.orEmpty(),
-        speakers = speakers?.map {
-            SpeakerModel(
-                id = it.id,
-                name = it.name,
-                avatar = it.avatar
-            )
-        }.orEmpty()
+        coverPhotoUrl = getFirstValidImageUrl(),
+        speakers = speakers?.map { it.toSpeakerModel() }.orEmpty()
+    )
+}
+
+private fun EventEntity.getLocationName(): String {
+    return when {
+        location.isNotBlank() -> location
+        locations.isNotEmpty() -> locations.first().name
+        else -> ""
+    }
+}
+
+private fun EventEntity.getLatitude(): Double {
+    return when {
+        latitude != 0.0 -> latitude
+        locations.isNotEmpty() -> locations.first().latitude
+        else -> 0.0
+    }
+}
+
+private fun EventEntity.getLongitude(): Double {
+    return when {
+        longitude != 0.0 -> longitude
+        locations.isNotEmpty() -> locations.first().longitude
+        else -> 0.0
+    }
+}
+
+private fun EventEntity.getFirstValidImageUrl(): String {
+    return images.firstOrNull { it.isNotBlank() }.orEmpty()
+}
+
+private fun EventLocationResponse.toLocationModel(): EventLocationsModel {
+    return EventLocationsModel(
+        id = id,
+        name = name,
+        address = address,
+        latitude = latitude,
+        longitude = longitude
+    )
+}
+
+private fun SpeakerResponse.toSpeakerModel(): SpeakerModel {
+    return SpeakerModel(
+        id = id,
+        name = name,
+        avatar = avatar
     )
 }
 
