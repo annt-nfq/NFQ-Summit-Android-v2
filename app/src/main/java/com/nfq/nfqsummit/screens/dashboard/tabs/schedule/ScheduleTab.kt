@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -47,7 +46,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,7 +59,6 @@ import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicEvent
 import com.nfq.nfqsummit.components.Schedule
 import com.nfq.nfqsummit.components.ScheduleSize
-import com.nfq.nfqsummit.components.SegmentedControl
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.isSame
 import com.nfq.nfqsummit.mocks.mockEventDay1
@@ -147,36 +144,18 @@ fun ScheduleTabUI(
             }
         }
     ) { innerPadding ->
-        HorizontalPager(
-            state = pagerState,
-            userScrollEnabled = uiState.summitEvents.isNotEmpty() && uiState.techRockEvents.isNotEmpty(),
-            modifier = Modifier.padding(innerPadding)
-        ) { page ->
-            Surface(
-                color = Color(0xFFF8F8FA),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                when (page) {
-                    0 -> {
-                        SummitSchedules(
-                            dailyEvents = uiState.summitEvents,
-                            currentTime = uiState.currentTime,
-                            verticalScroll = verticalScroll,
-                            onEventClick = onEventClick
-                        )
-                    }
-
-                    else -> {
-                        SummitSchedules(
-                            dailyEvents = uiState.techRockEvents,
-                            currentTime = uiState.currentTime,
-                            hourSize = uiState.hourSize,
-                            verticalScroll = verticalScroll,
-                            onEventClick = onEventClick
-                        )
-                    }
-                }
-            }
+        Surface(
+            color = Color(0xFFF8F8FA),
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            SummitSchedules(
+                dailyEvents = uiState.dailyEvents,
+                currentTime = uiState.currentTime,
+                verticalScroll = verticalScroll,
+                onEventClick = onEventClick
+            )
         }
     }
 }
@@ -274,7 +253,7 @@ private fun ScheduleHeader(
                     Spacer(modifier = Modifier.width(21.dp))
                 }
             }
-            if (uiState.summitEvents.isNotEmpty() && uiState.techRockEvents.isNotEmpty()) {
+            /*if (uiState.summitEvents.isNotEmpty() && uiState.techRockEvents.isNotEmpty()) {
                 SegmentedControl(
                     items = listOf(
                         "Summit \uD83D\uDCBC",
@@ -289,7 +268,7 @@ private fun ScheduleHeader(
                         .padding(bottom = 24.dp)
                         .padding()
                 )
-            }
+            }*/
 
             HorizontalDivider(color = Color(0xFFCFCAE4), thickness = 1.dp)
         }
