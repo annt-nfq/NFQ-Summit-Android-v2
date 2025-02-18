@@ -494,23 +494,26 @@ private fun SingleLocationSection(
         modifier = modifier.padding(top = 16.dp),
         verticalAlignment = Alignment.Top
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_loaction),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(top = 6.dp)
-        )
-        Text(
-            text = event.locationName,
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Medium,
-            fontSize = 10.sp,
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 6.dp)
-                .padding(top = 8.dp)
-                .padding(end = 8.dp)
-        )
+        if (event.locationName.isNotEmpty()) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_loaction),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(top = 6.dp)
+            )
+            Text(
+                text = event.locationName,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Medium,
+                fontSize = 10.sp,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 6.dp)
+                    .padding(top = 8.dp)
+                    .padding(end = 8.dp)
+            )
+        }
+
         BookmarkItem(
             isFavorite = event.isFavorite,
             id = event.id,
@@ -518,32 +521,35 @@ private fun SingleLocationSection(
             iconTint = if (event.isFavorite) Color.White else MaterialTheme.colorScheme.primary,
             backgroundColor = if (event.isFavorite) MaterialTheme.colorScheme.primary else Color.Transparent
         )
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .size(116.dp, 30.dp)
-                .bounceClick()
-                .clip(RoundedCornerShape(8.dp))
-                .clickable {
-                    onViewLocation(
-                        event.latitude,
-                        event.longitude,
-                        event.locationName
-                    )
-                }
-                .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
-                .background(color = MaterialTheme.colorScheme.primary)
+
+        if (event.locationName.isNotEmpty()) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .size(116.dp, 30.dp)
+                    .bounceClick()
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable {
+                        onViewLocation(
+                            event.latitude,
+                            event.longitude,
+                            event.locationName
+                        )
+                    }
+                    .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
+                    .background(color = MaterialTheme.colorScheme.primary)
 
 
-        ) {
-            Text(
-                text = "View Location",
-                style = MaterialTheme.typography.bodySmall,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
+            ) {
+                Text(
+                    text = "View Location",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }
