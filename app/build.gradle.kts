@@ -22,7 +22,7 @@ android {
         applicationId = "com.nfq.nfqsummit"
         minSdk = 26
         targetSdk = 35
-        versionCode = 101031
+        versionCode = 101032
         versionName = "1.2.1"
 
         testInstrumentationRunner = "com.nfq.nfqsummit.HiltTestRunner"
