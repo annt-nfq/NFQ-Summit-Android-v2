@@ -163,6 +163,7 @@ class NFQSummitRepositoryImpl @Inject constructor(
                         sponsorLogoUrls = it.sponsorLogoUrls
                     )
                 }
+                vouchersDao.deleteAllVouchers()
                 vouchersDao.insertVouchers(voucherEntities)
             }
     }
