@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.components.AutoResizedText
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.model.LocationUIModel
@@ -50,7 +51,9 @@ fun VoucherCard(
                 .padding(horizontal = 12.dp, vertical = 18.dp)
                 .fillMaxWidth()
         ) {
-            Row {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
@@ -70,26 +73,21 @@ fun VoucherCard(
                     contentDescription = "ic_union",
                     modifier = Modifier.weight(1f)
                 )
-
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
+                Box(
+                    contentAlignment = Alignment.CenterEnd,
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .weight(1f)
                 ) {
-                    Text(
-                        text = model.price,
+                    AutoResizedText(
+                        text = "${model.price} ₫",
                         style = MaterialTheme.typography.displaySmall,
-                        fontSize = 20.sp,
+                        maxFontSize = 20.sp,
                         color = MaterialTheme.colorScheme.onPrimary,
                         letterSpacing = (-0.5).sp,
-                    )
-                    Image(
-                        painter = painterResource(R.drawable.ic_currency),
-                        contentDescription = "ic_currency",
-                        modifier = Modifier.padding(start = 2.dp)
-                    )
-                }
 
+                        )
+                }
             }
 
             Box(

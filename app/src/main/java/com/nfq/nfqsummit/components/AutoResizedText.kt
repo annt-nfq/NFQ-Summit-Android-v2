@@ -22,9 +22,10 @@ fun AutoResizedText(
     style: TextStyle = MaterialTheme.typography.bodyMedium,
     modifier: Modifier = Modifier,
     color: Color = style.color,
-    maxLines: Int = 2,
+    maxLines: Int = 1,
     minFontSize: TextUnit = 11.sp,
-    maxFontSize: TextUnit = style.fontSize.takeIf { !it.isUnspecified } ?: 24.sp
+    maxFontSize: TextUnit = style.fontSize.takeIf { !it.isUnspecified } ?: 24.sp,
+    letterSpacing: TextUnit = TextUnit.Unspecified
 ) {
     var resizedTextStyle by remember { mutableStateOf(style.copy(fontSize = maxFontSize)) }
     var lineCount by remember { mutableIntStateOf(0) }
@@ -34,6 +35,7 @@ fun AutoResizedText(
         color = color,
         modifier = modifier.drawWithContent { drawContent() },
         style = resizedTextStyle,
+        letterSpacing = letterSpacing,
         onTextLayout = { result ->
             lineCount = result.lineCount
             if (lineCount > maxLines && resizedTextStyle.fontSize > minFontSize) {
