@@ -9,12 +9,15 @@ import com.nfq.data.domain.model.Attraction
 import com.nfq.data.domain.model.Blog
 import com.nfq.data.domain.model.CategoryEnum
 import com.nfq.data.domain.model.EventDetailsModel
+import com.nfq.data.domain.model.EventLocationsModel
 import com.nfq.data.domain.model.SpeakerModel
 import com.nfq.data.remote.model.response.AttendeeResponse
 import com.nfq.data.remote.model.response.AttractionResponse
 import com.nfq.data.remote.model.response.AttractionBlogResponse
 import com.nfq.data.remote.model.response.BlogResponse
 import com.nfq.data.remote.model.response.EventActivityResponse
+import com.nfq.data.remote.model.response.EventLocationResponse
+import com.nfq.data.remote.model.response.SpeakerResponse
 import com.nfq.data.toFormattedDateTimeString
 import com.nfq.data.toLocalDateTime
 import com.nfq.data.toLocalDateTimeInMillis
@@ -38,6 +41,7 @@ fun EventActivityResponse.toEventEntity(): EventEntity {
         location = location.orEmpty(),
         latitude = latitude ?: 0.0,
         longitude = longitude ?: 0.0,
+        locations = locations.orEmpty(),
         gatherTime = gatherTime.orEmpty(),
         gatherLocation = gatherLocation.orEmpty(),
         leavingTime = leavingTime.orEmpty(),
@@ -75,28 +79,68 @@ fun AttendeeResponse.toUserEntity(): UserEntity {
     )
 }
 
+private const val DATE_TIME_PATTERN = "EEE, MMM d • HH:mm"
+
 fun EventEntity.toEventDetailsModel(): EventDetailsModel {
-    val startTime = this
-        .timeStart
-        .toFormattedDateTimeString(targetPattern = "EEE, MMM d • HH:mm")
     return EventDetailsModel(
         id = id,
         startDateTime = timeStart.toLocalDateTime(),
-        startTime = startTime,
+        startTime = timeStart.toFormattedDateTimeString(DATE_TIME_PATTERN),
         name = name,
         description = description,
-        locationName = location,
-        latitude = latitude,
-        longitude = longitude,
+        locationName = getLocationName(),
+        latitude = getLatitude(),
+        longitude = getLongitude(),
+        locations = locations.map { it.toLocationModel() },
         isFavorite = isFavorite,
-        coverPhotoUrl = images.find { image -> image.isNotBlank() }.orEmpty(),
-        speakers = speakers?.map {
-            SpeakerModel(
-                id = it.id,
-                name = it.name,
-                avatar = it.avatar
-            )
-        }.orEmpty()
+        coverPhotoUrl = getFirstValidImageUrl(),
+        speakers = speakers?.map { it.toSpeakerModel() }.orEmpty()
+    )
+}
+
+private fun EventEntity.getLocationName(): String {
+    return when {
+        locations.isNotEmpty() -> locations.first().address
+        location.isNotBlank() -> location
+        else -> ""
+    }
+}
+
+private fun EventEntity.getLatitude(): Double {
+    return when {
+        locations.isNotEmpty() -> locations.first().latitude
+        latitude != 0.0 -> latitude
+        else -> 0.0
+    }
+}
+
+private fun EventEntity.getLongitude(): Double {
+    return when {
+        locations.isNotEmpty() -> locations.first().longitude
+        longitude != 0.0 -> longitude
+        else -> 0.0
+    }
+}
+
+private fun EventEntity.getFirstValidImageUrl(): String {
+    return images.firstOrNull { it.isNotBlank() }.orEmpty()
+}
+
+private fun EventLocationResponse.toLocationModel(): EventLocationsModel {
+    return EventLocationsModel(
+        id = id,
+        name = name,
+        address = address,
+        latitude = latitude,
+        longitude = longitude
+    )
+}
+
+private fun SpeakerResponse.toSpeakerModel(): SpeakerModel {
+    return SpeakerModel(
+        id = id,
+        name = name,
+        avatar = avatar
     )
 }
 

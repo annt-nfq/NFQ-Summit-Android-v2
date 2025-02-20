@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.nfq.data.remote.model.response.CategoryResponse
 import com.nfq.data.remote.model.response.EventDayResponse
+import com.nfq.data.remote.model.response.EventLocationResponse
 import com.nfq.data.remote.model.response.GenreResponse
 import com.nfq.data.remote.model.response.SpeakerResponse
 import kotlinx.serialization.Serializable
@@ -25,6 +26,7 @@ data class EventEntity(
     @ColumnInfo("location") val location: String,
     @ColumnInfo("latitude") val latitude: Double,
     @ColumnInfo("longitude") val longitude: Double,
+    @ColumnInfo("locations") val locations: List<EventLocationResponse>,
     @ColumnInfo("gatherTime") val gatherTime: String,
     @ColumnInfo("gatherLocation") val gatherLocation: String,
     @ColumnInfo("leavingTime") val leavingTime: String,
@@ -41,3 +43,4 @@ data class EventEntity(
     @ColumnInfo("speaker") val speakers: List<SpeakerResponse>?,
     @ColumnInfo("updatedAt") val updatedAt: Long
 )
+

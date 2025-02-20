@@ -18,6 +18,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,11 +66,16 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.nfq.data.domain.model.EventDetailsModel
+import com.nfq.data.domain.model.EventLocationsModel
 import com.nfq.data.domain.model.SpeakerModel
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.analytics.TrackEventDetailScreenViewEvent
+import com.nfq.nfqsummit.analytics.helper.LocalAnalyticsHelper
+import com.nfq.nfqsummit.analytics.logViewLocation
+import com.nfq.nfqsummit.components.AnnotatedHtmlStringWithLink
 import com.nfq.nfqsummit.components.BasicAlertDialog
+import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
-import com.nfq.nfqsummit.components.HtmlText
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.notification.AlarmReceiver
@@ -85,6 +92,7 @@ fun EventDetailsBottomSheet(
     eventId: String,
     onDismissRequest: () -> Unit
 ) {
+    val analyticsHelper = LocalAnalyticsHelper.current
     val skipPartiallyExpanded by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded)
     val scope = rememberCoroutineScope()
@@ -101,6 +109,7 @@ fun EventDetailsBottomSheet(
         }
     }
     val viewModel: EventDetailsBottomSheetViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(eventId) {
         viewModel.getEvent(eventId)
@@ -124,7 +133,7 @@ fun EventDetailsBottomSheet(
     BasicModalBottomSheet(
         onDismissRequest = onDismissRequest,
         content = {
-            viewModel.event?.let { event ->
+            uiState.event?.let { event ->
                 EventDetailsUI(
                     event = event,
                     markAsFavorite = { isFavorite, _ ->
@@ -147,6 +156,11 @@ fun EventDetailsBottomSheet(
                     onViewLocation = { latitude, longitude, locationName ->
                         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
                             if (!bottomSheetState.isVisible) {
+                                analyticsHelper.logViewLocation(
+                                    attendeeCode = uiState.attendeeCode,
+                                    eventId = event.id,
+                                    eventTitle = event.name
+                                )
                                 context.openMapView(
                                     latitude = latitude,
                                     longitude = longitude,
@@ -158,6 +172,11 @@ fun EventDetailsBottomSheet(
                 )
             }
         }
+    )
+    TrackEventDetailScreenViewEvent(
+        screenName = "event_detail",
+        eventId = eventId,
+        eventTitle = uiState.event?.name ?: ""
     )
 }
 
@@ -389,61 +408,206 @@ private fun EventDetailsUI(
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.bottomSheetMedium)
                     .fillMaxHeight(0.92f)
-
-
             ) {
 
                 Column(
-                    modifier = Modifier
-                        .padding(vertical = 32.dp)
-                        .padding(horizontal = 24.dp)
+                    modifier = Modifier.padding(vertical = 32.dp)
                 ) {
                     Text(
                         text = event.name,
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(horizontal = 24.dp)
                     )
 
-                    Row(
-                        modifier = Modifier.padding(top = 16.dp),
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_loaction),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                        )
-                        Text(
-                            text = event.locationName,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 10.sp,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 6.dp)
-                                .padding(top = 8.dp)
-                                .padding(end = 8.dp)
-                        )
+                    if (event.locations.size > 1) {
                         BookmarkItem(
                             isFavorite = event.isFavorite,
                             id = event.id,
                             markAsFavorite = markAsFavorite,
                             iconTint = if (event.isFavorite) Color.White else MaterialTheme.colorScheme.primary,
-                            backgroundColor = if (event.isFavorite) MaterialTheme.colorScheme.primary else Color.Transparent
+                            backgroundColor = if (event.isFavorite) MaterialTheme.colorScheme.primary else Color.Transparent,
+                            modifier = Modifier
+                                .padding(top = 8.dp)
+                                .padding(start = 24.dp)
+                        )
+                        MultipleLocationSection(
+                            locations = event.locations,
+                            onViewLocation = onViewLocation,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+                    } else {
+                        SingleLocationSection(
+                            event = event,
+                            markAsFavorite = markAsFavorite,
+                            onViewLocation = onViewLocation,
+                            modifier = Modifier.padding(horizontal = 24.dp)
+                        )
+                    }
+
+                    SpeakersSection(event.speakers)
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                            .padding(top = 24.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        if (event.description.isNotEmpty()) {
+                            AnnotatedHtmlStringWithLink(
+                                htmlText = event.description,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+
+                        Image(
+                            painter = networkImagePainter(event.coverPhotoUrl),
+                            contentDescription = event.name,
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(MaterialTheme.shapes.small)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SingleLocationSection(
+    modifier: Modifier = Modifier,
+    event: EventDetailsModel,
+    markAsFavorite: (isFavorite: Boolean, event: String) -> Unit,
+    onViewLocation: (latitude: Double?, longitude: Double?, locationName: String) -> Unit
+) {
+    Row(
+        modifier = modifier.padding(top = 16.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        if (event.locationName.isNotEmpty()) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_loaction),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(top = 6.dp)
+            )
+            Text(
+                text = event.locationName,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Medium,
+                fontSize = 10.sp,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 6.dp)
+                    .padding(top = 8.dp)
+                    .padding(end = 8.dp)
+            )
+        }
+
+        BookmarkItem(
+            isFavorite = event.isFavorite,
+            id = event.id,
+            markAsFavorite = markAsFavorite,
+            iconTint = if (event.isFavorite) Color.White else MaterialTheme.colorScheme.primary,
+            backgroundColor = if (event.isFavorite) MaterialTheme.colorScheme.primary else Color.Transparent
+        )
+
+        if (event.locationName.isNotEmpty()) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .size(116.dp, 30.dp)
+                    .bounceClick()
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable {
+                        onViewLocation(
+                            event.latitude,
+                            event.longitude,
+                            event.locationName
+                        )
+                    }
+                    .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
+                    .background(color = MaterialTheme.colorScheme.primary)
+
+
+            ) {
+                Text(
+                    text = "View Location",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MultipleLocationSection(
+    modifier: Modifier = Modifier,
+    locations: List<EventLocationsModel>,
+    onViewLocation: (latitude: Double?, longitude: Double?, locationName: String) -> Unit
+) {
+
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Row {
+            Text(
+                text = "Available Locations",
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .padding(start = 24.dp)
+            )
+            Image(
+                painter = painterResource(id = R.drawable.ic_loaction),
+                contentDescription = null
+            )
+        }
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp)
+        ) {
+            items(locations) { location ->
+                BasicCard(
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            text = location.name,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 10.sp,
+                            modifier = Modifier
+                                .padding(start = 6.dp)
+                                .padding(top = 24.dp)
+                                .padding(end = 8.dp)
+                                .padding(bottom = 16.dp)
                         )
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .padding(start = 8.dp)
+                                .padding(horizontal = 24.dp)
+                                .padding(bottom = 16.dp)
                                 .size(116.dp, 30.dp)
                                 .bounceClick()
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable {
                                     onViewLocation(
-                                        event.latitude,
-                                        event.longitude,
-                                        event.locationName
+                                        location.latitude,
+                                        location.longitude,
+                                        location.name
                                     )
                                 }
                                 .graphicsLayer(alpha = 30f, shape = RoundedCornerShape(7.dp))
@@ -460,38 +624,6 @@ private fun EventDetailsUI(
                             )
                         }
                     }
-
-                    SpeakersSection(event.speakers)
-
-                    Column(
-                        modifier = Modifier
-                            .padding(top = 24.dp)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        Text(
-                            text = "Please show your QR code to our staff\nfor check-in",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        if (event.description.isNotEmpty()) {
-                            HtmlText(
-                                html = event.description,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(top = 24.dp)
-                            )
-                        }
-
-                        Image(
-                            painter = networkImagePainter(event.coverPhotoUrl),
-                            contentDescription = event.name,
-                            contentScale = ContentScale.FillWidth,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 24.dp)
-                                .clip(MaterialTheme.shapes.small)
-                        )
-                    }
                 }
             }
         }
@@ -502,31 +634,35 @@ private fun EventDetailsUI(
 private fun SpeakersSection(
     speakers: List<SpeakerModel>
 ) {
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(top = 8.dp)
-    ) {
-        items(speakers) { speaker ->
-            if (speaker.name.isNotBlank()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Image(
-                        painter = if (speaker.avatar.isNotBlank())
-                            networkImagePainter(speaker.avatar) else
-                            painterResource(id = R.drawable.ic_user),
-                        contentDescription = speaker.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(CircleShape)
-                    )
-                    Text(
-                        text = speaker.name,
-                        style = MaterialTheme.typography.displaySmall,
-                        fontSize = 10.sp
-                    )
+    if (speakers.isNotEmpty()) {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .padding(horizontal = 24.dp)
+        ) {
+            items(speakers) { speaker ->
+                if (speaker.name.isNotBlank()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Image(
+                            painter = if (speaker.avatar.isNotBlank())
+                                networkImagePainter(speaker.avatar) else
+                                painterResource(id = R.drawable.ic_user),
+                            contentDescription = speaker.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                        )
+                        Text(
+                            text = speaker.name,
+                            style = MaterialTheme.typography.displaySmall,
+                            fontSize = 10.sp
+                        )
+                    }
                 }
             }
         }
@@ -551,6 +687,7 @@ private fun EventDetailsPreview() {
                 startTime = LocalDateTime.now().format(
                     DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")
                 ),
+                locations = emptyList(),
                 speakers = listOf(
                     SpeakerModel(
                         id = 1,
@@ -567,6 +704,87 @@ private fun EventDetailsPreview() {
 
             markAsFavorite = { _, _ -> },
             onViewLocation = { _, _, _ -> },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun EventDetailsWithMultipleLocationsPreview() {
+    NFQSnapshotTestThemeForPreview {
+        EventDetailsUI(
+            event = EventDetailsModel(
+                id = "1",
+                name = "Pre-Summit Check in @Vietnam Saigon Office",
+                description = "<p>Kicking off your morning at 8 AM with an hour of Muay Thai with our professional trainer . It's your personal dose of adrenaline, focus, and sweat. Let&rsquo;s learn the art of Thai boxing and get stronger together! I know, 8am is hard especially with Jet Lag. As we pay the trainer only for you - if you sign up you must be there! Otherwise I will personally send the Muay Thai Trainer to kick you out of the bed.<\\/p>",
+                latitude = 0.0,
+                longitude = 0.0,
+                coverPhotoUrl = "",
+                locationName = "Saigon, Vietnam Office ",
+                isFavorite = false,
+                startDateTime = LocalDateTime.now(),
+                startTime = LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern("EEE, MMM d • HH:mm")
+                ),
+                locations = listOf(
+                    EventLocationsModel(
+                        id = 1,
+                        name = "Location 1",
+                        address = "Address 1",
+                        latitude = 0.0,
+                        longitude = 0.0
+                    ),
+                    EventLocationsModel(
+                        id = 2,
+                        name = "Location 2",
+                        address = "Address 2",
+                        latitude = 0.0,
+                        longitude = 0.0
+                    )
+                ),
+                speakers = listOf(
+                    SpeakerModel(
+                        id = 1,
+                        name = "John Doe",
+                        avatar = ""
+                    ),
+                    SpeakerModel(
+                        id = 2,
+                        name = "Jane Doe",
+                        avatar = ""
+                    )
+                )
+            ),
+
+            markAsFavorite = { _, _ -> },
+            onViewLocation = { _, _, _ -> },
+        )
+    }
+}
+
+
+@Preview
+@Composable
+private fun MultipleLocationSectionPreview() {
+    NFQSnapshotTestThemeForPreview {
+        MultipleLocationSection(
+            locations = listOf(
+                EventLocationsModel(
+                    id = 1,
+                    name = "Location 1",
+                    address = "Address 1",
+                    latitude = 0.0,
+                    longitude = 0.0
+                ),
+                EventLocationsModel(
+                    id = 2,
+                    name = "Location 2",
+                    address = "Address 2",
+                    latitude = 0.0,
+                    longitude = 0.0
+                )
+            ),
+            onViewLocation = { _, _, _ -> }
         )
     }
 }

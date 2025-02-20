@@ -18,13 +18,13 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -40,6 +40,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -48,15 +49,17 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.data.domain.model.SummitEvent
+import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicEvent
 import com.nfq.nfqsummit.components.Schedule
 import com.nfq.nfqsummit.components.ScheduleSize
-import com.nfq.nfqsummit.components.SegmentedControl
+import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.isSame
 import com.nfq.nfqsummit.mocks.mockEventDay1
 import com.nfq.nfqsummit.mocks.mockEventDay1H1
@@ -65,7 +68,9 @@ import com.nfq.nfqsummit.mocks.mockEventDay1H13
 import com.nfq.nfqsummit.mocks.mockEventDay2H1
 import com.nfq.nfqsummit.mocks.mockEventDay2H2
 import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
+import com.nfq.nfqsummit.screens.signIn.SignInBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
+import com.nfq.nfqsummit.ui.theme.boxShadow
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
@@ -78,6 +83,7 @@ import java.util.Locale
 
 @Composable
 fun ScheduleTab(
+    goToSignIn: () -> Unit,
     viewModel: ScheduleViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -92,23 +98,35 @@ fun ScheduleTab(
     }
     ScheduleTabUI(
         uiState = uiState,
+        goToSignIn = goToSignIn,
         onDayClick = viewModel::onDateSelected,
         onEventClick = {
             eventId = it.id
             showEventDetailsBottomSheet = true
         }
     )
+
+    TrackScreenViewEvent(screenName = "calendar")
 }
 
 @Composable
 fun ScheduleTabUI(
     uiState: ScheduleUIState,
     onDayClick: (LocalDate) -> Unit,
-    onEventClick: (SummitEvent) -> Unit
+    onEventClick: (SummitEvent) -> Unit,
+    goToSignIn: () -> Unit = {},
 ) {
 
     val verticalScroll = rememberScrollState()
     val pagerState = rememberPagerState { 2 }
+    var isSignInBottomSheetVisible by remember { mutableStateOf(false) }
+
+    if (isSignInBottomSheetVisible) {
+        SignInBottomSheet(
+            onDismissRequest = { isSignInBottomSheetVisible = false },
+            goToSignIn = goToSignIn
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -118,38 +136,26 @@ fun ScheduleTabUI(
                 verticalScroll = verticalScroll,
                 onDayClick = onDayClick
             )
+        },
+        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = {
+            if (uiState.isLoggedIn.not()) {
+                SignInButton(onClickAction = { isSignInBottomSheetVisible = true })
+            }
         }
     ) { innerPadding ->
-        HorizontalPager(
-            state = pagerState,
-            userScrollEnabled = uiState.summitEvents.isNotEmpty() && uiState.techRockEvents.isNotEmpty(),
-            modifier = Modifier.padding(innerPadding)
-        ) { page ->
-            Surface(
-                color = Color(0xFFF8F8FA),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                when (page) {
-                    0 -> {
-                        SummitSchedules(
-                            dailyEvents = uiState.summitEvents,
-                            currentTime = uiState.currentTime,
-                            verticalScroll = verticalScroll,
-                            onEventClick = onEventClick
-                        )
-                    }
-
-                    else -> {
-                        SummitSchedules(
-                            dailyEvents = uiState.techRockEvents,
-                            currentTime = uiState.currentTime,
-                            hourSize = uiState.hourSize,
-                            verticalScroll = verticalScroll,
-                            onEventClick = onEventClick
-                        )
-                    }
-                }
-            }
+        Surface(
+            color = Color(0xFFF8F8FA),
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            SummitSchedules(
+                dailyEvents = uiState.dailyEvents,
+                currentTime = uiState.currentTime,
+                verticalScroll = verticalScroll,
+                onEventClick = onEventClick
+            )
         }
     }
 }
@@ -247,7 +253,7 @@ private fun ScheduleHeader(
                     Spacer(modifier = Modifier.width(21.dp))
                 }
             }
-            if (uiState.summitEvents.isNotEmpty() && uiState.techRockEvents.isNotEmpty()) {
+            /*if (uiState.summitEvents.isNotEmpty() && uiState.techRockEvents.isNotEmpty()) {
                 SegmentedControl(
                     items = listOf(
                         "Summit \uD83D\uDCBC",
@@ -262,7 +268,7 @@ private fun ScheduleHeader(
                         .padding(bottom = 24.dp)
                         .padding()
                 )
-            }
+            }*/
 
             HorizontalDivider(color = Color(0xFFCFCAE4), thickness = 1.dp)
         }
@@ -396,7 +402,8 @@ fun ScheduleDays(
             } else {
                 val primaryCount =
                     if (eventCount.first < 3) eventCount.first else if (eventCount.second == 0) 3 else 2
-                val secondaryCount = if (eventCount.first == 0) 3 else if (eventCount.second != 0) 1 else 0
+                val secondaryCount =
+                    if (eventCount.first == 0) 3 else if (eventCount.second != 0) 1 else 0
 
                 repeat(primaryCount) {
                     EventCountIndicator(primaryColor)
@@ -442,6 +449,40 @@ fun EventCountIndicator(
             .size(4.dp)
             .background(color, CircleShape)
     )
+}
+
+@Composable
+private fun SignInButton(
+    modifier: Modifier = Modifier,
+    onClickAction: () -> Unit,
+    containerColor: Color = MaterialTheme.colorScheme.primary,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary
+) {
+    Box(
+        modifier = modifier
+            .bounceClick()
+            .height(58.dp)
+            .boxShadow(
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+                blurRadius = 48.dp,
+                spreadRadius = 0.dp,
+                offset = DpOffset(0.dp, 24.dp)
+            )
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { onClickAction() }
+            .background(containerColor)
+    ) {
+        Text(
+            text = "Sign In To See Your Registered Events",
+            style = MaterialTheme.typography.bodyMedium,
+            color = contentColor,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .align(Alignment.Center)
+        )
+    }
 }
 
 @Preview

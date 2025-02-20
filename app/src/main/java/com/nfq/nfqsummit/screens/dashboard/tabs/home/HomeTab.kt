@@ -49,6 +49,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -57,6 +58,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
+import com.nfq.nfqsummit.analytics.helper.LocalAnalyticsHelper
+import com.nfq.nfqsummit.analytics.logTapToShowQrCode
 import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.Loading
@@ -72,6 +76,7 @@ import com.nfq.nfqsummit.screens.eventDetails.EventDetailsBottomSheet
 import com.nfq.nfqsummit.screens.eventDetails.HandlePermissionDialogs
 import com.nfq.nfqsummit.screens.eventDetails.setUpScheduler
 import com.nfq.nfqsummit.screens.qrCode.QRCodeBottomSheet
+import com.nfq.nfqsummit.screens.signIn.SignInBottomSheet
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 import com.nfq.nfqsummit.ui.theme.boxShadow
 
@@ -83,6 +88,7 @@ fun HomeTab(
     seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
 ) {
+    val analyticsHelper = LocalAnalyticsHelper.current
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val showReminderDialog by viewModel.showReminderDialog.collectAsState()
@@ -93,6 +99,7 @@ fun HomeTab(
 
 
     var isEventDetailsBottomSheetVisible by remember { mutableStateOf(false) }
+    var isSignInBottomSheetVisible by remember { mutableStateOf(false) }
     var selectedEventId by remember { mutableStateOf("") }
     var isQRCodeBottomSheetVisible by remember { mutableStateOf(false) }
     var isVoucherDialogVisible by remember { mutableStateOf(false) }
@@ -135,6 +142,13 @@ fun HomeTab(
         EventDetailsBottomSheet(
             eventId = selectedEventId,
             onDismissRequest = { isEventDetailsBottomSheetVisible = false }
+        )
+    }
+
+    if (isSignInBottomSheetVisible) {
+        SignInBottomSheet(
+            onDismissRequest = { isSignInBottomSheetVisible = false },
+            goToSignIn = goToSignIn
         )
     }
 
@@ -202,7 +216,7 @@ fun HomeTab(
     HomeTabUI(
         uiState = uiState,
         goToAttractions = goToAttractions,
-        goToSignIn = goToSignIn,
+        onShowSignInBS = { isSignInBottomSheetVisible = true },
         markAsFavorite = { isFavorite, event ->
             pendingAction = {
                 setUpScheduler(
@@ -230,16 +244,22 @@ fun HomeTab(
             isVoucherDialogVisible = true
         },
         onShowQRCode = {
+            uiState.user?.attendeeCode?.let {
+                analyticsHelper.logTapToShowQrCode(it)
+            }
+
             isQRCodeBottomSheetVisible = true
         }
     )
+
+    TrackScreenViewEvent(screenName = "home")
 }
 
 @Composable
 private fun HomeTabUI(
     uiState: HomeUIState,
     goToDetails: (String) -> Unit,
-    goToSignIn: () -> Unit,
+    onShowSignInBS: () -> Unit,
     goToAttractions: () -> Unit,
     seeAllEvents: () -> Unit = {},
     seeAllSavedEvents: () -> Unit = {},
@@ -247,6 +267,10 @@ private fun HomeTabUI(
     onShowVoucher: () -> Unit,
     markAsFavorite: (favorite: Boolean, event: UpcomingEventUIModel) -> Unit
 ) {
+    val containerColor = if (uiState.user != null) MaterialTheme.colorScheme.surface
+    else MaterialTheme.colorScheme.primary
+    val contentColor = MaterialTheme.colorScheme.onPrimary
+
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -254,26 +278,38 @@ private fun HomeTabUI(
             contentPadding = PaddingValues(bottom = 24.dp),
             modifier = Modifier.navigationBarsPadding()
         ) {
+            if (uiState.user == null) {
+                tapToShowSection(
+                    modifier = Modifier.padding(top = 12.dp),
+                    iconRes = R.drawable.ic_face_id_solid,
+                    iconSize = 75.dp,
+                    title = "Please sign-in",
+                    description = "Sign in with your QR or attendee code to see your registered events.",
+                    containerColor = containerColor,
+                    contentColor = contentColor,
+                    onTap = { onShowSignInBS() }
+                )
+            }
+            if (uiState.user != null) {
+                tapToShowSection(
+                    modifier = Modifier.padding(top = 12.dp),
+                    iconRes = R.drawable.ic_logo_qrcode,
+                    iconSize = 75.dp,
+                    title = "Tap to show my QR Code",
+                    description = "You'll need to show this at NFQ Summit registration \uD83D\uDCCB",
+                    containerColor = containerColor,
+                    onTap = { onShowQRCode() }
+                )
+            }
 
-            tapToShowSection(
-                modifier = Modifier.padding(top = 12.dp),
-                iconRes = R.drawable.ic_logo_qrcode,
-                title = "Tap to show my QR Code",
-                description = "You'll need to show this at NFQ Summit registration \uD83D\uDCCB",
-                onTap = {
-                    if (uiState.user == null) {
-                        goToSignIn()
-                    } else {
-                        onShowQRCode()
-                    }
-                }
-            )
             if (uiState.user != null && uiState.vouchers.isNotEmpty()) {
                 tapToShowSection(
                     modifier = Modifier.padding(top = 8.dp),
                     iconRes = R.drawable.ic_voucher,
+                    iconSize = 82.dp,
                     title = "Tap to show my vouchers",
                     description = "Quick access to your vouchers at a tap! \uD83C\uDFAB",
+                    containerColor = containerColor,
                     onTap = onShowVoucher
                 )
             }
@@ -298,8 +334,11 @@ private fun HomeTabUI(
 private fun LazyListScope.tapToShowSection(
     onTap: () -> Unit,
     iconRes: Int,
+    iconSize: Dp,
     title: String,
     description: String,
+    containerColor: Color,
+    contentColor: Color? = null,
     modifier: Modifier = Modifier
 ) {
     item {
@@ -319,7 +358,8 @@ private fun LazyListScope.tapToShowSection(
                     )
                     .clip(RoundedCornerShape(32.dp))
                     .clickable { onTap() }
-                    .background(MaterialTheme.colorScheme.surface)) {
+                    .background(containerColor)
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
@@ -329,7 +369,7 @@ private fun LazyListScope.tapToShowSection(
                     Image(
                         painter = painterResource(id = iconRes),
                         contentDescription = null,
-                        modifier = Modifier.size(75.dp)
+                        modifier = Modifier.size(iconSize)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(
@@ -339,15 +379,15 @@ private fun LazyListScope.tapToShowSection(
                             text = title,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = contentColor ?: MaterialTheme.colorScheme.primary
                             )
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = description,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onBackground.copy(0.5f)
-                            )
+                            style = MaterialTheme.typography.bodySmall,
+                            color = contentColor
+                                ?: MaterialTheme.colorScheme.onBackground.copy(0.5f)
                         )
                     }
                 }
@@ -497,7 +537,7 @@ fun HomeTabUIPreview() {
         HomeTabUI(
             goToDetails = {},
             goToAttractions = {},
-            goToSignIn = {},
+            onShowSignInBS = {},
             markAsFavorite = { _, _ -> },
             uiState = HomeUIState(
                 upcomingEvents = mockUpcomingEvents,
@@ -516,7 +556,7 @@ fun HomeTabUIDarkPreview() {
         HomeTabUI(
             goToDetails = {},
             goToAttractions = {},
-            goToSignIn = {},
+            onShowSignInBS = {},
             markAsFavorite = { _, _ -> },
             uiState = HomeUIState(
                 upcomingEvents = mockUpcomingEvents,

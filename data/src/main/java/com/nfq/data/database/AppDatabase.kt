@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.nfq.data.BuildConfig
 import com.nfq.data.database.dao.AttractionDao
 import com.nfq.data.database.dao.BlogDao
@@ -22,7 +24,7 @@ import net.sqlcipher.database.SupportFactory
 
 @Database(
     entities = [EventEntity::class, UserEntity::class, AttractionBlogEntity::class, AttractionEntity::class, BlogEntity::class, VoucherEntity::class],
-    version = 1,
+    version = 3,
     exportSchema = true
 )
 @TypeConverters(EventTypeConverters::class)
@@ -41,7 +43,50 @@ abstract class AppDatabase : RoomDatabase() {
             val factory = SupportFactory(passphrase)
             return Room.databaseBuilder(context, AppDatabase::class.java, "nfq-summit-2025")
                 .openHelperFactory(factory)
+                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_2_3)
                 .build()
         }
+    }
+}
+
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Create a new table with the updated schema
+        db.execSQL(
+            """
+            CREATE TABLE voucher_entity_new (
+                id TEXT NOT NULL,
+                type TEXT NOT NULL,
+                date TEXT NOT NULL,
+                locations TEXT NOT NULL,
+                price TEXT NOT NULL,
+                imageUrl TEXT NOT NULL,
+                sponsorLogoUrls TEXT NOT NULL,
+                PRIMARY KEY(id)
+            )
+        """.trimIndent()
+        )
+
+        // Copy the data from the old table to the new table
+        db.execSQL(
+            """
+            INSERT INTO voucher_entity_new (id, type, date, locations, price, imageUrl, sponsorLogoUrls)
+            SELECT id, type, date, '[]', price, imageUrl, sponsorLogoUrls
+            FROM voucher_entity
+        """.trimIndent()
+        )
+
+        // Remove the old table
+        db.execSQL("DROP TABLE voucher_entity")
+
+        // Rename the new table to the old table name
+        db.execSQL("ALTER TABLE voucher_entity_new RENAME TO voucher_entity")
+    }
+}
+
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE event_entity ADD COLUMN locations TEXT NOT NULL DEFAULT '[]'")
     }
 }

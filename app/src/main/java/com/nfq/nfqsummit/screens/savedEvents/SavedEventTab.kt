@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
 import com.nfq.nfqsummit.mocks.mockSavedEvents
 import com.nfq.nfqsummit.model.SavedEventUIModel
 import com.nfq.nfqsummit.screens.dashboard.tabs.home.component.SavedEventCard
@@ -55,6 +56,8 @@ fun SavedEventTab(
             showEventDetailsBottomSheet = true
         }
     )
+
+    TrackScreenViewEvent(screenName = "saved_event")
 }
 
 @Composable

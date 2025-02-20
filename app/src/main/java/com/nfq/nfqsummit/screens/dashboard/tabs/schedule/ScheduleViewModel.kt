@@ -36,8 +36,9 @@ class ScheduleViewModel @Inject constructor(
     private val _currentTime = MutableStateFlow(LocalTime.now())
     private val _uiState = combine(
         _selectedDate,
+        repository.user.map { it != null },
         repository.events.map { it.toSubmitEvents() }
-    ) { oldSelectedDate, events ->
+    ) { oldSelectedDate, isLoggedIn, events ->
 
         val today = LocalDate.now()
         val firstEventDate = events.firstOrNull()?.start?.toLocalDate() ?: today
@@ -70,6 +71,7 @@ class ScheduleViewModel @Inject constructor(
         val techRockEvents = dailyEvents.toTechRockEvents()
 
         ScheduleUIState(
+            isLoggedIn = isLoggedIn,
             selectedDate = selectedDate,
             dailyEvents = dailyEvents,
             dayEventPairs = dayEventPairs,
@@ -125,6 +127,7 @@ fun PersistentList<SummitEvent>.toSummitEvents(): PersistentList<SummitEvent> {
 
 data class ScheduleUIState(
     val isLoading: Boolean = false,
+    val isLoggedIn: Boolean = false,
     val selectedDate: LocalDate = LocalDate.MIN,
     val currentTime: LocalTime = LocalTime.now(),
     val dailyEvents: PersistentList<SummitEvent> = persistentListOf(),

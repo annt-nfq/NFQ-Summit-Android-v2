@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
 import com.nfq.nfqsummit.components.Loading
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.components.networkImagePainter
@@ -74,6 +75,8 @@ fun ExploreTab(
             }
         }
     }
+
+    TrackScreenViewEvent(screenName = "explore")
 }
 
 data class ExploreItem(

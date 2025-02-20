@@ -15,6 +15,9 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.nfq.nfqsummit.analytics.helper.AnalyticsHelper
+import com.nfq.nfqsummit.analytics.helper.LocalAnalyticsHelper
+import com.nfq.nfqsummit.analytics.logScreenView
 import com.nfq.nfqsummit.screens.attractions.AttractionsScreen
 import com.nfq.nfqsummit.screens.attractions.attractionBlogs.AttractionBlogsScreen
 import com.nfq.nfqsummit.screens.blog.BlogScreen
@@ -36,6 +39,7 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val analyticsHelper: AnalyticsHelper = LocalAnalyticsHelper.current
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -105,6 +109,17 @@ fun AppNavHost(
                     )
                 },
                 goToDestination = {
+                    val screen = when (it) {
+                        AppDestination.Survival.route -> "survival_kit"
+                        AppDestination.Transportations.route -> "transportation"
+                        AppDestination.Payment.route -> "payment"
+                        AppDestination.Attractions.route -> "attractions"
+                        else -> ""
+                    }
+                    if (screen.isNotEmpty()) {
+                        analyticsHelper.logScreenView(screen)
+                    }
+
                     navController.navigate(it)
                 },
                 goToSignIn = {

@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -54,7 +56,7 @@ fun BasicCard(
     shape: RoundedCornerShape = RoundedCornerShape(16.dp),
     blurRadius: Dp = 30.dp,
     contentAlignment: Alignment = Alignment.TopStart,
-    shadowColor: Color = Color(0xFF969696),
+    shadowColor: Color = Color(0xFF1E1C2E),
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
@@ -62,7 +64,7 @@ fun BasicCard(
             .boxShadow(
                 color = shadowColor.copy(alpha = 0.08f),
                 blurRadius = blurRadius,
-                spreadRadius = 0.dp,
+                spreadRadius = 1.dp,
                 offset = DpOffset(0.dp, 8.dp)
             )
             .clip(shape = shape)

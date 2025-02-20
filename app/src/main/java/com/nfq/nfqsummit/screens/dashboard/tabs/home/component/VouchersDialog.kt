@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,6 +42,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.nfq.nfqsummit.model.VoucherUIModel
 import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.components.BasicCard
+import com.nfq.nfqsummit.model.LocationUIModel
 import com.nfq.nfqsummit.ui.theme.NFQSnapshotTestThemeForPreview
 
 @Composable
@@ -100,7 +102,7 @@ private fun VouchersContent(
 
         LazyColumn(
             state = scrollState,
-            contentPadding = PaddingValues(bottom = 50.dp, start = 18.dp, end = 18.dp),
+            contentPadding = PaddingValues(start = 18.dp, end = 18.dp),
             modifier = Modifier
                 .navigationBarsPadding()
                 .simpleVerticalScrollbar(scrollState)
@@ -118,7 +120,7 @@ private fun VouchersContent(
                                 .height(38.dp)
                         ) {
                             Text(
-                                text = date,
+                                text = "${list.firstOrNull()?.type ?: ""}, $date",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
@@ -133,6 +135,9 @@ private fun VouchersContent(
                         model = it
                     )
                 }
+            }
+            item {
+                Spacer(modifier = Modifier.height(100.dp))
             }
         }
     }
@@ -180,7 +185,13 @@ val previewVouchers = listOf(
     VoucherUIModel(
         type = "Lunch",
         date = "26th Feb 2025",
-        location = "The Sentry",
+        locations = listOf(
+            LocationUIModel(
+                id = 1,
+                name = "NFQ Technologies",
+                address = "Bangkok, Thailand"
+            )
+        ),
         price = "350.000",
         imageUrl = "https://picsum.photos/200",
         sponsorLogoUrls = listOf("https://picsum.photos/200")
@@ -188,7 +199,13 @@ val previewVouchers = listOf(
     VoucherUIModel(
         type = "Snack",
         date = "27th Feb 2025",
-        location = "The Sentry",
+        locations = listOf(
+            LocationUIModel(
+                id = 1,
+                name = "NFQ Technologies",
+                address = "Bangkok, Thailand"
+            )
+        ),
         price = "20.000",
         imageUrl = "https://picsum.photos/200",
         sponsorLogoUrls = listOf("https://picsum.photos/200")

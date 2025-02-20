@@ -18,6 +18,7 @@ data class EventActivityResponse(
     @SerialName("location") val location: String?,
     @SerialName("latitude") val latitude: Double?,
     @SerialName("longitude") val longitude: Double?,
+    @SerialName("locations") val locations: List<EventLocationResponse>?,
     @SerialName("gatherTime") val gatherTime: String?,
     @SerialName("gatherLocation") val gatherLocation: String?,
     @SerialName("leavingTime") val leavingTime: String?,
@@ -38,7 +39,7 @@ data class CategoryResponse(
     @SerialName("id") val id: Int,
     @SerialName("name") val name: String?,
     @SerialName("code") val code: String?
-){
+) {
     fun isTechRockEvent() = code == "tech_rock"
 }
 
@@ -62,4 +63,13 @@ data class SpeakerResponse(
     @SerialName("id") val id: Int,
     @SerialName("name") val name: String,
     @SerialName("avatar") val avatar: String
+)
+
+@Serializable
+data class EventLocationResponse(
+    @SerialName("id") val id: Int,
+    @SerialName("name") val name: String,
+    @SerialName("address") val address: String,
+    @SerialName("latitude") val latitude: Double,
+    @SerialName("longitude") val longitude: Double
 )

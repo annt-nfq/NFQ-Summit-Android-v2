@@ -3,6 +3,9 @@ package com.nfq.nfqsummit.screens.signIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nfq.data.domain.repository.NFQSummitRepository
+import com.nfq.nfqsummit.analytics.helper.AnalyticsHelper
+import com.nfq.nfqsummit.analytics.logLoginWithQrCodeFail
+import com.nfq.nfqsummit.analytics.logLoginWithQrCodeSuccess
 import com.nfq.nfqsummit.utils.UserMessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val repository: NFQSummitRepository
+    private val repository: NFQSummitRepository,
+    private val analyticsHelper: AnalyticsHelper
 ) : ViewModel() {
 
     val loading = MutableStateFlow(false)
@@ -25,9 +29,11 @@ class SignInViewModel @Inject constructor(
             repository
                 .authenticateWithAttendeeCode(attendeeCode)
                 .onLeft {
+                    analyticsHelper.logLoginWithQrCodeFail(attendeeCode, it.message.orEmpty())
                     loading.value = false
                     UserMessageManager.showMessage(it)
                 }.onRight {
+                    analyticsHelper.logLoginWithQrCodeSuccess(attendeeCode)
                     loading.value = false
                 }
 

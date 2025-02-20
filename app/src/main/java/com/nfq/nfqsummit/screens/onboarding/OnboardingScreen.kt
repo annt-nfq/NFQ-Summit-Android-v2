@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nfq.nfqsummit.R
+import com.nfq.nfqsummit.analytics.TrackScreenViewEvent
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.ui.theme.Grey
 import com.nfq.nfqsummit.ui.theme.LightGrey
@@ -90,6 +91,7 @@ fun OnboardingScreen(
             viewModel.updateOnboardingStatus(true)
         }
     )
+    TrackScreenViewEvent(screenName = "onboarding")
 }
 
 
