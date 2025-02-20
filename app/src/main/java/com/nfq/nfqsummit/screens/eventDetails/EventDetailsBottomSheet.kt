@@ -72,10 +72,10 @@ import com.nfq.nfqsummit.R
 import com.nfq.nfqsummit.analytics.TrackEventDetailScreenViewEvent
 import com.nfq.nfqsummit.analytics.helper.LocalAnalyticsHelper
 import com.nfq.nfqsummit.analytics.logViewLocation
+import com.nfq.nfqsummit.components.AnnotatedHtmlStringWithLink
 import com.nfq.nfqsummit.components.BasicAlertDialog
 import com.nfq.nfqsummit.components.BasicCard
 import com.nfq.nfqsummit.components.BasicModalBottomSheet
-import com.nfq.nfqsummit.components.HtmlText
 import com.nfq.nfqsummit.components.bounceClick
 import com.nfq.nfqsummit.components.networkImagePainter
 import com.nfq.nfqsummit.notification.AlarmReceiver
@@ -448,22 +448,16 @@ private fun EventDetailsUI(
                     SpeakersSection(event.speakers)
 
                     Column(
+                        verticalArrangement = Arrangement.spacedBy(14.dp),
                         modifier = Modifier
-                            .padding(top = 24.dp)
                             .padding(horizontal = 24.dp)
+                            .padding(top = 24.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
-                        Text(
-                            text = "Please show your QR code to our staff\nfor check-in",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-
                         if (event.description.isNotEmpty()) {
-                            HtmlText(
-                                html = event.description,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(top = 24.dp)
+                            AnnotatedHtmlStringWithLink(
+                                htmlText = event.description,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
 
@@ -473,7 +467,6 @@ private fun EventDetailsUI(
                             contentScale = ContentScale.FillWidth,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 24.dp)
                                 .clip(MaterialTheme.shapes.small)
                         )
                     }
